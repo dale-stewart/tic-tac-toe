@@ -16,8 +16,10 @@ export default defineConfig({
   //   - port 4174: /tic-tac-toe/-base preview for production-bundle regression spec
   webServer: [
     {
+      // Vite preview inherits `base: '/tic-tac-toe/'` from vite.config.ts,
+      // so the health check must target the base path (root / redirects 302).
       command: 'pnpm preview --port 4173 --strictPort',
-      url: 'http://localhost:4173',
+      url: 'http://localhost:4173/tic-tac-toe/',
       reuseExistingServer: !process.env['CI'],
       timeout: 30_000,
     },
