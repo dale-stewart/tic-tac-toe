@@ -8,6 +8,7 @@
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
+    "preview:pages": "vite preview --base /tic-tac-toe/ --port 4174 --strictPort",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "lint-and-typecheck": "pnpm lint && pnpm typecheck",

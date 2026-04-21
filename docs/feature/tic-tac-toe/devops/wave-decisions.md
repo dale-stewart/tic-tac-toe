@@ -16,13 +16,13 @@
 - **[D7] No runtime alerting / no on-call.** CI red-X on PR + committer email IS the alerting channel. Static site, single author, traffic near zero — only incident shape is "build regression" and that's caught at the gate.
 - **[D8] CSP = `default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'`.** Enforces KPI-5 at the edge; network-assertion CI gate is the defence in depth.
 - **[D9] Pre-commit / pre-push local gates** = format + lint + secrets scan + fast unit subset (pre-commit, <30s) and full unit+property+typecheck+dep-cruiser (pre-push, <5min). Heavyweight gates (Lighthouse, axe, network-assertion, bundle-size) stay CI-only.
-- **[D10] Mutation testing = recommended per-feature (Stryker on changed files per PR, ~5–15 min); **Dale decides** whether to install. Recorded as open item, not adopted by default.
+- **[D10] Mutation testing = recommended per-feature (Stryker on changed files per PR, ~5–15 min); **Dale decides\*\* whether to install. Recorded as open item, not adopted by default.
 
 ## 2. Constraints Established (downstream must honour)
 
 1. **Every PR must pass 8 blocking gates** before merge. No admin-override path; emergency fixes follow the same path.
 2. **Any new runtime dependency >1KB gzipped requires a superseding ADR** to ADR-0002 before `bundle-size-check` will accept the increase.
-3. **`src/core/**` MUST NOT import from `src/adapters/**`** — enforced by `dependency-cruiser` in CI and a pre-push local check.
+3. **`src/core/**`MUST NOT import from`src/adapters/**`** — enforced by `dependency-cruiser` in CI and a pre-push local check.
 4. **Zero runtime third-party network requests** — enforced by both CSP header and Playwright network-assertion. No analytics, fonts, CDN-hosted libs, error trackers, or `<link rel="preconnect">` to anything but `self`.
 5. **Bundle ceiling = 50KB gzipped** (production build, JS+CSS combined). Soft warn at 45KB (PR comment), hard fail at 50KB.
 6. **Lighthouse thresholds per PR:** perf ≥90, a11y ≥95, FMP ≤500ms, CLS ≤0.1.
@@ -47,9 +47,9 @@
 
 ## 4. Reuse Analysis
 
-| Existing Component | File | Overlap | Decision | Justification |
-|---|---|---|---|---|
-| N/A — greenfield | — | — | N/A | No pre-existing pipeline, deploy config, or platform infra to extend. |
+| Existing Component | File | Overlap | Decision | Justification                                                         |
+| ------------------ | ---- | ------- | -------- | --------------------------------------------------------------------- |
+| N/A — greenfield   | —    | —       | N/A      | No pre-existing pipeline, deploy config, or platform infra to extend. |
 
 ## 5. Upstream Changes
 
@@ -81,11 +81,15 @@ None. All DESIGN + DISCUSS + DISCOVER constraints honoured without modification.
 The crafter-authored HTML shell **MUST** include this exact CSP meta tag (or a stricter equivalent that still satisfies the gate):
 
 ```html
-<meta http-equiv="Content-Security-Policy"
-      content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; form-action 'none'; base-uri 'self'">
+<meta
+  http-equiv="Content-Security-Policy"
+  content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'self'"
+/>
 ```
 
 The network-assertion gate (Job 9) and the post-deploy smoke (Job 10) both check for this tag. Omitting or malforming it will fail the deploy with a red X. GitHub Pages does not permit custom HTTP response headers, so the meta-tag form is the only viable mechanism.
+
+**Directives removed from the original mandate (post-01-02 bugfix):** `frame-ancestors 'none'` and `form-action 'none'` were dropped because browsers ignore both directives when delivered via `<meta http-equiv>` (per the CSP spec; they require a real response header) and emit a console warning at every page load. Defence in depth is unchanged: `default-src 'self'` already blocks form submissions to foreign origins, and GitHub Pages cannot set response headers anyway, so those two directives were pure noise. Downstream crafters MUST NOT reintroduce them in meta form.
 
 ---
 
@@ -117,6 +121,7 @@ The network-assertion gate (Job 9) and the post-deploy smoke (Job 10) both check
 **Major (1):** Post-deploy smoke failure escalation policy was ambiguous → **RESOLVED** (ci-pipeline.md Job 10 now includes a smoke-failure escalation table mapping each failure type to the required response).
 
 **Medium (2, non-blocking):**
+
 - Lighthouse CI temporary-storage 7-14 day retention may be insufficient long-term; forward note: consider self-hosted LHCI or GitHub Releases archival if trend history becomes important.
 - Dependabot PR review cadence + auto-merge policy is unspecified; recommend auto-merge minor/patch, manual-review major + dev-deps. Not blocking for v1.
 
