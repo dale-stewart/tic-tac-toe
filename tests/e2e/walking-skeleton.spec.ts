@@ -11,7 +11,7 @@ import { test, expect } from '@playwright/test';
 
 test.describe('@slice:01 — Sam opens the page and sees a ready-to-play board', () => {
   test('empty 3x3 board is visible with role=grid and 9 gridcells', async ({ page }) => {
-    await page.goto('/');
+    await page.goto('/tic-tac-toe/');
     const grid = page.getByRole('grid');
     await expect(grid).toBeVisible();
     const cells = page.getByRole('gridcell');
@@ -23,27 +23,27 @@ test.describe('@slice:01 — Sam opens the page and sees a ready-to-play board',
   });
 
   test('turn indicator reads exactly "Your turn (X)."', async ({ page }) => {
-    await page.goto('/');
+    await page.goto('/tic-tac-toe/');
     const turnIndicator = page.getByTestId('turn-indicator');
     await expect(turnIndicator).toHaveText('Your turn (X).');
   });
 
   test('turn indicator is ARIA-labeled (live region)', async ({ page }) => {
-    await page.goto('/');
+    await page.goto('/tic-tac-toe/');
     const announce = page.locator('#announce');
     await expect(announce).toHaveAttribute('role', 'status');
     await expect(announce).toHaveAttribute('aria-live', 'polite');
   });
 
   test('default mode is solo against a medium AI (data attribute contract)', async ({ page }) => {
-    await page.goto('/');
+    await page.goto('/tic-tac-toe/');
     const app = page.locator('#app');
     await expect(app).toHaveAttribute('data-mode', 'solo');
     await expect(app).toHaveAttribute('data-difficulty', 'medium');
   });
 
   test('no modal, signup prompt, or cookie wall blocks the board', async ({ page }) => {
-    await page.goto('/');
+    await page.goto('/tic-tac-toe/');
     // The grid must be visible and not covered by any dialog/overlay/cookie banner.
     await expect(page.getByRole('grid')).toBeVisible();
     await expect(page.getByRole('dialog')).toHaveCount(0);
@@ -55,7 +55,7 @@ test.describe('@slice:01 — Sam opens the page and sees a ready-to-play board',
 
   test('board is interactive within 500 milliseconds of page load', async ({ page }) => {
     const start = Date.now();
-    await page.goto('/', { waitUntil: 'domcontentloaded' });
+    await page.goto('/tic-tac-toe/', { waitUntil: 'domcontentloaded' });
     await page.getByRole('grid').waitFor({ state: 'visible' });
     await page.getByRole('gridcell').first().waitFor({ state: 'visible' });
     const elapsed = Date.now() - start;
@@ -69,7 +69,7 @@ test.describe('@slice:01 — Priya on a 360px mobile viewport', () => {
   test('3x3 grid is fully visible with no horizontal scroll and cells >=44x44', async ({
     page,
   }) => {
-    await page.goto('/');
+    await page.goto('/tic-tac-toe/');
     // No horizontal scroll: scrollWidth must not exceed clientWidth of document.
     const overflow = await page.evaluate(() => {
       const { scrollWidth, clientWidth } = document.documentElement;
@@ -98,7 +98,7 @@ test.describe('@ac:US-01-fallback-message — ancient browser fallback', () => {
       // Deliberately break a required modern feature to trigger the fallback.
       (globalThis as unknown as Record<string, unknown>)['queueMicrotask'] = undefined;
     });
-    await page.goto('/');
+    await page.goto('/tic-tac-toe/');
 
     const fallback = page.getByTestId('ancient-browser-fallback');
     await expect(fallback).toBeVisible();

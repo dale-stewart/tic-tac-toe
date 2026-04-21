@@ -11,35 +11,19 @@ export default defineConfig({
   use: {
     trace: 'on-first-retry',
   },
-  // Two preview servers run in parallel:
-  //   - port 4173: default-base preview for a11y/privacy/walking-skeleton specs
-  //   - port 4174: /tic-tac-toe/-base preview for production-bundle regression spec
-  webServer: [
-    {
-      // Vite preview inherits `base: '/tic-tac-toe/'` from vite.config.ts,
-      // so the health check must target the base path (root / redirects 302).
-      command: 'pnpm preview --port 4173 --strictPort',
-      url: 'http://localhost:4173/tic-tac-toe/',
-      reuseExistingServer: !process.env['CI'],
-      timeout: 30_000,
-    },
-    {
-      command: 'pnpm preview:pages',
-      url: 'http://127.0.0.1:4174/tic-tac-toe/',
-      reuseExistingServer: !process.env['CI'],
-      timeout: 30_000,
-    },
-  ],
+  // Single preview server serving the Pages-shaped bundle at /tic-tac-toe/.
+  // Every test (a11y, privacy, walking-skeleton, production-bundle) runs
+  // against the production base path — parity by construction, no fork.
+  webServer: {
+    command: 'pnpm preview --port 4173 --strictPort',
+    url: 'http://localhost:4173/tic-tac-toe/',
+    reuseExistingServer: !process.env['CI'],
+    timeout: 30_000,
+  },
   projects: [
     {
       name: 'chromium',
-      testIgnore: ['**/production-bundle.spec.ts'],
       use: { ...devices['Desktop Chrome'], baseURL: 'http://localhost:4173' },
-    },
-    {
-      name: 'production-bundle',
-      testMatch: ['**/production-bundle.spec.ts'],
-      use: { ...devices['Desktop Chrome'], baseURL: 'http://127.0.0.1:4174' },
     },
   ],
 });

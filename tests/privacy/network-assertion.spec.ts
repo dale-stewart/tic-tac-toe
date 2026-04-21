@@ -5,7 +5,7 @@ test.describe('network privacy — scaffold shell', () => {
     const requests: string[] = [];
     page.on('request', (req) => requests.push(req.url()));
 
-    await page.goto('/');
+    await page.goto('/tic-tac-toe/');
     await page.waitForLoadState('networkidle');
 
     const origin = new URL(page.url()).origin;
