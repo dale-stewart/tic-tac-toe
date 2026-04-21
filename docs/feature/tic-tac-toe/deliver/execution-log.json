@@ -13,7 +13,7 @@
       "sid": "01-01",
       "p": "RED_ACCEPTANCE",
       "s": "EXECUTED",
-      "d": "SCAFFOLDING: empty project has no toolchain installed; gates fail until config is authored",
+      "d": "FAIL",
       "t": "2026-04-21T21:27:54Z"
     },
     {
@@ -29,6 +29,13 @@
       "s": "EXECUTED",
       "d": "PASS",
       "t": "2026-04-21T21:39:41Z"
+    },
+    {
+      "sid": "01-01",
+      "p": "COMMIT",
+      "s": "EXECUTED",
+      "d": "PASS",
+      "t": "2026-04-21T21:45:14Z"
     }
   ]
 }
