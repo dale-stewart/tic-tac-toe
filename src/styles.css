@@ -1,0 +1,102 @@
+/*
+ * Global styles for the tic-tac-toe SPA. Imported by bootstrap so Vite bundles
+ * the stylesheet; CSP's style-src 'self' permits it. No external fonts, no
+ * third-party assets.
+ *
+ * Slice 01 scope: grid layout, ≥44px touch targets, reserved dimensions to
+ * avoid CLS on first paint. Colours, hover states, and win-line animations
+ * arrive in later slices.
+ */
+
+:root {
+  --cell-size: clamp(44px, 28vw, 120px);
+  --board-gap: 4px;
+  --color-board-border: #333333;
+  --color-cell-bg: #f7f7f7;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: #ffffff;
+  color: #111111;
+  font-family:
+    system-ui,
+    -apple-system,
+    sans-serif;
+}
+
+header {
+  padding: 0.75rem 1rem;
+}
+
+main {
+  padding: 1rem;
+  min-height: 200px;
+}
+
+.game-shell {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.75rem;
+  max-width: 100%;
+}
+
+.turn-indicator {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.board {
+  display: grid;
+  grid-template-columns: repeat(3, var(--cell-size));
+  grid-template-rows: repeat(3, var(--cell-size));
+  gap: var(--board-gap);
+  /* Reserve dimensions to avoid CLS. */
+  width: calc(var(--cell-size) * 3 + var(--board-gap) * 2);
+  height: calc(var(--cell-size) * 3 + var(--board-gap) * 2);
+  max-width: 100%;
+  background: var(--color-board-border);
+  padding: var(--board-gap);
+  border-radius: 4px;
+}
+
+.board [role='row'] {
+  display: contents;
+}
+
+.board [role='gridcell'] {
+  background: var(--color-cell-bg);
+  min-width: 44px;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(var(--cell-size) * 0.5);
+  font-weight: 700;
+  border-radius: 2px;
+}
+
+.ancient-browser-fallback {
+  padding: 1rem;
+  border: 2px solid #b00020;
+  background: #fff4f4;
+  color: #111111;
+  max-width: 40rem;
+}
+
+/* Hide the #announce live region visually while keeping it in the a11y tree. */
+#announce {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
