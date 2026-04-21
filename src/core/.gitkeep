@@ -1,0 +1,3 @@
+# Placeholder — pure core modules (board, win-detector, ai/*, game reducer)
+# arrive in steps 01-02+. This marker exists so the architectural boundary
+# (core vs adapters) is git-tracked from the first commit.

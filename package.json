@@ -1,0 +1,53 @@
+{
+  "name": "tic-tac-toe",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Accessible, zero-backend tic-tac-toe SPA (methodology practice project)",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "lint-and-typecheck": "pnpm lint && pnpm typecheck",
+    "test": "vitest run",
+    "test:unit": "vitest run",
+    "test:watch": "vitest",
+    "depcruise": "depcruise --config .dependency-cruiser.cjs src",
+    "test:e2e": "playwright test",
+    "test:a11y": "playwright test tests/a11y",
+    "size": "size-limit",
+    "lhci": "lhci autorun",
+    "check:all": "pnpm lint-and-typecheck && pnpm test && pnpm depcruise && pnpm build && pnpm size"
+  },
+  "size-limit": [
+    {
+      "path": "dist/**/*.js",
+      "limit": "45 KB"
+    },
+    {
+      "path": "dist/**/*.{js,css}",
+      "limit": "50 KB",
+      "name": "total-budget"
+    }
+  ],
+  "devDependencies": {
+    "@axe-core/playwright": "^4.10.0",
+    "@lhci/cli": "^0.14.0",
+    "@playwright/test": "^1.48.0",
+    "@size-limit/file": "^11.1.6",
+    "@types/node": "^22.7.0",
+    "@typescript-eslint/eslint-plugin": "^8.8.0",
+    "@typescript-eslint/parser": "^8.8.0",
+    "dependency-cruiser": "^16.5.0",
+    "eslint": "^9.12.0",
+    "fast-check": "^3.22.0",
+    "lefthook": "^1.7.18",
+    "prettier": "^3.3.3",
+    "size-limit": "^11.1.6",
+    "typescript": "^5.6.0",
+    "vite": "^5.4.0",
+    "vitest": "^2.1.0"
+  }
+}

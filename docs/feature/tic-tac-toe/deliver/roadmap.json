@@ -1,0 +1,201 @@
+{
+  "roadmap": {
+    "project_id": "tic-tac-toe",
+    "created_at": "2026-04-21T21:16:20Z",
+    "total_steps": 8,
+    "phases": 3
+  },
+  "phases": [
+    {
+      "id": "01",
+      "name": "Scaffolding and walking skeleton (slices 01 + 02)",
+      "steps": [
+        {
+          "id": "01-01",
+          "name": "Project scaffolding and CI gates",
+          "criteria": "Vite + TypeScript + Vitest + fast-check + Playwright + axe-core + dependency-cruiser + lefthook installed; GitHub Actions workflow authored from platform/ci-pipeline.md with all 8 CI gates (install, lint-and-typecheck, unit-and-property, dependency-cruiser, e2e-playwright, axe-core, lighthouse-ci, bundle-size) running green against an empty-page skeleton PR; src/core/ and src/adapters/ folders exist with a dependency-cruiser rule forbidding src/core/** from importing src/adapters/**; index.html shell includes the mandatory Content-Security-Policy meta tag (script-src 'self'; default-src 'self') per DEVOPS wave-decisions; axe-core executes cleanly against the empty page; no production TypeScript written beyond a bootstrap stub that mounts an empty #app div.",
+          "test_file": ".github/workflows/ci.yml",
+          "scenario_name": "CI gate matrix green on empty-page scaffold (no DISTILL .feature driven yet)",
+          "estimate_hours": "4-6",
+          "depends_on": [],
+          "implementation_scope": [
+            "package.json",
+            "pnpm-lock.yaml",
+            "vite.config.ts",
+            "tsconfig.json",
+            "vitest.config.ts",
+            "playwright.config.ts",
+            ".dependency-cruiser.cjs",
+            "lefthook.yml",
+            ".github/workflows/ci.yml",
+            "index.html",
+            "src/core/",
+            "src/adapters/",
+            "src/adapters/bootstrap.ts (stub)"
+          ]
+        },
+        {
+          "id": "01-02",
+          "name": "Render empty board - slice 01",
+          "criteria": "All 6 walking-skeleton slice-01 acceptance criteria pass: empty 3x3 grid rendered with role=grid and 9 role=gridcell cells, turn indicator text exactly 'Your turn (X).' present and ARIA-labeled, default mode solo + medium AI wired (no selector UI yet), no modal/signup/cookie wall blocks the board, mobile 360px viewport shows full grid without horizontal scroll with every cell >=44x44 CSS pixels, ancient-browser fallback message 'This game needs a modern browser. Try Firefox, Chrome, Safari, or Edge.' rendered and announced when a required modern feature is absent; Lighthouse a11y score >=95 on the empty-board state; axe-core reports zero violations on empty board; all slice-01 scenarios green via Playwright.",
+          "test_file": "docs/feature/tic-tac-toe/distill/feature-walking-skeleton.feature",
+          "scenario_name": "@slice:01 scenarios (feature-walking-skeleton.feature lines 15-30) plus ancient-browser fallback @ac:US-01-fallback-message (feature-crosscutting.feature lines 30-35)",
+          "estimate_hours": "3-4",
+          "depends_on": ["01-01"],
+          "implementation_scope": [
+            "src/core/board.ts (emptyBoard, BoardState, Mark types)",
+            "src/adapters/render.ts (lit-html template for grid + turn indicator + fallback)",
+            "src/adapters/bootstrap.ts (initial paint wiring)",
+            "src/styles.css (grid layout with reserved dimensions; >=44px cell minimum)",
+            "index.html (#app mount, #announce live region, fallback noscript/feature-detect)"
+          ]
+        },
+        {
+          "id": "01-03",
+          "name": "Accept moves, random AI, win detection, play again - slice 02",
+          "criteria": "All 7 walking-skeleton slice-02 scenarios pass: pointer click places X in center within 100ms and AI responds with O in a previously empty cell within 300ms with turn indicator returning to 'Your turn (X).'; human completing top row triggers result banner 'You win!' and focus moves to Play again and AI stops; AI-wins path renders 'AI wins.' banner with focus on Play again; draw state renders 'Draw.' banner with focus on Play again; clicking a filled cell is a no-op leaving board and turn state unchanged; Play again resets board to empty, preserves solo + medium mode, and restores 'Your turn (X).'; page reload yields fresh empty board with no persisted state; property tests confirm reducer never produces a BoardState with >9 marks and placeMark is idempotent on rejection.",
+          "test_file": "docs/feature/tic-tac-toe/distill/feature-walking-skeleton.feature",
+          "scenario_name": "@slice:02 scenarios (feature-walking-skeleton.feature lines 33-95)",
+          "estimate_hours": "4-6",
+          "depends_on": ["01-02"],
+          "implementation_scope": [
+            "src/core/board.ts (placeMark with Result<BoardState, PlacementError>)",
+            "src/core/win-detector.ts (detectWin -> WinLine | null; detectDraw)",
+            "src/core/ai/easy.ts (seedable random legal-move selector)",
+            "src/core/game.ts (reducer: PLACE_MARK | RESET actions; GameState)",
+            "src/adapters/input/pointer.ts (delegated click -> PLACE_MARK action)",
+            "src/adapters/render.ts (result banner; Play again button; focus hints)",
+            "src/adapters/bootstrap.ts (maybeRunAi solo-mode microtask scheduler; dispatch loop)",
+            "tests/property/board.spec.ts",
+            "tests/property/game-reducer.spec.ts"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "02",
+      "name": "Release 1 - accessibility, difficulty, hot-seat (slices 03 + 04 + 05)",
+      "steps": [
+        {
+          "id": "02-01",
+          "name": "Keyboard navigation and ARIA live region - slice 03",
+          "criteria": "All 14 scenarios in feature-keyboard-aria.feature pass: arrow keys move focus across the 3x3 grid without wrapping (left on top-left stays put; right/down/left/up transitions match the outline table) and without scrolling the viewport; Enter and Space on a focused empty cell place an X within 100ms with focus preserved; Enter on a filled cell triggers live-region announcement 'Cell already taken' within 1s and leaves board unchanged; every move (human and AI) is announced by row+column within 1s; terminal state announces 'You win.' / 'AI wins.' / 'Draw.' within 1s; focus moves to Play again on terminal and Enter activates it; Tab order is nine cells in reading order then Play again; every focusable element shows a visible focus indicator meeting 3:1 contrast; no keyboard trap exists (Tab/Shift+Tab cycles back to browser chrome); axe-core zero violations on all four canonical states (empty, mid-game, won, draw); Lighthouse a11y >=95.",
+          "test_file": "docs/feature/tic-tac-toe/distill/feature-keyboard-aria.feature",
+          "scenario_name": "@slice:03 all 14 scenarios including the 4-row arrow-navigation outline and the 4 axe-core canonical-state scenarios",
+          "estimate_hours": "4-6",
+          "depends_on": ["01-03"],
+          "implementation_scope": [
+            "src/adapters/input/keyboard.ts (arrow navigation, Enter/Space PLACE_MARK, focus map)",
+            "src/adapters/announce.ts (state-diff -> string; 1s debounce; role=status aria-live=polite)",
+            "src/adapters/render.ts (focus management on terminal; visible focus-ring CSS)",
+            "src/styles.css (focus-visible 3:1 contrast indicator)",
+            "tests/a11y/four-canonical-states.spec.ts",
+            "tests/e2e/keyboard-aria.spec.ts"
+          ]
+        },
+        {
+          "id": "02-02",
+          "name": "Difficulty levels - slice 04",
+          "criteria": "All 10 scenarios (including outline rows) in feature-difficulty-levels.feature pass: ARIA radio-group difficulty control with three options easy/medium/perfect visible at first paint with medium selected by default; keyboard activation of 'perfect' announces 'Difficulty: perfect' within 1s; control disabled whenever at least one mark is placed and re-enabled at terminal state; medium AI blocks an immediate three-in-a-row threat and completes its own winning line when available; easy AI never places on a filled cell across 20 moves; selected difficulty persists across Play again within a session; fast-check property test 'perfect never loses' runs 100 independently seeded games of perfect vs random and asserts every outcome is in {perfect_wins, draw}; fast-check property test 'shared signature' confirms each of easy/medium/perfect returns an empty-cell coordinate for any legal in-progress board and any mark.",
+          "test_file": "docs/feature/tic-tac-toe/distill/feature-difficulty-levels.feature",
+          "scenario_name": "@slice:04 all 10 scenarios including @property @tool:vitest-property perfect-never-loses and shared-signature",
+          "estimate_hours": "5-7",
+          "depends_on": ["02-01"],
+          "implementation_scope": [
+            "src/core/ai/medium.ts (one-ply: complete > block > random)",
+            "src/core/ai/perfect.ts (memoized minimax over canonical board key)",
+            "src/core/ai/index.ts (AiFn signature; strategies registry; Difficulty type)",
+            "src/core/game.ts (SET_DIFFICULTY action; disable-mid-game predicate)",
+            "src/adapters/render.ts (radio-group control; disabled state; selected indicator)",
+            "src/adapters/input/keyboard.ts (1/2/3 shortcut -> SET_DIFFICULTY)",
+            "src/adapters/announce.ts (difficulty-change announcement)",
+            "tests/property/perfect-ai-never-loses.spec.ts",
+            "tests/property/ai-shared-signature.spec.ts",
+            "tests/e2e/difficulty.spec.ts"
+          ]
+        },
+        {
+          "id": "02-03",
+          "name": "Hot-seat mode - slice 05",
+          "criteria": "All 13 scenarios (including the 4-row shared-win-detector outline) in feature-hot-seat.feature pass: mode toggle with 'Solo'/'Hot-seat' options visible and keyboard-focusable; switching to hot-seat resets board to empty and shows turn indicator 'P1's turn (X).'; P1 places X and turn advances to 'P2's turn (O).' with AI suppressed (no automatic O); P2 places O and turn returns to P1 with no AI move; P1 and P2 wins render 'P1 wins!' and 'P2 wins!' banners respectively with focus to Play again and mode toggle re-enabled; hot-seat draw renders 'Draw.'; mode toggle disabled once any mark is placed mid-game and board preserved; Play again preserves hot-seat mode and resets to 'P1's turn (X).'; shared-win-detector outline confirms top row / middle column / both diagonals detected identically to solo mode; Alex's full keyboard-only hot-seat game reaches a terminal state using only arrow keys and Enter, with result-banner and focus behavior identical to solo mode.",
+          "test_file": "docs/feature/tic-tac-toe/distill/feature-hot-seat.feature",
+          "scenario_name": "@slice:05 all 13 scenarios including @a11y keyboard-parity and the shared-win-detector outline",
+          "estimate_hours": "4-5",
+          "depends_on": ["02-02"],
+          "implementation_scope": [
+            "src/core/game.ts (SET_MODE action; suppress AI when gameMode==='hot-seat'; turn vocabulary)",
+            "src/adapters/render.ts (segmented mode-toggle control; P1/P2 turn-indicator branching; banner vocabulary)",
+            "src/adapters/input/keyboard.ts (H key -> SET_MODE toggle; only at turn 0)",
+            "src/adapters/announce.ts (P1/P2 vocabulary branching)",
+            "tests/e2e/hot-seat.spec.ts"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "03",
+      "name": "Release 2 - polish, footer, cross-cutting guardrails (slices 06 + 07 + crosscutting)",
+      "steps": [
+        {
+          "id": "03-01",
+          "name": "Win-line animation, palette, and footer - slices 06 + 07",
+          "criteria": "All 6 scenarios in feature-polish.feature and all 4 scenarios in feature-footer.feature pass: animated line drawn across the three winning cells completing within 500ms with zero layout shift (CLS <=0.1 over the animation window); prefers-reduced-motion: reduce replaces the animation with a static overlay on the three winning cells; X and O remain distinguishable by shape alone under simulated color-blind filter (shape-not-color-only); axe-core zero violations across all four canonical states (empty, mid-game, won, draw) - no regression from slice 03; body text >=4.5:1 contrast and UI boundaries >=3:1 contrast; footer 'No ads. No signup. No tracking.' visible on first paint at 1280x800 viewport without scrolling with board still above the fold; keyboard-focusable '[source]' link with visible focus indicator resolves to the canonical public repo URL; activating the link opens in a new tab with rel='noopener noreferrer'.",
+          "test_file": "docs/feature/tic-tac-toe/distill/feature-polish.feature",
+          "scenario_name": "@slice:06 all 6 polish scenarios plus @slice:07 all 4 footer scenarios (feature-footer.feature)",
+          "estimate_hours": "2-3",
+          "depends_on": ["02-03"],
+          "implementation_scope": [
+            "src/adapters/render.ts (win-line overlay consuming WinLine.cells; footer markup with source link)",
+            "src/styles.css (win-line SVG/CSS animation; @media prefers-reduced-motion; color-blind-safe palette; shape differentiation for X/O)",
+            "tests/e2e/polish.spec.ts",
+            "tests/e2e/footer.spec.ts",
+            "tests/a11y/four-canonical-states.spec.ts (re-run for no-regression)"
+          ]
+        },
+        {
+          "id": "03-02",
+          "name": "Cross-cutting guardrails and release finalization",
+          "criteria": "All 8 scenarios in feature-crosscutting.feature pass: zero third-party network requests on page load (network interception confirms every request is same-origin); zero tracking cookies / fingerprinting beacons / third-party storage entries created on a fresh session; CSP meta header rejects inline-script injection from a third origin and restricts script-src to 'self'; production gzipped bundle size <=50KB (bundle-size CI gate); Lighthouse performance score >=90 with CLS <=0.1 and FMP <=500ms on the deployed preview; Lighthouse accessibility score >=95; footer slice 07 added zero new JavaScript (pre/post bundle delta == 0 bytes for JS); ancient-browser fallback (already landed in 01-02) re-verified. Optional: mutation testing run on src/core/** via Stryker with score >=80% if Dale has opted in. Release tagged (e.g., v1.0.0) after all gates green on main.",
+          "test_file": "docs/feature/tic-tac-toe/distill/feature-crosscutting.feature",
+          "scenario_name": "@slice:crosscutting and @slice:07 all 8 crosscutting scenarios (network, CSP, bundle, Lighthouse perf, Lighthouse a11y, no-runtime-js-added)",
+          "estimate_hours": "2-3",
+          "depends_on": ["03-01"],
+          "implementation_scope": [
+            "tests/e2e/crosscutting.spec.ts (network interception; CSP injection probe; no-runtime-js bundle delta)",
+            ".github/workflows/ci.yml (bundle-size gate; Lighthouse CI thresholds; optional Stryker job)",
+            "lighthouserc.json (perf>=90, a11y>=95, CLS<=0.1, FMP<=500ms budgets)",
+            ".bundlesize.json or size-limit config (50KB gzipped ceiling)",
+            "stryker.config.mjs (optional, core-only scope if opted in)"
+          ]
+        }
+      ]
+    }
+  ],
+  "implementation_scope": {
+    "source_directories": [
+      "src/core/",
+      "src/core/ai/",
+      "src/adapters/",
+      "src/adapters/input/"
+    ],
+    "test_directories": [
+      "tests/unit/",
+      "tests/property/",
+      "tests/a11y/",
+      "tests/e2e/"
+    ],
+    "excluded_patterns": [
+      "node_modules/**",
+      "dist/**",
+      "coverage/**",
+      "playwright-report/**",
+      "test-results/**",
+      ".vite/**"
+    ]
+  },
+  "validation": {
+    "status": "pending",
+    "reviewer": "TODO",
+    "approved_at": "TODO"
+  }
+}

@@ -1,0 +1,238 @@
+schema_version: 1
+
+journey:
+  name: "Hot-Seat Pair (Two Humans, Same Device)"
+  goal: "Two humans alternate turns on one device, with clear attribution at every step"
+  persona: "Hot-Seat Pair"
+  platform: "web"
+  evidence_tier: "C"
+  evidence_note: >
+    Illustrative, carried forward from DISCOVER.
+    See docs/feature/tic-tac-toe/discover/wave-decisions.md §1.
+  traces_to_opportunities: ["O3", "O4", "O5", "O6"]
+
+  emotional_arc:
+    pattern: "Shared Playfulness"
+    start: "Curious (both players)"
+    middle: "Alternating focus"
+    end: "Shared closure"
+
+steps:
+  - id: 1
+    name: "Toggle to Hot-Seat"
+    command: "click | tap | Enter on hot-seat toggle"
+    tui_mockup: |
+      +------------------------------------------------------+
+      |  tic-tac-toe    [solo vs AI: medium] [HOT-SEAT ●]    |
+      |         +---+---+---+                                |
+      |         |   |   |   |                                |
+      |         +---+---+---+                                |
+      |         |   |   |   |                                |
+      |         +---+---+---+                                |
+      |         |   |   |   |                                |
+      |         +---+---+---+                                |
+      |  P1's turn (X).                                      |
+      +------------------------------------------------------+
+    shared_artifacts:
+      - name: "gameMode"
+        source: "client state"
+        displayed_as: "${gameMode} = 'hot-seat'"
+        consumers: ["mode toggle control", "turn indicator", "win banner formatter"]
+      - name: "turnIndicator"
+        source: "derived from boardState + gameMode"
+        displayed_as: "${turnIndicator}"
+        consumers: ["status text", "ARIA live region"]
+    emotional_state:
+      entry: "Curious"
+      exit: "Ready"
+    integration_checkpoint: |
+      Toggling to hot-seat resets the board.
+      Turn indicator format differs from solo mode (uses "P1" / "P2" not "You" / "AI").
+    failure_modes:
+      - "Toggle does not reset board (carries stale AI game)"
+      - "Turn indicator still says 'Your turn (X)' instead of 'P1's turn (X)'"
+      - "Toggle cannot be activated by keyboard"
+    gherkin: |
+      Scenario: Switching to hot-seat mode resets the board
+        Given the player is in solo vs AI mode with a game in progress
+        When the player activates the hot-seat toggle after the current game ends
+        Then the board is empty
+        And the mode is "hot-seat"
+        And the turn indicator reads "P1's turn (X)."
+
+  - id: 2
+    name: "P1 Places X"
+    command: "click | tap | Enter on empty cell"
+    tui_mockup: |
+      +------------------------------------------------------+
+      |         +---+---+---+                                |
+      |         |   |   |   |                                |
+      |         +---+---+---+                                |
+      |         |   | X |   |                                |
+      |         +---+---+---+                                |
+      |         |   |   |   |                                |
+      |         +---+---+---+                                |
+      |  P2's turn (O).                                      |
+      +------------------------------------------------------+
+    shared_artifacts:
+      - name: "boardState"
+        source: "client state"
+        displayed_as: "${boardState}"
+        consumers: ["board cells", "win detector", "turn indicator", "ARIA live region"]
+      - name: "turnIndicator"
+        source: "derived from boardState + gameMode"
+        displayed_as: "${turnIndicator}"
+        consumers: ["status text", "ARIA live region"]
+    emotional_state:
+      entry: "Ready"
+      exit: "Alternating focus"
+    integration_checkpoint: |
+      Mark appears AND turn indicator flips in the same frame.
+      Mode toggle becomes disabled once a move has been placed.
+    failure_modes:
+      - "Mark appears but turn indicator still says 'P1's turn'"
+      - "P2 can still click and place X (player identity not switched)"
+      - "Mode toggle still active mid-game (would reset board by accident)"
+    gherkin: |
+      Scenario: P1 places X and turn passes to P2
+        Given hot-seat mode with an empty board
+        When P1 clicks the center cell
+        Then an X appears in the center cell
+        And the turn indicator reads "P2's turn (O)."
+        And the mode toggle is disabled until the game ends
+
+  - id: 3
+    name: "P2 Places O"
+    command: "click | tap | Enter on empty cell"
+    tui_mockup: |
+      +------------------------------------------------------+
+      |         +---+---+---+                                |
+      |         | O |   |   |                                |
+      |         +---+---+---+                                |
+      |         |   | X |   |                                |
+      |         +---+---+---+                                |
+      |         |   |   |   |                                |
+      |         +---+---+---+                                |
+      |  P1's turn (X).                                      |
+      +------------------------------------------------------+
+    shared_artifacts:
+      - name: "boardState"
+        source: "client state"
+        displayed_as: "${boardState}"
+        consumers: ["board cells", "win detector", "turn indicator", "ARIA live region"]
+    emotional_state:
+      entry: "Alternating focus"
+      exit: "Alternating focus (continues)"
+    integration_checkpoint: |
+      Same as Step 2 but mirrored (O instead of X, P1 becomes next).
+      No AI move is ever generated in hot-seat mode.
+    failure_modes:
+      - "AI code path fires in hot-seat mode (double move)"
+      - "Turn indicator does not flip back to P1"
+    gherkin: |
+      Scenario: P2 places O and turn returns to P1
+        Given hot-seat mode and P1 has placed X in the center
+        When P2 clicks the top-left cell
+        Then an O appears in the top-left cell
+        And the turn indicator reads "P1's turn (X)."
+        And no AI move is triggered
+
+  - id: 4
+    name: "Game Ends"
+    command: "(automatic when terminal state reached)"
+    tui_mockup: |
+      +------------------------------------------------------+
+      |         +===+===+===+                                |
+      |         | X = X = X |                                |
+      |         +===+===+===+                                |
+      |         |   | O | O |                                |
+      |         +---+---+---+                                |
+      |         |   |   | O |                                |
+      |         +---+---+---+                                |
+      |  P1 wins!                                            |
+      |     [ Play again ]                                   |
+      +------------------------------------------------------+
+    shared_artifacts:
+      - name: "gameResult"
+        source: "derived from boardState + gameMode"
+        displayed_as: "${gameResult}"
+        consumers: ["result banner", "ARIA live region", "Play again focus"]
+    emotional_state:
+      entry: "Alternating focus"
+      exit: "Shared closure"
+    integration_checkpoint: |
+      Result banner uses hot-seat vocabulary ("P1 wins!" / "P2 wins!" / "Draw.")
+      not solo vocabulary ("You win!" / "AI wins.").
+      Mode toggle becomes re-enabled.
+    failure_modes:
+      - "Banner says 'You win!' in hot-seat mode (wrong mode vocabulary)"
+      - "Mode toggle remains disabled after terminal state"
+    gherkin: |
+      Scenario: P1 wins in hot-seat mode
+        Given hot-seat mode with two X in a row and P1's turn
+        When P1 completes the third X
+        Then the winning line is highlighted
+        And the result banner reads "P1 wins!"
+        And the mode toggle is re-enabled
+        And the "Play again" button receives keyboard focus
+
+      Scenario: Hot-seat game ends in a draw
+        Given hot-seat mode with 8 cells filled and no winner
+        When the final cell is filled with no line completed
+        Then the result banner reads "Draw."
+        And the "Play again" button receives keyboard focus
+
+  - id: 5
+    name: "Play Again"
+    command: "click | tap | Enter on 'Play again'"
+    tui_mockup: |
+      +------------------------------------------------------+
+      |         +---+---+---+                                |
+      |         |   |   |   |                                |
+      |         +---+---+---+                                |
+      |         |   |   |   |                                |
+      |         +---+---+---+                                |
+      |         |   |   |   |                                |
+      |         +---+---+---+                                |
+      |  P1's turn (X).                                      |
+      +------------------------------------------------------+
+    shared_artifacts:
+      - name: "gameMode"
+        source: "client state (preserved)"
+        displayed_as: "${gameMode}"
+        consumers: ["mode toggle"]
+    emotional_state:
+      entry: "Shared closure"
+      exit: "Curious (cycle) or done"
+    integration_checkpoint: |
+      Same as solo: mode preserved, board cleared, P1 always starts (v1 rule).
+    failure_modes:
+      - "Reset silently flips mode back to solo"
+      - "P2 starts instead of P1 (rule violation)"
+    gherkin: |
+      Scenario: Hot-seat rematch keeps the mode
+        Given a hot-seat game has just ended
+        When the players activate "Play again"
+        Then the board is empty
+        And the mode is still "hot-seat"
+        And the turn indicator reads "P1's turn (X)."
+
+integration_validation:
+  shared_artifact_consistency:
+    - artifact: "boardState"
+      must_match_across: [1, 2, 3, 4, 5]
+      failure_message: "Board cells, win detector, turn indicator, and ARIA region disagree on current state"
+    - artifact: "turnIndicator"
+      must_match_across: [1, 2, 3, 5]
+      failure_message: "Turn indicator out of sync with next-player rule in hot-seat mode"
+    - artifact: "gameMode"
+      must_match_across: [1, 2, 3, 4, 5]
+      failure_message: "Hot-seat mode silently changed during a game"
+    - artifact: "gameResult"
+      must_match_across: [4]
+      failure_message: "Result banner uses wrong vocabulary for mode"
+
+changelog:
+  - date: "2026-04-21"
+    feature: "tic-tac-toe"
+    change: "Initial hot-seat journey authored during DISCUSS wave (practice exercise, Tier C)"

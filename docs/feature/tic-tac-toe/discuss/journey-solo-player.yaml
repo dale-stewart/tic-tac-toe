@@ -1,0 +1,259 @@
+schema_version: 1
+
+journey:
+  name: "Solo Player (vs AI)"
+  goal: "Complete a satisfying tic-tac-toe game vs AI in <90s with zero setup"
+  persona: "Casual-Idle-Time Player"
+  platform: "web"
+  evidence_tier: "C"
+  evidence_note: >
+    Illustrative, carried forward from DISCOVER.
+    See docs/feature/tic-tac-toe/discover/wave-decisions.md §1.
+  traces_to_opportunities: ["O1", "O2", "O4", "O6"]
+
+  emotional_arc:
+    pattern: "Discovery Joy"
+    start: "Curious"
+    middle: "Focused"
+    end: "Satisfied"
+
+steps:
+  - id: 1
+    name: "Arrive & See Board"
+    command: "GET / (URL load)"
+    tui_mockup: |
+      +------------------------------------------------------+
+      |  tic-tac-toe    [solo vs AI: medium ▾] [hot-seat]    |
+      |         +---+---+---+                                |
+      |         |   |   |   |                                |
+      |         +---+---+---+                                |
+      |         |   |   |   |                                |
+      |         +---+---+---+                                |
+      |         |   |   |   |                                |
+      |         +---+---+---+                                |
+      |  Your turn (X).                                      |
+      +------------------------------------------------------+
+    shared_artifacts:
+      - name: "gameMode"
+        source: "client state (default: solo-medium)"
+        displayed_as: "${gameMode}"
+        consumers: ["mode toggle control", "AI move generator", "analytics counter"]
+      - name: "turnIndicator"
+        source: "derived from boardState + gameMode"
+        displayed_as: "${turnIndicator}"
+        consumers: ["status text", "ARIA live region"]
+      - name: "boardState"
+        source: "client state (initial: empty 3x3)"
+        displayed_as: "${boardState}"
+        consumers: ["board cells", "win detector", "AI move generator"]
+    emotional_state:
+      entry: "Curious"
+      exit: "Oriented"
+    integration_checkpoint: |
+      Board visible within 500ms of URL load; no modal, no signup,
+      no cookie banner beyond legal requirement (EU).
+    failure_modes:
+      - "Board does not render within 2s on 3G connection"
+      - "Mode toggle unreachable by keyboard"
+      - "Turn indicator missing on first paint"
+    gherkin: |
+      Scenario: Board is ready to play on first paint
+        Given a casual player navigates to the tic-tac-toe URL
+        When the page finishes its first meaningful paint
+        Then an empty 3x3 board is visible
+        And the turn indicator reads "Your turn (X)."
+        And the default mode is "solo vs AI: medium"
+        And no modal or signup prompt blocks interaction
+
+  - id: 2
+    name: "Human Makes a Move"
+    command: "click | tap | Enter on focused cell"
+    tui_mockup: |
+      +------------------------------------------------------+
+      |         +---+---+---+                                |
+      |         |   |   |   |                                |
+      |         +---+---+---+                                |
+      |         |   | X |   |  <-- human placed X            |
+      |         +---+---+---+                                |
+      |         |   |   |   |                                |
+      |         +---+---+---+                                |
+      |  AI is thinking...                                   |
+      +------------------------------------------------------+
+    shared_artifacts:
+      - name: "boardState"
+        source: "client state"
+        displayed_as: "${boardState}"
+        consumers: ["board cells", "win detector", "AI move generator", "ARIA live region"]
+      - name: "turnIndicator"
+        source: "derived from boardState + gameMode"
+        displayed_as: "${turnIndicator}"
+        consumers: ["status text", "ARIA live region"]
+    emotional_state:
+      entry: "Oriented"
+      exit: "Focused"
+    integration_checkpoint: |
+      Visual placement completes within 100ms of input.
+      ARIA live region announces move within 1s.
+      Board state and visual are consistent in the same frame.
+    failure_modes:
+      - "Click on already-filled cell places a second mark"
+      - "Keyboard input does not place a mark"
+      - "Screen-reader announcement is missing or wrong"
+    gherkin: |
+      Scenario: Human places X on an empty cell
+        Given an empty board and it is the human's turn
+        When the human clicks the center cell
+        Then an X appears in the center cell within 100ms
+        And the turn indicator reads "AI is thinking..."
+        And a screen reader announces "X placed at row 2, column 2"
+
+  - id: 3
+    name: "AI Responds"
+    command: "(automatic after human move)"
+    tui_mockup: |
+      +------------------------------------------------------+
+      |         +---+---+---+                                |
+      |         |   |   |   |                                |
+      |         +---+---+---+                                |
+      |         |   | X |   |                                |
+      |         +---+---+---+                                |
+      |         |   |   | O |  <-- AI placed O               |
+      |         +---+---+---+                                |
+      |  Your turn (X).                                      |
+      +------------------------------------------------------+
+    shared_artifacts:
+      - name: "boardState"
+        source: "client state"
+        displayed_as: "${boardState}"
+        consumers: ["board cells", "win detector", "AI move generator", "ARIA live region"]
+      - name: "turnIndicator"
+        source: "derived from boardState + gameMode"
+        displayed_as: "${turnIndicator}"
+        consumers: ["status text", "ARIA live region"]
+    emotional_state:
+      entry: "Focused"
+      exit: "Engaged"
+    integration_checkpoint: |
+      AI move appears within 300ms of human move for easy/medium.
+      Perfect AI uses full minimax and may use up to 600ms.
+      AI only moves when game is non-terminal AND it is AI's turn.
+    failure_modes:
+      - "AI moves after game has ended (terminal state)"
+      - "AI move takes >1s (feels broken)"
+      - "AI places mark on an already-filled cell"
+    gherkin: |
+      Scenario: AI responds with a valid O move
+        Given the human has just placed X and the game is not over
+        When the AI takes its turn
+        Then an O appears in a previously empty cell within 300ms
+        And the turn indicator reads "Your turn (X)."
+        And a screen reader announces the AI's move
+
+  - id: 4
+    name: "Game Ends (Win/Loss/Draw)"
+    command: "(automatic when board reaches terminal state)"
+    tui_mockup: |
+      +------------------------------------------------------+
+      |         +===+===+===+                                |
+      |         | X = X = X |  <-- winning line animated     |
+      |         +===+===+===+                                |
+      |         |   | X |   |                                |
+      |         +---+---+---+                                |
+      |         |   | O | O |                                |
+      |         +---+---+---+                                |
+      |  You win!                                            |
+      |                                                      |
+      |     [ Play again ]  (focused)                        |
+      +------------------------------------------------------+
+    shared_artifacts:
+      - name: "gameResult"
+        source: "derived from boardState (win detector)"
+        displayed_as: "${gameResult}"
+        consumers: ["result banner", "ARIA live region", "Play again focus"]
+      - name: "winningLine"
+        source: "derived from boardState (win detector)"
+        displayed_as: "${winningLine} (array of 3 cells)"
+        consumers: ["animated win line overlay"]
+    emotional_state:
+      entry: "Engaged"
+      exit: "Satisfied"
+    integration_checkpoint: |
+      Result banner and ARIA live announcement fire in the same frame.
+      "Play again" button receives keyboard focus automatically.
+      Winning line animation completes within 500ms.
+    failure_modes:
+      - "Result banner shows but ARIA announcement is silent"
+      - "'Play again' button not keyboard-focusable"
+      - "Draw detected but banner says 'You win!' (off-by-one in win detector)"
+    gherkin: |
+      Scenario: Human wins with three X in a row
+        Given the board has two X in a row and it is the human's turn
+        When the human places the third X completing the line
+        Then the winning line is highlighted
+        And the result banner reads "You win!"
+        And the "Play again" button receives keyboard focus
+        And a screen reader announces "You win."
+
+      Scenario: Game ends in a draw
+        Given the board has 8 cells filled with no winner
+        When the human places the final mark and no line is completed
+        Then the result banner reads "Draw."
+        And the "Play again" button receives keyboard focus
+
+  - id: 5
+    name: "Play Again or Leave"
+    command: "click | tap | Enter on 'Play again'"
+    tui_mockup: |
+      +------------------------------------------------------+
+      |         +---+---+---+                                |
+      |         |   |   |   |                                |
+      |         +---+---+---+                                |
+      |         |   |   |   |                                |
+      |         +---+---+---+                                |
+      |         |   |   |   |                                |
+      |         +---+---+---+                                |
+      |  Your turn (X).                                      |
+      +------------------------------------------------------+
+    shared_artifacts:
+      - name: "gameMode"
+        source: "client state (preserved across resets)"
+        displayed_as: "${gameMode}"
+        consumers: ["mode toggle"]
+      - name: "boardState"
+        source: "client state (reset to empty)"
+        displayed_as: "${boardState}"
+        consumers: ["board cells"]
+    emotional_state:
+      entry: "Satisfied"
+      exit: "Curious (cycle) or closed"
+    integration_checkpoint: |
+      Reset preserves gameMode and difficulty; clears boardState and
+      gameResult. Re-render completes within 100ms.
+    failure_modes:
+      - "Reset changes difficulty silently"
+      - "Old game result banner lingers after reset"
+    gherkin: |
+      Scenario: Reset starts a fresh game at the same difficulty
+        Given the previous game has ended
+        And the mode was "solo vs AI: medium"
+        When the player activates "Play again"
+        Then the board is empty
+        And the mode remains "solo vs AI: medium"
+        And the turn indicator reads "Your turn (X)."
+
+integration_validation:
+  shared_artifact_consistency:
+    - artifact: "boardState"
+      must_match_across: [1, 2, 3, 4, 5]
+      failure_message: "Board cells, win detector, AI, and ARIA region disagree on current state"
+    - artifact: "turnIndicator"
+      must_match_across: [1, 2, 3, 5]
+      failure_message: "Turn indicator is out of sync with actual next player"
+    - artifact: "gameMode"
+      must_match_across: [1, 5]
+      failure_message: "Mode silently changed across reset"
+
+changelog:
+  - date: "2026-04-21"
+    feature: "tic-tac-toe"
+    change: "Initial journey authored during DISCUSS wave (practice exercise, Tier C)"

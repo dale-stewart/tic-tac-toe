@@ -1,0 +1,24 @@
+# Local quality gates per docs/product/platform/ci-pipeline.md
+# pre-commit < 30s | pre-push < 5min
+
+pre-commit:
+  parallel: true
+  commands:
+    format:
+      glob: '*.{ts,css,html,md,yml,json}'
+      run: pnpm exec prettier --check {staged_files}
+    lint:
+      glob: '*.ts'
+      run: pnpm exec eslint {staged_files}
+
+pre-push:
+  parallel: false
+  commands:
+    unit-and-property:
+      run: pnpm test
+    typecheck:
+      run: pnpm typecheck
+    depcruise:
+      run: pnpm depcruise
+    build-dry-run:
+      run: pnpm build

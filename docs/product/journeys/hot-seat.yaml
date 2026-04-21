@@ -1,0 +1,35 @@
+# Product-level SSOT copy of the hot-seat journey.
+# See solo-player.yaml for the bootstrap convention.
+# Evidence tier: C (practice exercise)
+
+schema_version: 1
+
+journey:
+  name: "Hot-Seat Pair (Two Humans, Same Device)"
+  goal: "Two humans alternate turns on one device, with clear attribution at every step"
+  persona: "Hot-Seat Pair"
+  platform: "web"
+  evidence_tier: "C"
+  owning_feature: "tic-tac-toe"
+
+  emotional_arc:
+    pattern: "Shared Playfulness"
+    start: "Curious (both players)"
+    middle: "Alternating focus"
+    end: "Shared closure"
+
+source_of_truth_for_feature: "docs/feature/tic-tac-toe/discuss/journey-hot-seat.yaml"
+
+cross_references:
+  problem_validation: "docs/feature/tic-tac-toe/discover/problem-validation.md"
+  opportunities_addressed: ["O3", "O4", "O5", "O6"]
+  stories: ["US-05"]
+
+note: |
+  For the full step-by-step schema, see the feature-level YAML. This product-level
+  file is the index / registry entry.
+
+changelog:
+  - date: "2026-04-21"
+    feature: "tic-tac-toe"
+    change: "Bootstrapped during DISCUSS wave (practice exercise, Tier C)"
