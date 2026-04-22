@@ -148,6 +148,9 @@ test.describe('@slice:03 — focus management + tab order', () => {
     // Board back to empty -> banner gone, first-cell empty.
     await expect(page.getByTestId('result-banner')).toHaveCount(0);
     await expect(page.getByTestId('cell-0-0')).toHaveText('');
+    // After Play again, focus returns to the center cell so keyboard users
+    // can resume arrow-key navigation without re-entering via Tab.
+    await expect(page.getByTestId('cell-1-1')).toBeFocused();
   });
 
   test('Tab order: nine cells in reading order then Play again', async ({ page }) => {

@@ -78,15 +78,23 @@ const focusPlayAgain = (app: HTMLElement): void => {
 };
 
 /**
- * Focus the center cell on initial paint so keyboard users see the focus
- * indicator immediately — discoverability affordance for arrow-key navigation.
- * Only fires if nothing else on the page has focus (don't steal focus from a
- * user who already interacted with the document before mount).
+ * Focus the center cell — discoverability affordance for arrow-key navigation.
+ * Called on initial mount, and again on the terminal→in_progress transition
+ * after Play again (where focus was on the now-removed button and would
+ * otherwise fall back to <body>).
+ */
+const focusCenterCell = (app: HTMLElement): void => {
+  const center = app.querySelector<HTMLElement>('[data-testid="cell-1-1"]');
+  if (center !== null) center.focus();
+};
+
+/**
+ * Initial-mount variant: only claim focus if nothing else on the page has it
+ * (don't steal focus from a user who already interacted before mount).
  */
 const focusInitialCell = (app: HTMLElement): void => {
   if (document.activeElement !== null && document.activeElement !== document.body) return;
-  const center = app.querySelector<HTMLElement>('[data-testid="cell-1-1"]');
-  if (center !== null) center.focus();
+  focusCenterCell(app);
 };
 
 const wirePlayAgainClick = (app: HTMLElement, store: Store): void => {
@@ -122,7 +130,14 @@ const createRenderApp =
       }),
       ctx.app,
     );
-    if (state.result.status !== 'in_progress') focusPlayAgain(ctx.app);
+    if (state.result.status !== 'in_progress') {
+      focusPlayAgain(ctx.app);
+    } else if (ctx.previousState.result.status !== 'in_progress') {
+      // terminal → in_progress (Play again): previous focus was on the now-removed
+      // Play-again button. Re-claim focus on the center cell so keyboard users
+      // don't land back on <body>.
+      focusCenterCell(ctx.app);
+    }
     if (ctx.announcer !== null && ctx.previousState !== state) {
       ctx.announcer.announce(ctx.previousState, state);
     }
