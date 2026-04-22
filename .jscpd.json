@@ -1,0 +1,17 @@
+{
+  "threshold": 5,
+  "reporters": ["console"],
+  "ignore": [
+    "**/node_modules/**",
+    "**/dist/**",
+    "**/test-results/**",
+    "**/playwright-report/**",
+    "**/.lighthouseci/**",
+    "**/coverage/**"
+  ],
+  "absolute": false,
+  "gitignore": true,
+  "format": ["typescript", "javascript"],
+  "minTokens": 50,
+  "minLines": 5
+}

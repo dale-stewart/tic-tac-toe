@@ -14,7 +14,7 @@
  *
  * Plumbing:
  *   This spec runs in its own Playwright project (`production-bundle`) whose
- *   webServer is `pnpm preview:pages` (vite preview --base /tic-tac-toe/ on
+ *   webServer is `bun run preview:pages` (vite preview --base /tic-tac-toe/ on
  *   port 4174). The project's baseURL is `http://127.0.0.1:4174` so that
  *   `page.goto('/tic-tac-toe/')` hits the production base path exactly as
  *   GitHub Pages would serve it.

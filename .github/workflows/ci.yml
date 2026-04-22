@@ -27,15 +27,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
+      - uses: oven-sh/setup-bun@v2
         with:
-          version: 10
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-          cache: 'pnpm'
+          bun-version: latest
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: bun install --frozen-lockfile
 
   # Gate 2 — lint-and-typecheck
   lint-and-typecheck:
@@ -44,16 +40,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
+      - uses: oven-sh/setup-bun@v2
         with:
-          version: 10
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-          cache: 'pnpm'
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm lint
-      - run: pnpm typecheck
+          bun-version: latest
+      - run: bun install --frozen-lockfile
+      - run: bun run lint
+      - run: bun run typecheck
 
   # Gate 3 — unit-and-property
   unit-and-property:
@@ -62,15 +54,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
+      - uses: oven-sh/setup-bun@v2
         with:
-          version: 10
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-          cache: 'pnpm'
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm test
+          bun-version: latest
+      - run: bun install --frozen-lockfile
+      - run: bun run test
 
   # Gate 4 — dependency-cruiser
   dependency-cruiser:
@@ -79,32 +67,34 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
+      - uses: oven-sh/setup-bun@v2
         with:
-          version: 10
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-          cache: 'pnpm'
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm depcruise
+          bun-version: latest
+      - run: bun install --frozen-lockfile
+      - run: bun run depcruise
+
+  # Gate 4b — complexity (lizard via uvx)
+  complexity:
+    name: complexity
+    needs: install
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v4
+      - run: uvx --from lizard lizard src -l typescript -C 10 -L 80 -a 5 -w
 
   # Gate 5 — build + artifact upload (feeds 6/7/8)
   build:
     name: build
-    needs: [lint-and-typecheck, unit-and-property, dependency-cruiser]
+    needs: [lint-and-typecheck, unit-and-property, dependency-cruiser, complexity]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
+      - uses: oven-sh/setup-bun@v2
         with:
-          version: 10
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-          cache: 'pnpm'
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm build
+          bun-version: latest
+      - run: bun install --frozen-lockfile
+      - run: bun run build
       - uses: actions/upload-artifact@v4
         with:
           name: dist-v${{ github.run_id }}
@@ -118,19 +108,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
+      - uses: oven-sh/setup-bun@v2
         with:
-          version: 10
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-          cache: 'pnpm'
-      - run: pnpm install --frozen-lockfile
+          bun-version: latest
+      - run: bun install --frozen-lockfile
       - uses: actions/download-artifact@v4
         with:
           name: dist-v${{ github.run_id }}
           path: dist/
-      - run: pnpm size
+      - run: bun run size
 
   # Gate 7 — e2e-playwright (axe-core a11y + network-assertion run via Playwright)
   e2e-playwright:
@@ -139,20 +125,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
+      - uses: oven-sh/setup-bun@v2
         with:
-          version: 10
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-          cache: 'pnpm'
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm exec playwright install --with-deps chromium
+          bun-version: latest
+      - run: bun install --frozen-lockfile
+      - run: bunx playwright install --with-deps chromium
       - uses: actions/download-artifact@v4
         with:
           name: dist-v${{ github.run_id }}
           path: dist/
-      - run: pnpm test:e2e
+      - run: bun run test:e2e
 
   # Gate 8 — axe-core (re-asserts a11y independently of the broader e2e suite)
   axe-core:
@@ -161,20 +143,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
+      - uses: oven-sh/setup-bun@v2
         with:
-          version: 10
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-          cache: 'pnpm'
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm exec playwright install --with-deps chromium
+          bun-version: latest
+      - run: bun install --frozen-lockfile
+      - run: bunx playwright install --with-deps chromium
       - uses: actions/download-artifact@v4
         with:
           name: dist-v${{ github.run_id }}
           path: dist/
-      - run: pnpm test:a11y
+      - run: bun run test:a11y
 
   # Gate 9 — lighthouse-ci
   lighthouse-ci:
@@ -183,24 +161,31 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
+      - uses: oven-sh/setup-bun@v2
         with:
-          version: 10
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-          cache: 'pnpm'
-      - run: pnpm install --frozen-lockfile
+          bun-version: latest
+      - run: bun install --frozen-lockfile
       - uses: actions/download-artifact@v4
         with:
           name: dist-v${{ github.run_id }}
           path: dist/
-      - run: pnpm lhci
+      - run: bun run lhci
 
   # Deploy — main push only
   deploy:
     name: deploy
-    needs: [lint-and-typecheck, unit-and-property, dependency-cruiser, build, bundle-size, e2e-playwright, axe-core, lighthouse-ci]
+    needs:
+      [
+        lint-and-typecheck,
+        unit-and-property,
+        dependency-cruiser,
+        complexity,
+        build,
+        bundle-size,
+        e2e-playwright,
+        axe-core,
+        lighthouse-ci,
+      ]
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     environment:

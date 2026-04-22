@@ -11,17 +11,23 @@ Greenfield web-based tic-tac-toe SPA — methodology practice project.
 
 ## Local quality gates
 
+Use `make` (see `make help` for the full list) or call `bun run <script>` directly.
+
+Prerequisites: [`bun`](https://bun.sh) and [`uv`](https://docs.astral.sh/uv/) (uv provides `uvx`, used to run the Python-based `lizard` complexity analyzer without polluting a global environment).
+
 ```bash
-pnpm install         # one-time
-pnpm lint            # ESLint
-pnpm typecheck       # tsc --noEmit
-pnpm test            # Vitest + fast-check
-pnpm depcruise       # architectural boundary check
-pnpm build           # Vite production build
-pnpm size            # gzipped bundle-size check (≤ 50 KB)
-pnpm test:e2e        # Playwright (axe-core + network-assertion)
-pnpm lhci            # Lighthouse CI
-pnpm check:all       # run them all sequentially
+make install         # one-time — bun install --frozen-lockfile
+make lint            # ESLint (incl. complexity / max-lines / max-params rules)
+make typecheck       # tsc --noEmit
+make test            # Vitest + fast-check
+make depcruise       # architectural boundary check
+make duplication     # jscpd copy-paste detection
+make complexity      # lizard cyclomatic complexity (via uvx)
+make build           # Vite production build
+make size            # gzipped bundle-size check (≤ 50 KB)
+make test-e2e        # Playwright (axe-core + network-assertion)
+make lhci            # Lighthouse CI
+make check           # all fast gates (pre-push equivalent)
 ```
 
 CI runs the same gates plus the Lighthouse and Playwright suites that are too

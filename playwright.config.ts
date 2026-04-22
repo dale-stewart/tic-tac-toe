@@ -15,7 +15,7 @@ export default defineConfig({
   // Every test (a11y, privacy, walking-skeleton, production-bundle) runs
   // against the production base path — parity by construction, no fork.
   webServer: {
-    command: 'pnpm preview --port 4173 --strictPort',
+    command: 'bun run preview --port 4173 --strictPort',
     url: 'http://localhost:4173/tic-tac-toe/',
     reuseExistingServer: !process.env['CI'],
     timeout: 30_000,

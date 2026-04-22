@@ -11,16 +11,17 @@
     "preview:pages": "vite preview --base /tic-tac-toe/ --port 4174 --strictPort",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
-    "lint-and-typecheck": "pnpm lint && pnpm typecheck",
+    "lint-and-typecheck": "bun run lint && bun run typecheck",
     "test": "vitest run",
     "test:unit": "vitest run",
     "test:watch": "vitest",
     "depcruise": "depcruise --config .dependency-cruiser.cjs src",
+    "duplication": "jscpd src tests",
     "test:e2e": "playwright test",
     "test:a11y": "playwright test tests/a11y",
     "size": "size-limit",
     "lhci": "lhci autorun",
-    "check:all": "pnpm lint-and-typecheck && pnpm test && pnpm depcruise && pnpm build && pnpm size"
+    "check:all": "bun run lint-and-typecheck && bun run test && bun run depcruise && bun run duplication && bun run build && bun run size"
   },
   "size-limit": [
     {
@@ -44,6 +45,7 @@
     "dependency-cruiser": "^16.5.0",
     "eslint": "^9.12.0",
     "fast-check": "^3.22.0",
+    "jscpd": "^4.0.9",
     "lefthook": "^1.7.18",
     "prettier": "^3.3.3",
     "size-limit": "^11.1.6",

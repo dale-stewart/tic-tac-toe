@@ -6,19 +6,19 @@ pre-commit:
   commands:
     format:
       glob: '*.{ts,css,html,md,yml,json}'
-      run: pnpm exec prettier --check {staged_files}
+      run: bunx prettier --check {staged_files}
     lint:
       glob: '*.ts'
-      run: pnpm exec eslint {staged_files}
+      run: bunx eslint {staged_files}
 
 pre-push:
   parallel: false
   commands:
     unit-and-property:
-      run: pnpm test
+      run: bun run test
     typecheck:
-      run: pnpm typecheck
+      run: bun run typecheck
     depcruise:
-      run: pnpm depcruise
+      run: bun run depcruise
     build-dry-run:
-      run: pnpm build
+      run: bun run build
