@@ -5,7 +5,7 @@
 .PHONY: help install dev build preview preview-pages \
         lint typecheck lint-and-typecheck \
         test test-watch test-unit test-e2e test-a11y \
-        depcruise duplication complexity size lhci \
+        depcruise duplication complexity mutation size lhci \
         check clean distclean hooks
 
 help: ## Show available targets
@@ -63,6 +63,9 @@ duplication: ## Copy-paste detection (jscpd over src + tests)
 
 complexity: ## Cyclomatic complexity (lizard via uvx; requires uv)
 	uvx --from lizard lizard src -l typescript -C 10 -L 80 -a 5 -w
+
+mutation: ## Mutation testing (Stryker over src/core; ≥ 80% kill rate)
+	bun run mutation
 
 size: ## Bundle-size budget (≤ 50 KB gzipped)
 	bun run size

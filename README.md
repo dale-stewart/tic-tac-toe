@@ -23,6 +23,7 @@ make test            # Vitest + fast-check
 make depcruise       # architectural boundary check
 make duplication     # jscpd copy-paste detection
 make complexity      # lizard cyclomatic complexity (via uvx)
+make mutation        # Stryker mutation testing over src/core (≥ 80% kill rate, ~75s)
 make build           # Vite production build
 make size            # gzipped bundle-size check (≤ 50 KB)
 make test-e2e        # Playwright (axe-core + network-assertion)

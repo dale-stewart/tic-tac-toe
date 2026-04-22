@@ -171,6 +171,26 @@ jobs:
           path: dist/
       - run: bun run lhci
 
+  # Mutation testing — main push only (too slow for PR feedback)
+  mutation:
+    name: mutation
+    needs: install
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    steps:
+      - uses: actions/checkout@v6
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      - run: bun install --frozen-lockfile
+      - run: bun run mutation
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: mutation-report-${{ github.run_id }}
+          path: reports/mutation/
+          retention-days: 14
+
   # Deploy — main push only
   deploy:
     name: deploy
