@@ -23,3 +23,14 @@ export const bannerTextFor = (result: GameResult, humanMark: Mark): string | nul
   if (result.status === 'draw') return 'Draw.';
   return result.winner === humanMark ? 'You win!' : 'AI wins.';
 };
+
+export type Difficulty = 'easy' | 'medium' | 'perfect';
+
+export const DIFFICULTY_OPTIONS: readonly Difficulty[] = ['easy', 'medium', 'perfect'];
+
+export const difficultyLabelText = (difficulty: Difficulty): string => difficulty;
+
+export const difficultyRadioAriaLabel = (difficulty: Difficulty): string =>
+  `Difficulty: ${difficulty}`;
+
+export const difficultyGroupAriaLabel = (): string => 'Difficulty';

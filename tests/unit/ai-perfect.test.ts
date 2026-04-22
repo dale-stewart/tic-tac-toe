@@ -1,0 +1,108 @@
+/**
+ * Unit tests for the perfect AI (minimax with memoization).
+ */
+import { describe, it, expect } from 'vitest';
+import { emptyBoard, placeMark, type BoardState, type Mark } from '../../src/core/board';
+import { boardKey, choosePerfectMove } from '../../src/core/ai/perfect';
+
+const play = (board: BoardState, moves: ReadonlyArray<[number, number, Mark]>): BoardState => {
+  let b = board;
+  for (const [row, col, mark] of moves) {
+    const result = placeMark(b, row, col, mark);
+    if (!result.ok) throw new Error(result.error);
+    b = result.value;
+  }
+  return b;
+};
+
+describe('choosePerfectMove', () => {
+  it('takes the immediate win when available', () => {
+    const board = play(emptyBoard(), [
+      [0, 0, 'O'],
+      [1, 0, 'X'],
+      [0, 1, 'O'],
+      [2, 2, 'X'],
+    ]);
+    expect(choosePerfectMove(board, 'O')).toEqual([0, 2]);
+  });
+
+  it('blocks the opponent three-in-a-row', () => {
+    const board = play(emptyBoard(), [
+      [0, 0, 'X'],
+      [1, 0, 'O'],
+      [0, 1, 'X'],
+    ]);
+    expect(choosePerfectMove(board, 'O')).toEqual([0, 2]);
+  });
+
+  it('returns a legal move from an empty board (center or corner)', () => {
+    const [row, col] = choosePerfectMove(emptyBoard(), 'X');
+    expect(row).toBeGreaterThanOrEqual(0);
+    expect(row).toBeLessThan(3);
+    expect(col).toBeGreaterThanOrEqual(0);
+    expect(col).toBeLessThan(3);
+  });
+
+  it('is deterministic across calls on the same board', () => {
+    const board = play(emptyBoard(), [
+      [1, 1, 'X'],
+      [0, 0, 'O'],
+    ]);
+    expect(choosePerfectMove(board, 'X')).toEqual(choosePerfectMove(board, 'X'));
+  });
+
+  it('avoids a losing move: when X threatens a fork, O plays into it', () => {
+    // Classic corner-trap: X at [0,0], O at center, X at [2,2]. O must not play
+    // another corner (which would set up a double threat) — perfect plays a
+    // side cell. We assert the move is an edge, not a corner.
+    const board = play(emptyBoard(), [
+      [0, 0, 'X'],
+      [1, 1, 'O'],
+      [2, 2, 'X'],
+    ]);
+    const [row, col] = choosePerfectMove(board, 'O');
+    const corners: ReadonlyArray<readonly [number, number]> = [
+      [0, 0],
+      [0, 2],
+      [2, 0],
+      [2, 2],
+    ];
+    const isCorner = corners.some(([r, c]) => r === row && c === col);
+    expect(isCorner).toBe(false);
+  });
+
+  it('throws when called on a terminal board', () => {
+    // Full draw board.
+    const board = play(emptyBoard(), [
+      [0, 0, 'X'],
+      [0, 1, 'O'],
+      [0, 2, 'X'],
+      [1, 2, 'O'],
+      [1, 0, 'X'],
+      [2, 0, 'O'],
+      [1, 1, 'X'],
+      [2, 2, 'O'],
+      [2, 1, 'X'],
+    ]);
+    expect(() => choosePerfectMove(board, 'O')).toThrow(/no legal move/);
+  });
+});
+
+describe('boardKey', () => {
+  it('encodes the empty board as 9 dashes plus the to-play mark', () => {
+    expect(boardKey(emptyBoard(), 'X')).toBe('---------|X');
+  });
+
+  it('encodes marks in row-major order', () => {
+    const board = play(emptyBoard(), [
+      [0, 0, 'X'],
+      [1, 1, 'O'],
+      [2, 2, 'X'],
+    ]);
+    expect(boardKey(board, 'O')).toBe('X---O---X|O');
+  });
+
+  it('distinguishes boards by whose turn it is', () => {
+    expect(boardKey(emptyBoard(), 'X')).not.toBe(boardKey(emptyBoard(), 'O'));
+  });
+});

@@ -8,6 +8,7 @@ import fc from 'fast-check';
 import {
   combine,
   diffToMessage,
+  difficultyChangeText,
   findPlacement,
   isResetToEmpty,
 } from '../../src/adapters/announce-strings';
@@ -149,6 +150,18 @@ describe('diffToMessage', () => {
     // No placement diff (same board); no reset-to-empty; no simple null return.
     // This exercises the isResetToEmpty false-on-after branch.
     expect(message).toMatch(/You win\.?/i);
+  });
+
+  it('announces "Difficulty: perfect" when SET_DIFFICULTY flips difficulty', () => {
+    const before = fresh();
+    const after = gameReducer(before, { type: 'SET_DIFFICULTY', difficulty: 'perfect' });
+    expect(diffToMessage(before, after)).toBe('Difficulty: perfect');
+  });
+
+  it('announces "Difficulty: easy" when SET_DIFFICULTY switches to easy', () => {
+    const before = fresh();
+    const after = gameReducer(before, { type: 'SET_DIFFICULTY', difficulty: 'easy' });
+    expect(diffToMessage(before, after)).toBe('Difficulty: easy');
   });
 
   it('property: every accepted PLACE_MARK transition produces a non-empty message', () => {
@@ -301,6 +314,23 @@ describe('findPlacement', () => {
     const b = gameReducer(fresh(), { type: 'PLACE_MARK', row: 0, col: 0 }).board;
     expect(findPlacement(b, b)).toBeNull();
   });
+});
+
+describe('difficultyChangeText', () => {
+  it('returns null when difficulty is unchanged', () => {
+    const s = fresh();
+    expect(difficultyChangeText(s, s)).toBeNull();
+  });
+
+  it.each(['easy', 'medium', 'perfect'] as const)(
+    'returns "Difficulty: %s" when difficulty changes to that level',
+    (difficulty) => {
+      const before: GameState = { ...fresh(), difficulty: 'easy' };
+      const after: GameState = { ...before, difficulty };
+      const expected = before.difficulty === difficulty ? null : `Difficulty: ${difficulty}`;
+      expect(difficultyChangeText(before, after)).toBe(expected);
+    },
+  );
 });
 
 describe('combine', () => {

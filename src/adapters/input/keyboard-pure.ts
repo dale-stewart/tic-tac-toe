@@ -5,11 +5,30 @@
  * the intent mapping and focus arithmetic without a jsdom environment.
  */
 
+import type { Difficulty } from '../../core/game';
+
 export type Direction = 'left' | 'right' | 'up' | 'down';
 
 export type KeyIntent =
   | { readonly kind: 'move'; readonly direction: Direction }
   | { readonly kind: 'activate' };
+
+/**
+ * Map a number-key (top-row digits 1/2/3) to a difficulty level. Returns null
+ * for any other key. The mapping is stable: 1=easy, 2=medium, 3=perfect.
+ */
+export const keyToDifficulty = (key: string): Difficulty | null => {
+  switch (key) {
+    case '1':
+      return 'easy';
+    case '2':
+      return 'medium';
+    case '3':
+      return 'perfect';
+    default:
+      return null;
+  }
+};
 
 /**
  * Map a KeyboardEvent.key (or .code for Space) to a KeyIntent. Returns null

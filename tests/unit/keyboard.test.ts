@@ -8,7 +8,12 @@
  */
 import { describe, it, expect } from 'vitest';
 import fc from 'fast-check';
-import { keyToIntent, nextFocusFor, type KeyIntent } from '../../src/adapters/input/keyboard-pure';
+import {
+  keyToDifficulty,
+  keyToIntent,
+  nextFocusFor,
+  type KeyIntent,
+} from '../../src/adapters/input/keyboard-pure';
 
 const coord = (): fc.Arbitrary<readonly [number, number]> =>
   fc.tuple(fc.integer({ min: 0, max: 2 }), fc.integer({ min: 0, max: 2 }));
@@ -62,6 +67,18 @@ describe('nextFocusFor', () => {
         },
       ),
     );
+  });
+
+  it('keyToDifficulty maps 1/2/3 to easy/medium/perfect', () => {
+    expect(keyToDifficulty('1')).toBe('easy');
+    expect(keyToDifficulty('2')).toBe('medium');
+    expect(keyToDifficulty('3')).toBe('perfect');
+  });
+
+  it('keyToDifficulty returns null for any other key', () => {
+    for (const key of ['0', '4', '9', 'a', 'Enter', ' ', 'ArrowUp', 'Tab']) {
+      expect(keyToDifficulty(key)).toBeNull();
+    }
   });
 
   it('property: a move changes at most one axis by exactly 1', () => {

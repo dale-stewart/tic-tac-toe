@@ -9,6 +9,10 @@ import {
   ariaLabelForCell,
   bannerTextFor,
   cellText,
+  difficultyGroupAriaLabel,
+  difficultyLabelText,
+  difficultyRadioAriaLabel,
+  DIFFICULTY_OPTIONS,
   turnIndicatorText,
 } from '../../src/adapters/render-strings';
 import type { GameResult } from '../../src/core/win-detector';
@@ -92,5 +96,27 @@ describe('bannerTextFor', () => {
 
   it('returns "AI wins." when the human mark loses', () => {
     expect(bannerTextFor(oWins, 'X')).toBe('AI wins.');
+  });
+});
+
+describe('difficulty string helpers', () => {
+  it('DIFFICULTY_OPTIONS lists easy, medium, perfect in order', () => {
+    expect(DIFFICULTY_OPTIONS).toEqual(['easy', 'medium', 'perfect']);
+  });
+
+  it('difficultyLabelText returns the level name verbatim', () => {
+    expect(difficultyLabelText('easy')).toBe('easy');
+    expect(difficultyLabelText('medium')).toBe('medium');
+    expect(difficultyLabelText('perfect')).toBe('perfect');
+  });
+
+  it('difficultyRadioAriaLabel prefixes "Difficulty:"', () => {
+    expect(difficultyRadioAriaLabel('easy')).toBe('Difficulty: easy');
+    expect(difficultyRadioAriaLabel('medium')).toBe('Difficulty: medium');
+    expect(difficultyRadioAriaLabel('perfect')).toBe('Difficulty: perfect');
+  });
+
+  it('difficultyGroupAriaLabel returns the group-level label', () => {
+    expect(difficultyGroupAriaLabel()).toBe('Difficulty');
   });
 });

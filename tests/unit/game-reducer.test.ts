@@ -3,7 +3,7 @@
  * Pure function: (GameState, Action) -> GameState.
  */
 import { describe, it, expect } from 'vitest';
-import { gameReducer, initialState } from '../../src/core/game';
+import { gameReducer, initialState, isMidGame, type GameState } from '../../src/core/game';
 
 describe('gameReducer', () => {
   it('initial state has empty board, X to move, in_progress', () => {
@@ -83,6 +83,67 @@ describe('gameReducer', () => {
         expect(cell).toBeNull();
       }
     }
+  });
+
+  it('SET_DIFFICULTY on a fresh board updates difficulty', () => {
+    const s0 = initialState();
+    const s1 = gameReducer(s0, { type: 'SET_DIFFICULTY', difficulty: 'perfect' });
+    expect(s1.difficulty).toBe('perfect');
+    // All other fields preserved.
+    expect(s1.board).toBe(s0.board);
+    expect(s1.turn).toBe(s0.turn);
+    expect(s1.mode).toBe(s0.mode);
+    expect(s1.result).toBe(s0.result);
+  });
+
+  it('SET_DIFFICULTY to the current difficulty is a reference-preserving no-op', () => {
+    const s0 = initialState();
+    const s1 = gameReducer(s0, { type: 'SET_DIFFICULTY', difficulty: 'medium' });
+    expect(s1).toBe(s0);
+  });
+
+  it('SET_DIFFICULTY is rejected mid-game (at least one mark placed, in progress)', () => {
+    let state = initialState();
+    state = gameReducer(state, { type: 'PLACE_MARK', row: 1, col: 1 });
+    const attempted = gameReducer(state, { type: 'SET_DIFFICULTY', difficulty: 'perfect' });
+    expect(attempted).toBe(state);
+    expect(attempted.difficulty).toBe('medium');
+  });
+
+  it('SET_DIFFICULTY is accepted at a terminal state (game ended)', () => {
+    // Drive to an X win on the top row.
+    let state = initialState();
+    for (const [row, col] of [
+      [0, 0],
+      [2, 0],
+      [0, 1],
+      [2, 1],
+      [0, 2],
+    ] as const) {
+      state = gameReducer(state, { type: 'PLACE_MARK', row, col });
+    }
+    expect(state.result.status).toBe('won');
+    const updated = gameReducer(state, { type: 'SET_DIFFICULTY', difficulty: 'perfect' });
+    expect(updated.difficulty).toBe('perfect');
+  });
+
+  it('isMidGame returns false on initial state, true with a mark in progress, false at terminal', () => {
+    const s0 = initialState();
+    expect(isMidGame(s0)).toBe(false);
+    const s1 = gameReducer(s0, { type: 'PLACE_MARK', row: 0, col: 0 });
+    expect(isMidGame(s1)).toBe(true);
+    // Drive to X win
+    let s: GameState = s0;
+    for (const [row, col] of [
+      [0, 0],
+      [2, 0],
+      [0, 1],
+      [2, 1],
+      [0, 2],
+    ] as const) {
+      s = gameReducer(s, { type: 'PLACE_MARK', row, col });
+    }
+    expect(isMidGame(s)).toBe(false);
   });
 
   it('PLACE_MARK completing a draw transitions result to draw', () => {

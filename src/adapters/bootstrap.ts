@@ -11,8 +11,8 @@
  */
 import { render } from 'lit-html';
 import '../styles.css';
-import { initialState, type GameState } from '../core/game';
-import { chooseRandomMove } from '../core/ai/easy';
+import { initialState, isMidGame, type GameState } from '../core/game';
+import { strategies } from '../core/ai';
 import { ANCIENT_BROWSER_MESSAGE, renderAncientBrowserFallback, renderBoard } from './render';
 import { attachPointer } from './input/pointer';
 import { attachKeyboard } from './input/keyboard';
@@ -42,7 +42,7 @@ const maybeRunAi = (store: Store, aiDisabled: boolean): void => {
   if (state.result.status !== 'in_progress') return;
   if (state.mode !== 'solo') return;
   if (state.turn !== 'O') return;
-  const [row, col] = chooseRandomMove(state.board, 'O');
+  const [row, col] = strategies[state.difficulty](state.board, 'O');
   store.dispatch({ type: 'PLACE_MARK', row, col });
 };
 
@@ -106,6 +106,18 @@ const wirePlayAgainClick = (app: HTMLElement, store: Store): void => {
   });
 };
 
+const wireDifficultyClick = (app: HTMLElement, store: Store): void => {
+  app.addEventListener('click', (event) => {
+    const target = event.target;
+    if (!(target instanceof Element)) return;
+    const radio = target.closest<HTMLElement>('[role="radio"][data-difficulty-option]');
+    if (radio === null) return;
+    const option = radio.getAttribute('data-difficulty-option');
+    if (option !== 'easy' && option !== 'medium' && option !== 'perfect') return;
+    store.dispatch({ type: 'SET_DIFFICULTY', difficulty: option });
+  });
+};
+
 interface RuntimeContext {
   readonly app: HTMLElement;
   readonly store: Store;
@@ -126,6 +138,7 @@ const createRenderApp =
         turn: state.turn,
         mode: state.mode,
         difficulty: state.difficulty,
+        difficultyDisabled: isMidGame(state),
         result: state.result,
       }),
       ctx.app,
@@ -172,6 +185,9 @@ const mount = (): void => {
 
   // Expose the store for e2e tests. No sensitive data; pure client UI state.
   (window as unknown as { __store: Store }).__store = store;
+  // Expose the AI strategy registry for e2e tests that drive deterministic
+  // medium/perfect tactics without seeding the store-level RNG path.
+  (window as unknown as { __strategies: typeof strategies }).__strategies = strategies;
 
   const ctx: RuntimeContext = {
     app,
@@ -187,6 +203,7 @@ const mount = (): void => {
   attachPointer(app, (action) => dispatchWithAnnounce(store, announcer, action));
   attachKeyboard(app, (action) => dispatchWithAnnounce(store, announcer, action));
   wirePlayAgainClick(app, store);
+  wireDifficultyClick(app, store);
 
   renderApp();
   focusInitialCell(app);

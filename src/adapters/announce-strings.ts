@@ -65,6 +65,12 @@ export const combine = (prefix: string | null, suffix: string | null): string | 
  * clearing the board). When `options.rejected` is true and the state did not
  * change, announces "Cell already taken".
  */
+// Exported for direct mutation-kill coverage; not part of the adapter's public surface.
+export const difficultyChangeText = (before: GameState, after: GameState): string | null => {
+  if (before.difficulty === after.difficulty) return null;
+  return `Difficulty: ${after.difficulty}`;
+};
+
 export const diffToMessage = (
   before: GameState,
   after: GameState,
@@ -75,6 +81,9 @@ export const diffToMessage = (
   }
   // Stryker disable next-line ConditionalExpression: equivalent mutant — if this guard is bypassed (`false`), the reset-to-empty case falls through to placementText (returns null: no marks were added, only removed) and terminalMessage (returns null: after is in_progress), so combine(null, null) → null. Same observable result as the original early-return.
   if (isResetToEmpty(before, after)) return null;
+
+  const difficulty = difficultyChangeText(before, after);
+  if (difficulty !== null) return difficulty;
 
   const humanMark: Mark = options.humanMark ?? 'X';
   return combine(placementText(before.board, after.board), terminalMessage(after, humanMark));

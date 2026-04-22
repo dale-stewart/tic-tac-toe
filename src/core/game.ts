@@ -7,12 +7,7 @@
  *   - RESET preserves mode and difficulty.
  *   - `result` is recomputed via detectResult after every accepted placement.
  */
-import {
-  emptyBoard,
-  placeMark,
-  type BoardState,
-  type Mark,
-} from './board';
+import { emptyBoard, placeMark, type BoardState, type Mark } from './board';
 import { detectResult, type GameResult } from './win-detector';
 
 export type GameMode = 'solo' | 'hot-seat';
@@ -28,7 +23,8 @@ export interface GameState {
 
 export type Action =
   | { readonly type: 'PLACE_MARK'; readonly row: number; readonly col: number }
-  | { readonly type: 'RESET' };
+  | { readonly type: 'RESET' }
+  | { readonly type: 'SET_DIFFICULTY'; readonly difficulty: Difficulty };
 
 const nextTurn = (mark: Mark): Mark => (mark === 'X' ? 'O' : 'X');
 
@@ -40,11 +36,7 @@ export const initialState = (): GameState => ({
   result: { status: 'in_progress' },
 });
 
-const handlePlaceMark = (
-  state: GameState,
-  row: number,
-  col: number,
-): GameState => {
+const handlePlaceMark = (state: GameState, row: number, col: number): GameState => {
   // Reject moves after the game ends. Returning `state` preserves reference equality.
   if (state.result.status !== 'in_progress') return state;
 
@@ -62,6 +54,30 @@ const handlePlaceMark = (
   };
 };
 
+// Exported for direct test coverage of the mid-game predicate.
+export const isMidGame = (state: GameState): boolean => {
+  if (state.result.status !== 'in_progress') return false;
+  for (const row of state.board) {
+    for (const cell of row) {
+      if (cell !== null) return true;
+    }
+  }
+  return false;
+};
+
+const handleSetDifficulty = (state: GameState, difficulty: Difficulty): GameState => {
+  // Reject mid-game. Reference-preserving no-op keeps announce/render quiet.
+  if (isMidGame(state)) return state;
+  if (state.difficulty === difficulty) return state;
+  return {
+    board: state.board,
+    turn: state.turn,
+    mode: state.mode,
+    difficulty,
+    result: state.result,
+  };
+};
+
 export const gameReducer = (state: GameState, action: Action): GameState => {
   switch (action.type) {
     case 'PLACE_MARK':
@@ -74,5 +90,7 @@ export const gameReducer = (state: GameState, action: Action): GameState => {
         difficulty: state.difficulty,
         result: { status: 'in_progress' },
       };
+    case 'SET_DIFFICULTY':
+      return handleSetDifficulty(state, action.difficulty);
   }
 };

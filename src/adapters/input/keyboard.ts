@@ -9,7 +9,7 @@
  * translation (reading focused cell coords; calling focus()) and dispatch.
  */
 import type { Action } from '../../core/game';
-import { keyToIntent, nextFocusFor } from './keyboard-pure';
+import { keyToDifficulty, keyToIntent, nextFocusFor } from './keyboard-pure';
 
 const readCoord = (element: Element): readonly [number, number] | null => {
   const rowAttr = element.getAttribute('data-row');
@@ -52,6 +52,18 @@ export const attachKeyboard = (root: HTMLElement, dispatch: (action: Action) => 
   root.addEventListener('keydown', (event) => {
     const target = event.target;
     if (!(target instanceof Element)) return;
+
+    // Global difficulty shortcuts: 1/2/3 work from anywhere on the page, but
+    // not when the user is typing inside the grid (the grid consumes Enter
+    // and Space — digit keys are intentionally not consumed there either,
+    // but dispatching SET_DIFFICULTY from any focused element is the spec).
+    const difficulty = keyToDifficulty(event.key);
+    if (difficulty !== null) {
+      event.preventDefault();
+      dispatch({ type: 'SET_DIFFICULTY', difficulty });
+      return;
+    }
+
     const cell = target.closest('[role="gridcell"]');
     if (cell === null) return;
 
