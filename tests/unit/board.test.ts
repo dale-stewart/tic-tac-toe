@@ -4,12 +4,7 @@
  */
 import { describe, it, expect } from 'vitest';
 import fc from 'fast-check';
-import {
-  emptyBoard,
-  placeMark,
-  type BoardState,
-  type Cell,
-} from '../../src/core/board';
+import { emptyBoard, placeMark, type BoardState, type Cell } from '../../src/core/board';
 
 describe('board.emptyBoard', () => {
   it('returns a 3x3 grid', () => {
@@ -79,6 +74,14 @@ describe('board.placeMark', () => {
     }
   });
 
+  it('returns Err out_of_bounds for negative col', () => {
+    const result = placeMark(emptyBoard(), 0, -1, 'X');
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(result.error).toBe('out_of_bounds');
+    }
+  });
+
   it('returns Err out_of_bounds for row>=3', () => {
     const result = placeMark(emptyBoard(), 3, 0, 'X');
     expect(result.ok).toBe(false);
@@ -89,6 +92,23 @@ describe('board.placeMark', () => {
 
   it('returns Err out_of_bounds for col>=3', () => {
     const result = placeMark(emptyBoard(), 0, 3, 'X');
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(result.error).toBe('out_of_bounds');
+    }
+  });
+
+  // Guard against float/NaN/Infinity coords — otherwise the comparison-only
+  // bounds check would admit e.g. 0.5 as a "valid" in-range row.
+  it.each([
+    ['row', 0.5, 0],
+    ['col', 0, 0.5],
+    ['row NaN', Number.NaN, 0],
+    ['col NaN', 0, Number.NaN],
+    ['row Infinity', Number.POSITIVE_INFINITY, 0],
+    ['col -Infinity', 0, Number.NEGATIVE_INFINITY],
+  ] as const)('returns Err out_of_bounds for non-integer %s', (_label, row, col) => {
+    const result = placeMark(emptyBoard(), row, col, 'X');
     expect(result.ok).toBe(false);
     if (!result.ok) {
       expect(result.error).toBe('out_of_bounds');

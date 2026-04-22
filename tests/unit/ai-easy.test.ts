@@ -57,6 +57,27 @@ describe('chooseRandomMove', () => {
     expect(move1).toEqual(move2);
   });
 
+  it('throws when called on a fully-occupied board', () => {
+    let board: BoardState = emptyBoard();
+    const fills: Array<[number, number, 'X' | 'O']> = [
+      [0, 0, 'X'],
+      [0, 1, 'O'],
+      [0, 2, 'X'],
+      [1, 0, 'O'],
+      [1, 1, 'X'],
+      [1, 2, 'O'],
+      [2, 0, 'O'],
+      [2, 1, 'X'],
+      [2, 2, 'O'],
+    ];
+    for (const [row, col, mark] of fills) {
+      const result = placeMark(board, row, col, mark);
+      if (!result.ok) throw new Error(result.error);
+      board = result.value;
+    }
+    expect(() => chooseRandomMove(board, 'X')).toThrow(/no empty cells/);
+  });
+
   it('covers all 9 cells across varied seeds', () => {
     const seen = new Set<string>();
     for (let seed = 0; seed < 200; seed += 1) {

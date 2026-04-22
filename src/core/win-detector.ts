@@ -19,16 +19,48 @@ export type GameResult =
 // Enumerate the 8 winning lines statically.
 const LINES: readonly WinLine[] = [
   // Rows
-  [{ row: 0, col: 0 }, { row: 0, col: 1 }, { row: 0, col: 2 }],
-  [{ row: 1, col: 0 }, { row: 1, col: 1 }, { row: 1, col: 2 }],
-  [{ row: 2, col: 0 }, { row: 2, col: 1 }, { row: 2, col: 2 }],
+  [
+    { row: 0, col: 0 },
+    { row: 0, col: 1 },
+    { row: 0, col: 2 },
+  ],
+  [
+    { row: 1, col: 0 },
+    { row: 1, col: 1 },
+    { row: 1, col: 2 },
+  ],
+  [
+    { row: 2, col: 0 },
+    { row: 2, col: 1 },
+    { row: 2, col: 2 },
+  ],
   // Columns
-  [{ row: 0, col: 0 }, { row: 1, col: 0 }, { row: 2, col: 0 }],
-  [{ row: 0, col: 1 }, { row: 1, col: 1 }, { row: 2, col: 1 }],
-  [{ row: 0, col: 2 }, { row: 1, col: 2 }, { row: 2, col: 2 }],
+  [
+    { row: 0, col: 0 },
+    { row: 1, col: 0 },
+    { row: 2, col: 0 },
+  ],
+  [
+    { row: 0, col: 1 },
+    { row: 1, col: 1 },
+    { row: 2, col: 1 },
+  ],
+  [
+    { row: 0, col: 2 },
+    { row: 1, col: 2 },
+    { row: 2, col: 2 },
+  ],
   // Diagonals
-  [{ row: 0, col: 0 }, { row: 1, col: 1 }, { row: 2, col: 2 }],
-  [{ row: 0, col: 2 }, { row: 1, col: 1 }, { row: 2, col: 0 }],
+  [
+    { row: 0, col: 0 },
+    { row: 1, col: 1 },
+    { row: 2, col: 2 },
+  ],
+  [
+    { row: 0, col: 2 },
+    { row: 1, col: 1 },
+    { row: 2, col: 0 },
+  ],
 ];
 
 const cellAt = (state: BoardState, position: Position): BoardState[number][number] =>
@@ -37,6 +69,7 @@ const cellAt = (state: BoardState, position: Position): BoardState[number][numbe
 const lineWinner = (state: BoardState, line: WinLine): Mark | null => {
   const [a, b, c] = line;
   const first = cellAt(state, a);
+  // Stryker disable next-line ConditionalExpression: equivalent mutant — if this early return is removed, the subsequent `!== first` checks still return null in every branch where `first === null`. No observable behavior difference.
   if (first === null) return null;
   if (cellAt(state, b) !== first) return null;
   if (cellAt(state, c) !== first) return null;
