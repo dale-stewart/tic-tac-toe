@@ -44,8 +44,8 @@ jobs:
         with:
           bun-version: latest
       - run: bun install --frozen-lockfile
-      - run: bun run lint
-      - run: bun run typecheck
+      - run: make lint
+      - run: make typecheck
 
   # Gate 3 — unit-and-property
   unit-and-property:
@@ -58,7 +58,7 @@ jobs:
         with:
           bun-version: latest
       - run: bun install --frozen-lockfile
-      - run: bun run coverage
+      - run: make coverage
       - uses: actions/upload-artifact@v7
         if: always()
         with:
@@ -77,7 +77,7 @@ jobs:
         with:
           bun-version: latest
       - run: bun install --frozen-lockfile
-      - run: bun run depcruise
+      - run: make depcruise
 
   # Gate 4b — complexity (lizard via uvx)
   complexity:
@@ -91,7 +91,7 @@ jobs:
           # This repo has no Python project; uv is only a launcher for lizard.
           # Disable dependency-file caching to silence the "no file matched" warning.
           enable-cache: false
-      - run: uvx --from lizard lizard src -l typescript -C 10 -L 80 -a 5 -w
+      - run: make complexity
 
   # Gate 5 — build + artifact upload (feeds 6/7/8)
   build:
@@ -104,7 +104,7 @@ jobs:
         with:
           bun-version: latest
       - run: bun install --frozen-lockfile
-      - run: bun run build
+      - run: make build
       - uses: actions/upload-artifact@v7
         with:
           name: dist-v${{ github.run_id }}
@@ -126,7 +126,7 @@ jobs:
         with:
           name: dist-v${{ github.run_id }}
           path: dist/
-      - run: bun run size
+      - run: make size
 
   # Gate 7 — e2e-playwright (axe-core a11y + network-assertion run via Playwright)
   e2e-playwright:
@@ -144,7 +144,7 @@ jobs:
         with:
           name: dist-v${{ github.run_id }}
           path: dist/
-      - run: bun run test:e2e
+      - run: make test-e2e
 
   # Gate 8 — axe-core (re-asserts a11y independently of the broader e2e suite)
   axe-core:
@@ -162,7 +162,7 @@ jobs:
         with:
           name: dist-v${{ github.run_id }}
           path: dist/
-      - run: bun run test:a11y
+      - run: make test-a11y
 
   # Gate 9 — lighthouse-ci
   lighthouse-ci:
@@ -179,7 +179,7 @@ jobs:
         with:
           name: dist-v${{ github.run_id }}
           path: dist/
-      - run: bun run lhci
+      - run: make lhci
 
   # Mutation testing — main push only (too slow for PR feedback)
   mutation:
@@ -193,7 +193,7 @@ jobs:
         with:
           bun-version: latest
       - run: bun install --frozen-lockfile
-      - run: bun run mutation
+      - run: make mutation
       - uses: actions/upload-artifact@v7
         if: always()
         with:
