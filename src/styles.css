@@ -88,6 +88,34 @@ main {
   max-width: 40rem;
 }
 
+/*
+ * Focus indicators — visible outline meeting WCAG 2.2 AA 3:1 contrast.
+ * Cell background is #f7f7f7 (near-white); outline color #003b82 (dark blue)
+ * gives ~9:1 contrast against that background, well above the 3:1 minimum.
+ * Play-again button background #ffffff; same outline color gives ~10:1.
+ */
+.board [role='gridcell']:focus-visible,
+.board [role='gridcell']:focus {
+  outline: 3px solid #003b82;
+  outline-offset: 2px;
+}
+
+.play-again {
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  background: #ffffff;
+  color: #111111;
+  border: 1px solid #333333;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.play-again:focus-visible,
+.play-again:focus {
+  outline: 3px solid #003b82;
+  outline-offset: 2px;
+}
+
 /* Hide the #announce live region visually while keeping it in the a11y tree. */
 #announce {
   position: absolute;

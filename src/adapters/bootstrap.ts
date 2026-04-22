@@ -1,25 +1,22 @@
 /**
- * Composition root. Wires the dispatch loop for slices 01+02.
+ * Composition root. Wires the dispatch loop for slices 01+02+03.
  *
  * Responsibilities:
  *   1. Feature-detect a required modern capability; fall back cleanly if absent.
  *   2. Hold the single GameState in a module-scoped store.
- *   3. On each dispatch: reduce, render, manage focus, and schedule maybeRunAi.
- *   4. Wire pointer input via delegated click + Play-again button.
+ *   3. On each dispatch: reduce, render, manage focus, announce, schedule AI.
+ *   4. Wire pointer + keyboard input; own a single announce adapter on #announce.
  *
  * This module is the ONLY place with side effects at startup.
  */
 import { render } from 'lit-html';
 import '../styles.css';
-import { initialState } from '../core/game';
+import { initialState, type GameState } from '../core/game';
 import { chooseRandomMove } from '../core/ai/easy';
-import {
-  ANCIENT_BROWSER_MESSAGE,
-  bannerTextFor,
-  renderAncientBrowserFallback,
-  renderBoard,
-} from './render';
+import { ANCIENT_BROWSER_MESSAGE, renderAncientBrowserFallback, renderBoard } from './render';
 import { attachPointer } from './input/pointer';
+import { attachKeyboard } from './input/keyboard';
+import { createAnnouncer, type AnnounceAdapter } from './announce';
 import { createStore, type Store } from './store';
 
 const hasModernFeatures = (): boolean => {
@@ -49,32 +46,60 @@ const maybeRunAi = (store: Store, aiDisabled: boolean): void => {
   store.dispatch({ type: 'PLACE_MARK', row, col });
 };
 
-const mount = (): void => {
-  const app = document.querySelector<HTMLElement>('#app');
-  const announce = document.querySelector<HTMLElement>('#announce');
-  if (app === null) {
-    console.error('bootstrap: #app not found');
-    return;
+/**
+ * Dispatch wrapper that also announces rejected PLACE_MARK attempts.
+ *
+ * Accepted transitions are announced by renderApp via previousState diff; this
+ * wrapper only handles the no-op case (cell already taken, post-terminal
+ * input), where the state reference does not change and renderApp never runs.
+ */
+const dispatchWithAnnounce = (
+  store: Store,
+  announcer: AnnounceAdapter | null,
+  action: Parameters<Store['dispatch']>[0],
+): void => {
+  const before = store.getState();
+  store.dispatch(action);
+  const after = store.getState();
+  if (announcer === null) return;
+  if (action.type === 'PLACE_MARK' && before === after) {
+    announcer.announce(before, after, { rejected: true });
   }
+};
 
-  if (!hasModernFeatures()) {
-    render(renderAncientBrowserFallback(), app);
-    if (announce !== null) {
-      announce.textContent = ANCIENT_BROWSER_MESSAGE;
+const renderAncientFallback = (app: HTMLElement, announceEl: HTMLElement | null): void => {
+  render(renderAncientBrowserFallback(), app);
+  if (announceEl !== null) announceEl.textContent = ANCIENT_BROWSER_MESSAGE;
+};
+
+const focusPlayAgain = (app: HTMLElement): void => {
+  const playAgain = app.querySelector<HTMLButtonElement>('[data-testid="play-again"]');
+  if (playAgain !== null) playAgain.focus();
+};
+
+const wirePlayAgainClick = (app: HTMLElement, store: Store): void => {
+  app.addEventListener('click', (event) => {
+    const target = event.target;
+    if (target instanceof Element && target.closest('[data-testid="play-again"]') !== null) {
+      store.dispatch({ type: 'RESET' });
     }
-    return;
-  }
+  });
+};
 
-  const store = createStore(initialState());
-  const aiDisabled = isAiDisabled();
+interface RuntimeContext {
+  readonly app: HTMLElement;
+  readonly store: Store;
+  readonly announcer: AnnounceAdapter | null;
+  readonly aiDisabled: boolean;
+  previousState: GameState;
+}
 
-  // Expose the store for e2e tests. No sensitive data; pure client UI state.
-  (window as unknown as { __store: Store }).__store = store;
-
-  const renderApp = (): void => {
-    const state = store.getState();
-    app.setAttribute('data-mode', state.mode);
-    app.setAttribute('data-difficulty', state.difficulty);
+const createRenderApp =
+  (ctx: RuntimeContext): (() => void) =>
+  () => {
+    const state = ctx.store.getState();
+    ctx.app.setAttribute('data-mode', state.mode);
+    ctx.app.setAttribute('data-difficulty', state.difficulty);
     render(
       renderBoard({
         board: state.board,
@@ -83,47 +108,59 @@ const mount = (): void => {
         difficulty: state.difficulty,
         result: state.result,
       }),
-      app,
+      ctx.app,
     );
-
-    // Focus management: on terminal state, focus Play again.
-    if (state.result.status !== 'in_progress') {
-      const playAgain = app.querySelector<HTMLButtonElement>('[data-testid="play-again"]');
-      if (playAgain !== null) playAgain.focus();
+    if (state.result.status !== 'in_progress') focusPlayAgain(ctx.app);
+    if (ctx.announcer !== null && ctx.previousState !== state) {
+      ctx.announcer.announce(ctx.previousState, state);
     }
-
-    // Announce banner text via the shared live region when terminal.
-    if (announce !== null) {
-      const banner = bannerTextFor(state.result, 'X');
-      announce.textContent = banner ?? '';
-    }
-
-    // Schedule AI move on the microtask queue if it is its turn.
+    ctx.previousState = state;
     if (
       state.result.status === 'in_progress' &&
       state.mode === 'solo' &&
       state.turn === 'O' &&
-      !aiDisabled
+      !ctx.aiDisabled
     ) {
-      queueMicrotask(() => maybeRunAi(store, aiDisabled));
+      queueMicrotask(() => maybeRunAi(ctx.store, ctx.aiDisabled));
     }
   };
 
+const mount = (): void => {
+  const app = document.querySelector<HTMLElement>('#app');
+  const announceEl = document.querySelector<HTMLElement>('#announce');
+  if (app === null) {
+    console.error('bootstrap: #app not found');
+    return;
+  }
+
+  if (!hasModernFeatures()) {
+    renderAncientFallback(app, announceEl);
+    return;
+  }
+
+  const store = createStore(initialState());
+  const aiDisabled = isAiDisabled();
+  const announcer: AnnounceAdapter | null =
+    announceEl !== null ? createAnnouncer(announceEl) : null;
+
+  // Expose the store for e2e tests. No sensitive data; pure client UI state.
+  (window as unknown as { __store: Store }).__store = store;
+
+  const ctx: RuntimeContext = {
+    app,
+    store,
+    announcer,
+    aiDisabled,
+    previousState: store.getState(),
+  };
+
+  const renderApp = createRenderApp(ctx);
   store.subscribe(renderApp);
 
-  // Pointer input — delegated.
-  attachPointer(app, (action) => store.dispatch(action));
+  attachPointer(app, (action) => dispatchWithAnnounce(store, announcer, action));
+  attachKeyboard(app, (action) => dispatchWithAnnounce(store, announcer, action));
+  wirePlayAgainClick(app, store);
 
-  // Play-again: delegated click on the app container. Since the button is
-  // rendered anew each time, we rely on delegation on the app root.
-  app.addEventListener('click', (event) => {
-    const target = event.target;
-    if (target instanceof Element && target.closest('[data-testid="play-again"]') !== null) {
-      store.dispatch({ type: 'RESET' });
-    }
-  });
-
-  // Initial paint.
   renderApp();
 };
 

@@ -18,7 +18,9 @@ export default defineConfig({
         'src/**/*.test.ts',
         'src/adapters/bootstrap.ts',
         'src/adapters/render.ts',
-        'src/adapters/input/**',
+        'src/adapters/announce.ts',
+        'src/adapters/input/pointer.ts',
+        'src/adapters/input/keyboard.ts',
       ],
       thresholds: {
         lines: 95,

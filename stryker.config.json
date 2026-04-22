@@ -14,7 +14,9 @@
     "!src/**/*.d.ts",
     "!src/adapters/bootstrap.ts",
     "!src/adapters/render.ts",
-    "!src/adapters/input/**"
+    "!src/adapters/announce.ts",
+    "!src/adapters/input/pointer.ts",
+    "!src/adapters/input/keyboard.ts"
   ],
   "coverageAnalysis": "perTest",
   "reporters": ["progress", "clear-text", "html"],

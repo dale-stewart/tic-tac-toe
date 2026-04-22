@@ -46,7 +46,7 @@ const renderCell = (row: number, col: number, cell: Cell): TemplateResult => htm
     data-col=${col}
     data-testid="cell-${row}-${col}"
     aria-label=${ariaLabelForCell(row, col, cell)}
-    tabindex="-1"
+    tabindex="0"
   >
     ${cellText(cell)}
   </div>
