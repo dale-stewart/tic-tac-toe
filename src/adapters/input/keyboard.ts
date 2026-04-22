@@ -53,35 +53,11 @@ export const attachKeyboard = (
   dispatch: (action: Action) => void,
   getState?: () => GameState,
 ): void => {
+  // Grid-local keys — arrows, Enter, Space. Attached to the grid root because
+  // these only make sense with a gridcell focused.
   root.addEventListener('keydown', (event) => {
     const target = event.target;
     if (!(target instanceof Element)) return;
-
-    // Global difficulty shortcuts: 1/2/3 work from anywhere on the page, but
-    // not when the user is typing inside the grid (the grid consumes Enter
-    // and Space — digit keys are intentionally not consumed there either,
-    // but dispatching SET_DIFFICULTY from any focused element is the spec).
-    const difficulty = keyToDifficulty(event.key);
-    if (difficulty !== null) {
-      event.preventDefault();
-      dispatch({ type: 'SET_DIFFICULTY', difficulty });
-      return;
-    }
-
-    // Global mode toggle: H/h flips solo <-> hot-seat from anywhere. The reducer
-    // rejects mid-game as a correctness backstop, but we skip dispatch here when
-    // the store hook is available — avoids noisy no-op dispatches.
-    const modeSignal = keyToMode(event.key);
-    if (modeSignal !== null) {
-      event.preventDefault();
-      if (getState !== undefined) {
-        const state = getState();
-        const next = state.mode === 'solo' ? 'hot-seat' : 'solo';
-        dispatch({ type: 'SET_MODE', mode: next });
-      }
-      return;
-    }
-
     const cell = target.closest('[role="gridcell"]');
     if (cell === null) return;
 
@@ -92,5 +68,29 @@ export const attachKeyboard = (
 
     event.preventDefault();
     handleIntent(root, cell, intent, dispatch);
+  });
+
+  // Global shortcuts — 1/2/3 for difficulty, H for mode toggle. Attached to
+  // document so they work from anywhere, independent of where focus lives
+  // (previously `root`-bound, which silently failed whenever focus was on
+  // <body> — e.g. the brief window after clicking Play again).
+  document.addEventListener('keydown', (event) => {
+    const difficulty = keyToDifficulty(event.key);
+    if (difficulty !== null) {
+      event.preventDefault();
+      dispatch({ type: 'SET_DIFFICULTY', difficulty });
+      return;
+    }
+
+    const modeSignal = keyToMode(event.key);
+    if (modeSignal !== null) {
+      event.preventDefault();
+      if (getState !== undefined) {
+        const state = getState();
+        const next = state.mode === 'solo' ? 'hot-seat' : 'solo';
+        dispatch({ type: 'SET_MODE', mode: next });
+      }
+      return;
+    }
   });
 };

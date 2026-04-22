@@ -209,6 +209,59 @@ test.describe('@slice:05 — Play again preserves hot-seat mode', () => {
   });
 });
 
+test.describe('global shortcuts survive Play-again focus transitions', () => {
+  // Regression: after clicking Play again, focus briefly passes through <body>
+  // as the button is removed from the DOM. H and 1/2/3 are documented as
+  // "global" shortcuts; previously the keydown listener was bound to #app,
+  // so the shortcut silently no-op'd whenever focus left the app root. These
+  // tests lock in the document-level binding.
+
+  test('H toggles mode immediately after clicking Play again (solo → hot-seat → solo)', async ({
+    page,
+  }) => {
+    await goToApp(page);
+    await seedMoves(page, [
+      [0, 0], // X
+      [1, 0], // O
+      [0, 1], // X
+      [1, 1], // O
+      [0, 2], // X wins
+    ]);
+    await expect(page.getByTestId('result-banner')).toHaveText('You win!');
+    await page.getByTestId('play-again').click();
+    await expect(page.locator('#app')).toHaveAttribute('data-mode', 'solo');
+
+    // Press H with no explicit focus action — should toggle to hot-seat.
+    await page.keyboard.press('h');
+    await expect(page.locator('#app')).toHaveAttribute('data-mode', 'hot-seat');
+
+    // And again — should toggle back.
+    await page.keyboard.press('H');
+    await expect(page.locator('#app')).toHaveAttribute('data-mode', 'solo');
+  });
+
+  test('digit shortcuts switch difficulty immediately after clicking Play again', async ({
+    page,
+  }) => {
+    await goToApp(page);
+    await seedMoves(page, [
+      [0, 0],
+      [1, 0],
+      [0, 1],
+      [1, 1],
+      [0, 2],
+    ]);
+    await page.getByTestId('play-again').click();
+    await expect(page.locator('#app')).toHaveAttribute('data-difficulty', 'medium');
+
+    await page.keyboard.press('3');
+    await expect(page.locator('#app')).toHaveAttribute('data-difficulty', 'perfect');
+
+    await page.keyboard.press('1');
+    await expect(page.locator('#app')).toHaveAttribute('data-difficulty', 'easy');
+  });
+});
+
 // Scenario Outline — 4 cases.
 type Move = readonly [number, number];
 interface OutlineCase {
