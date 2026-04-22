@@ -80,7 +80,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
-      - uses: astral-sh/setup-uv@v8
+      - uses: astral-sh/setup-uv@v8.1.0
       - run: uvx --from lizard lizard src -l typescript -C 10 -L 80 -a 5 -w
 
   # Gate 5 — build + artifact upload (feeds 6/7/8)
