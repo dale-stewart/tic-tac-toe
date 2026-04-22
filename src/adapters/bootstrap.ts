@@ -77,6 +77,18 @@ const focusPlayAgain = (app: HTMLElement): void => {
   if (playAgain !== null) playAgain.focus();
 };
 
+/**
+ * Focus the center cell on initial paint so keyboard users see the focus
+ * indicator immediately — discoverability affordance for arrow-key navigation.
+ * Only fires if nothing else on the page has focus (don't steal focus from a
+ * user who already interacted with the document before mount).
+ */
+const focusInitialCell = (app: HTMLElement): void => {
+  if (document.activeElement !== null && document.activeElement !== document.body) return;
+  const center = app.querySelector<HTMLElement>('[data-testid="cell-1-1"]');
+  if (center !== null) center.focus();
+};
+
 const wirePlayAgainClick = (app: HTMLElement, store: Store): void => {
   app.addEventListener('click', (event) => {
     const target = event.target;
@@ -162,6 +174,7 @@ const mount = (): void => {
   wirePlayAgainClick(app, store);
 
   renderApp();
+  focusInitialCell(app);
 };
 
 mount();

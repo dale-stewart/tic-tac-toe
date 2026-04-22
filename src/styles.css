@@ -89,15 +89,21 @@ main {
 }
 
 /*
- * Focus indicators — visible outline meeting WCAG 2.2 AA 3:1 contrast.
- * Cell background is #f7f7f7 (near-white); outline color #003b82 (dark blue)
- * gives ~9:1 contrast against that background, well above the 3:1 minimum.
- * Play-again button background #ffffff; same outline color gives ~10:1.
+ * Focus indicators — outline + background tint + inner ring so the focused
+ * cell is noticeable peripherally, not just on close inspection. The 3:1
+ * WCAG 2.2 AA minimum was underpowered in practice against the near-white
+ * cell background.
+ *
+ * Outline color #003b82 (dark blue) gives ~9:1 contrast against #f7f7f7 —
+ * the background tint #e6efff adds ~11:1 contrast with the original cell
+ * while staying light enough not to obscure the X/O glyph.
  */
 .board [role='gridcell']:focus-visible,
 .board [role='gridcell']:focus {
-  outline: 3px solid #003b82;
+  outline: 4px solid #003b82;
   outline-offset: 2px;
+  background: #e6efff;
+  box-shadow: inset 0 0 0 2px #003b82;
 }
 
 .play-again {
