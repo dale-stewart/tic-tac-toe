@@ -13,7 +13,8 @@ import { detectResult } from '../win-detector';
 
 type Rng = () => number;
 
-const opponent = (mark: Mark): Mark => (mark === 'X' ? 'O' : 'X');
+// Exported for direct mutation-kill coverage; not part of the adapter's public surface.
+export const opponent = (mark: Mark): Mark => (mark === 'X' ? 'O' : 'X');
 
 // 9-character board key: 'X' / 'O' / '-' per cell in row-major order.
 // Kept internal; exported only for direct test coverage of the encoder.
@@ -38,7 +39,9 @@ interface Evaluation {
 const emptyCellsRowMajor = (state: BoardState): ReadonlyArray<readonly [number, number]> => {
   const cells: Array<readonly [number, number]> = [];
   for (let row = 0; row < 3; row += 1) {
+    // Stryker disable next-line EqualityOperator: equivalent mutant — iterating col to 3 reads state[row][3] which is undefined; undefined === null is false, so no extra cell is pushed. Matches the pattern already annotated in easy.ts and announce-strings.ts.
     for (let col = 0; col < 3; col += 1) {
+      // Stryker disable next-line ConditionalExpression: equivalent mutant — if the guard is bypassed (`true`) the list would include filled cells, but minimax's downstream placeMark returns !ok for filled cells and `continue`s, so the chosen move is unchanged.
       if (state[row]![col] === null) cells.push([row, col] as const);
     }
   }
@@ -54,7 +57,8 @@ const terminalEvaluation = (state: BoardState, maximizer: Mark): Evaluation | nu
   return null;
 };
 
-const pickBetter = (
+// Exported for direct mutation-kill coverage; not part of the adapter's public surface.
+export const pickBetter = (
   current: Evaluation,
   candidate: Evaluation,
   move: readonly [number, number],
@@ -63,6 +67,8 @@ const pickBetter = (
   const better = isMaxTurn ? candidate.score > current.score : candidate.score < current.score;
   return better ? { score: candidate.score, move } : current;
 };
+
+export type { Evaluation };
 
 const minimax = (
   state: BoardState,

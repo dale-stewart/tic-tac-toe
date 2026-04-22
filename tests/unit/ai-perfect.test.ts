@@ -3,7 +3,7 @@
  */
 import { describe, it, expect } from 'vitest';
 import { emptyBoard, placeMark, type BoardState, type Mark } from '../../src/core/board';
-import { boardKey, choosePerfectMove } from '../../src/core/ai/perfect';
+import { boardKey, choosePerfectMove, opponent, pickBetter } from '../../src/core/ai/perfect';
 
 const play = (board: BoardState, moves: ReadonlyArray<[number, number, Mark]>): BoardState => {
   let b = board;
@@ -104,5 +104,56 @@ describe('boardKey', () => {
 
   it('distinguishes boards by whose turn it is', () => {
     expect(boardKey(emptyBoard(), 'X')).not.toBe(boardKey(emptyBoard(), 'O'));
+  });
+});
+
+describe('opponent', () => {
+  it("maps 'X' to 'O'", () => {
+    expect(opponent('X')).toBe('O');
+  });
+
+  it("maps 'O' to 'X'", () => {
+    expect(opponent('O')).toBe('X');
+  });
+});
+
+describe('pickBetter', () => {
+  const moveA = [0, 0] as const;
+  const moveB = [1, 1] as const;
+
+  it('max-turn: strictly better candidate replaces current', () => {
+    const current = { score: 0, move: moveA };
+    const candidate = { score: 1, move: null };
+    expect(pickBetter(current, candidate, moveB, true)).toEqual({ score: 1, move: moveB });
+  });
+
+  it('max-turn: equal-score candidate does NOT replace (stable first-found wins)', () => {
+    const current = { score: 0, move: moveA };
+    const candidate = { score: 0, move: null };
+    expect(pickBetter(current, candidate, moveB, true)).toEqual(current);
+  });
+
+  it('max-turn: worse candidate keeps current', () => {
+    const current = { score: 1, move: moveA };
+    const candidate = { score: -1, move: null };
+    expect(pickBetter(current, candidate, moveB, true)).toEqual(current);
+  });
+
+  it('min-turn: strictly smaller candidate replaces current', () => {
+    const current = { score: 0, move: moveA };
+    const candidate = { score: -1, move: null };
+    expect(pickBetter(current, candidate, moveB, false)).toEqual({ score: -1, move: moveB });
+  });
+
+  it('min-turn: equal-score candidate does NOT replace (stable first-found wins)', () => {
+    const current = { score: 0, move: moveA };
+    const candidate = { score: 0, move: null };
+    expect(pickBetter(current, candidate, moveB, false)).toEqual(current);
+  });
+
+  it('min-turn: larger candidate keeps current', () => {
+    const current = { score: -1, move: moveA };
+    const candidate = { score: 1, move: null };
+    expect(pickBetter(current, candidate, moveB, false)).toEqual(current);
   });
 });
