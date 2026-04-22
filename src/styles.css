@@ -122,6 +122,60 @@ main {
   outline-offset: 2px;
 }
 
+/*
+ * Difficulty radio-group — segmented control.
+ * Selection indicated by filled background + stronger border + checkmark
+ * prefix (don't rely on color alone — WCAG 1.4.1).
+ * Disabled: muted palette + not-allowed cursor; still readable.
+ */
+.difficulty-group {
+  display: inline-flex;
+  gap: 0.25rem;
+  border: 1px solid #333333;
+  border-radius: 6px;
+  padding: 2px;
+  background: #ffffff;
+}
+
+.difficulty-group [role='radio'] {
+  padding: 0.35rem 0.75rem;
+  font-size: 0.9rem;
+  border-radius: 4px;
+  cursor: pointer;
+  user-select: none;
+  color: #111111;
+  background: transparent;
+  text-transform: capitalize;
+}
+
+.difficulty-group [role='radio'][aria-checked='true'] {
+  background: #003b82;
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.difficulty-group [role='radio'][aria-checked='true']::before {
+  content: '✓ ';
+}
+
+.difficulty-group [role='radio']:hover:not([aria-disabled='true']):not([aria-checked='true']) {
+  background: #e6efff;
+}
+
+.difficulty-group[aria-disabled='true'] {
+  opacity: 0.55;
+}
+
+.difficulty-group[aria-disabled='true'] [role='radio'] {
+  cursor: not-allowed;
+}
+
+.difficulty-group [role='radio']:focus-visible,
+.difficulty-group [role='radio']:focus {
+  outline: 3px solid #003b82;
+  outline-offset: 2px;
+}
+
 /* Hide the #announce live region visually while keeping it in the a11y tree. */
 #announce {
   position: absolute;
