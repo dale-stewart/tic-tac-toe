@@ -5,7 +5,13 @@
  */
 import { describe, it, expect } from 'vitest';
 import fc from 'fast-check';
-import { diffToMessage } from '../../src/adapters/announce-strings';
+import {
+  combine,
+  diffToMessage,
+  findPlacement,
+  isResetToEmpty,
+} from '../../src/adapters/announce-strings';
+import { emptyBoard } from '../../src/core/board';
 import { gameReducer, initialState, type GameState } from '../../src/core/game';
 
 const fresh = (): GameState => initialState();
@@ -18,6 +24,30 @@ describe('diffToMessage', () => {
     expect(message).not.toBeNull();
     expect(message!).toMatch(/row 2/i);
     expect(message!).toMatch(/column 2/i);
+  });
+
+  // Each placement must report its own coords — not always [0,0] nor always [1,1].
+  // Kills mutants that short-circuit findPlacement to return the first iteration.
+  it.each([
+    [0, 1, 'row 1', 'column 2'],
+    [0, 2, 'row 1', 'column 3'],
+    [1, 0, 'row 2', 'column 1'],
+    [1, 2, 'row 2', 'column 3'],
+    [2, 0, 'row 3', 'column 1'],
+    [2, 1, 'row 3', 'column 2'],
+    [2, 2, 'row 3', 'column 3'],
+  ] as const)('placement at [%i,%i] mentions %s and %s', (row, col, expectedRow, expectedCol) => {
+    const before = fresh();
+    const after = gameReducer(before, { type: 'PLACE_MARK', row, col });
+    const message = diffToMessage(before, after);
+    expect(message).toContain(expectedRow);
+    expect(message).toContain(expectedCol);
+  });
+
+  it('announces the mark character (X for the first placement on a fresh board)', () => {
+    const before = fresh();
+    const after = gameReducer(before, { type: 'PLACE_MARK', row: 2, col: 2 });
+    expect(diffToMessage(before, after)).toMatch(/^X at row 3, column 3/);
   });
 
   it('announces "Cell already taken" when PLACE_MARK targets a filled cell (no state change, same reference)', () => {
@@ -132,5 +162,166 @@ describe('diffToMessage', () => {
         return typeof message === 'string' && message.length > 0;
       }),
     );
+  });
+});
+
+// Structurally craft terminal states so isResetToEmpty branches can be tested
+// independently of reducer reachability.
+const wonByX = (): GameState => {
+  let state = fresh();
+  for (const [row, col] of [
+    [0, 0],
+    [2, 0],
+    [0, 1],
+    [2, 1],
+    [0, 2],
+  ] as const) {
+    state = gameReducer(state, { type: 'PLACE_MARK', row, col });
+  }
+  return state;
+};
+
+const drawState = (): GameState => {
+  let state = fresh();
+  for (const [row, col] of [
+    [0, 0],
+    [0, 1],
+    [0, 2],
+    [1, 2],
+    [1, 0],
+    [2, 0],
+    [1, 1],
+    [2, 2],
+    [2, 1],
+  ] as const) {
+    state = gameReducer(state, { type: 'PLACE_MARK', row, col });
+  }
+  return state;
+};
+
+const emptyBoardState = (): GameState['board'] => [
+  [null, null, null],
+  [null, null, null],
+  [null, null, null],
+];
+
+// Sparse non-empty board: at least one cell filled, but every row has ≥ 1 null.
+// Purpose: distinguishes row.every(every-null) from row.every(some-null).
+const sparseNonEmptyBoard = (): GameState['board'] => [
+  [null, 'X', null],
+  [null, null, null],
+  [null, null, null],
+];
+
+describe('isResetToEmpty', () => {
+  it('returns false when before is in_progress (not a post-terminal reset)', () => {
+    const before = fresh();
+    const after = gameReducer(fresh(), { type: 'RESET' });
+    expect(isResetToEmpty(before, after)).toBe(false);
+  });
+
+  it('returns false when after is still terminal (no reset happened)', () => {
+    const before = wonByX();
+    const after = wonByX();
+    expect(isResetToEmpty(before, after)).toBe(false);
+  });
+
+  // Kills ConditionalExpression mutant on the `after !== in_progress` guard:
+  // without that guard, a structurally-invalid "terminal with empty board"
+  // would pass the final board-check and return true.
+  it('returns false when after is terminal even with an empty board (after-check is load-bearing)', () => {
+    const before = wonByX();
+    const after: GameState = { ...before, board: emptyBoardState() };
+    expect(after.result.status).not.toBe('in_progress');
+    expect(isResetToEmpty(before, after)).toBe(false);
+  });
+
+  // Kills MethodExpression mutant on `row.every(cell === null)` → `row.some(cell === null)`:
+  // every row has ≥ 1 null, but not every cell is null.
+  it('returns false when after has a sparsely-populated board (every-vs-some distinction)', () => {
+    const before = wonByX();
+    const after: GameState = {
+      ...before,
+      board: sparseNonEmptyBoard(),
+      result: { status: 'in_progress' },
+    };
+    expect(isResetToEmpty(before, after)).toBe(false);
+  });
+
+  it('returns false when after is non-empty even if transitioning from terminal', () => {
+    const before = wonByX();
+    // Craft a hypothetical: post-terminal in_progress but board still has marks.
+    const after: GameState = { ...before, result: { status: 'in_progress' } };
+    expect(isResetToEmpty(before, after)).toBe(false);
+  });
+
+  it('returns true when transitioning from a won terminal to an empty in_progress board', () => {
+    const before = wonByX();
+    const after = gameReducer(before, { type: 'RESET' });
+    expect(isResetToEmpty(before, after)).toBe(true);
+  });
+
+  it('returns true when transitioning from a draw terminal to an empty in_progress board', () => {
+    const before = drawState();
+    const after = gameReducer(before, { type: 'RESET' });
+    expect(isResetToEmpty(before, after)).toBe(true);
+  });
+});
+
+describe('findPlacement', () => {
+  it('returns null when before and after are identical', () => {
+    const b = emptyBoard();
+    expect(findPlacement(b, b)).toBeNull();
+  });
+
+  it('locates the diffed coord when one cell changes', () => {
+    const before = emptyBoard();
+    const afterState = gameReducer(fresh(), { type: 'PLACE_MARK', row: 2, col: 2 });
+    const result = findPlacement(before, afterState.board);
+    expect(result).toEqual({ row: 2, col: 2, mark: 'X' });
+  });
+
+  it.each([
+    [0, 1, 'X'],
+    [0, 2, 'X'],
+    [1, 0, 'X'],
+    [1, 2, 'X'],
+    [2, 0, 'X'],
+    [2, 1, 'X'],
+  ] as const)(
+    'returns exact coord %i,%i (kills first-iteration short-circuit mutants)',
+    (row, col, mark) => {
+      const before = emptyBoard();
+      const after = gameReducer(fresh(), { type: 'PLACE_MARK', row, col });
+      expect(findPlacement(before, after.board)).toEqual({ row, col, mark });
+    },
+  );
+
+  it('returns null when no empty-to-filled transition exists (same board)', () => {
+    const b = gameReducer(fresh(), { type: 'PLACE_MARK', row: 0, col: 0 }).board;
+    expect(findPlacement(b, b)).toBeNull();
+  });
+});
+
+describe('combine', () => {
+  it('returns null when both prefix and suffix are null', () => {
+    expect(combine(null, null)).toBeNull();
+  });
+
+  it('returns the prefix alone when suffix is null', () => {
+    expect(combine('X at row 1, column 1.', null)).toBe('X at row 1, column 1.');
+  });
+
+  it('returns the suffix alone when prefix is null', () => {
+    expect(combine(null, 'You win.')).toBe('You win.');
+  });
+
+  it('joins both with a single space when both are present', () => {
+    expect(combine('X at row 1, column 1.', 'You win.')).toBe('X at row 1, column 1. You win.');
+  });
+
+  it('never emits the literal string "null" for one-sided inputs', () => {
+    expect(combine(null, 'Draw.')).not.toMatch(/null/);
+    expect(combine('X at row 3, column 3.', null)).not.toMatch(/null/);
   });
 });

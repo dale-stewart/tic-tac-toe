@@ -34,6 +34,7 @@ export const keyToIntent = (key: string): KeyIntent | null => {
   }
 };
 
+// Stryker disable next-line EqualityOperator: equivalent mutants on both bounds — `value < 0` → `value <= 0` and `value > 2` → `value >= 2` produce the same clamped output at the boundary values (0 and 2) and everywhere else, because both branches of the boundary ternary return the boundary itself.
 const clamp = (value: number): number => (value < 0 ? 0 : value > 2 ? 2 : value);
 
 /**

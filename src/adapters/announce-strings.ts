@@ -13,11 +13,13 @@ export interface DiffOptions {
   readonly humanMark?: Mark;
 }
 
-const findPlacement = (
+// Exported for direct mutation-kill coverage; not part of the adapter's public surface.
+export const findPlacement = (
   before: BoardState,
   after: BoardState,
 ): { readonly row: number; readonly col: number; readonly mark: Mark } | null => {
   for (let row = 0; row < 3; row += 1) {
+    // Stryker disable next-line EqualityOperator: equivalent mutant — extending the bound to `col <= 3` reads after[row][3] which is `undefined`; `undefined !== null` is true but `before[row][3]` is also undefined and `undefined === null` is false, so the guard never fires. No observable difference.
     for (let col = 0; col < 3; col += 1) {
       const beforeCell = before[row]![col]!;
       const afterCell = after[row]![col]!;
@@ -37,7 +39,8 @@ const terminalMessage = (state: GameState, humanMark: Mark): string | null => {
   return null;
 };
 
-const isResetToEmpty = (before: GameState, after: GameState): boolean => {
+// Exported for direct mutation-kill coverage; not part of the adapter's public surface.
+export const isResetToEmpty = (before: GameState, after: GameState): boolean => {
   if (before.result.status === 'in_progress') return false;
   if (after.result.status !== 'in_progress') return false;
   return after.board.every((row) => row.every((cell) => cell === null));
@@ -49,7 +52,8 @@ const placementText = (before: BoardState, after: BoardState): string | null => 
   return `${placement.mark} at row ${placement.row + 1}, column ${placement.col + 1}.`;
 };
 
-const combine = (prefix: string | null, suffix: string | null): string | null => {
+// Exported for direct mutation-kill coverage; not part of the adapter's public surface.
+export const combine = (prefix: string | null, suffix: string | null): string | null => {
   if (prefix !== null && suffix !== null) return `${prefix} ${suffix}`;
   return prefix ?? suffix;
 };
@@ -69,6 +73,7 @@ export const diffToMessage = (
   if (before === after) {
     return options.rejected === true ? 'Cell already taken' : null;
   }
+  // Stryker disable next-line ConditionalExpression: equivalent mutant — if this guard is bypassed (`false`), the reset-to-empty case falls through to placementText (returns null: no marks were added, only removed) and terminalMessage (returns null: after is in_progress), so combine(null, null) → null. Same observable result as the original early-return.
   if (isResetToEmpty(before, after)) return null;
 
   const humanMark: Mark = options.humanMark ?? 'X';

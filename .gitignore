@@ -10,3 +10,4 @@ test-results/
 .env.local
 .lighthouseci/
 reports/
+.stryker-tmp/
