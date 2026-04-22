@@ -17,7 +17,9 @@ export type GameResult =
   | { readonly status: 'draw' };
 
 // Enumerate the 8 winning lines statically.
-const LINES: readonly WinLine[] = [
+// Exported for use by view-layer consumers that need to iterate or property-
+// test against the full set of lines (e.g. render-strings winLineEndpoints).
+export const LINES: readonly WinLine[] = [
   // Rows
   [
     { row: 0, col: 0 },

@@ -26,6 +26,7 @@ import {
   modeLabelText,
   modeRadioAriaLabel,
   turnIndicatorText,
+  winLineEndpoints,
 } from './render-strings';
 
 export {
@@ -141,6 +142,31 @@ const renderModeGroup = (selected: GameMode, disabled: boolean): TemplateResult 
   </div>
 `;
 
+const renderWinLine = (result: GameResult): TemplateResult | typeof nothing => {
+  if (result.status !== 'won') return nothing;
+  const { x1, y1, x2, y2 } = winLineEndpoints(result.line);
+  // viewBox 0 0 3 3 — one unit per cell; preserveAspectRatio="none" stretches
+  // to whatever the .board box ends up at. Absolute positioning (see styles.css
+  // .board::win-line) ensures the SVG overlays the grid without reflowing it.
+  return html`
+    <svg
+      class="win-line"
+      data-testid="win-line"
+      viewBox="0 0 3 3"
+      preserveAspectRatio="none"
+      aria-hidden="true"
+    >
+      <line
+        x1=${String(x1)}
+        y1=${String(y1)}
+        x2=${String(x2)}
+        y2=${String(y2)}
+        class="win-line-stroke"
+      />
+    </svg>
+  `;
+};
+
 export const renderBoard = (view: RenderView): TemplateResult => html`
   <section class="game-shell">
     <div class="controls-row">
@@ -157,7 +183,7 @@ export const renderBoard = (view: RenderView): TemplateResult => html`
       data-mode=${view.mode}
       data-difficulty=${view.difficulty}
     >
-      ${view.board.map((row, rowIndex) => renderRow(rowIndex, row))}
+      ${view.board.map((row, rowIndex) => renderRow(rowIndex, row))} ${renderWinLine(view.result)}
     </div>
     ${renderBanner(view.result, 'X', view.mode)}
   </section>

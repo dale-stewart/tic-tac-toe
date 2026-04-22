@@ -21,6 +21,24 @@
         </section>
       </noscript>
     </main>
+    <!--
+      Static no-ads trust footer (slice 07). Rendered directly in index.html
+      rather than via lit-html so it's visible on first paint without waiting
+      for JS, cannot shift layout as JS hydrates, and survives the ancient-
+      browser fallback path (which replaces #app content but leaves the
+      document-level footer intact).
+    -->
+    <footer class="site-footer" data-testid="site-footer">
+      <p class="no-ads-copy">No ads. No signup. No tracking.</p>
+      <a
+        class="source-link"
+        data-testid="source-link"
+        href="https://github.com/dale-stewart/tic-tac-toe"
+        target="_blank"
+        rel="noopener noreferrer"
+        >[source]</a
+      >
+    </footer>
     <div id="announce" role="status" aria-live="polite"></div>
     <script type="module" src="/src/adapters/bootstrap.ts"></script>
   </body>
