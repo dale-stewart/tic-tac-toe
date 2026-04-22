@@ -10,11 +10,16 @@ export default defineConfig({
       provider: 'v8',
       reporter: ['text', 'html', 'lcov'],
       reportsDirectory: 'reports/coverage',
-      // Core + vitest-observable adapters. DOM-entangled adapters
-      // (bootstrap, render's TemplateResult builders, pointer) are
-      // exercised by Playwright and excluded below.
-      include: ['src/core/**/*.ts', 'src/adapters/store.ts', 'src/adapters/render-strings.ts'],
-      exclude: ['src/**/*.test.ts'],
+      // Deny-list: include all source, exclude only what vitest cannot
+      // observe (DOM-entangled adapters covered by Playwright instead).
+      // New pure files are picked up automatically.
+      include: ['src/**/*.ts'],
+      exclude: [
+        'src/**/*.test.ts',
+        'src/adapters/bootstrap.ts',
+        'src/adapters/render.ts',
+        'src/adapters/input/**',
+      ],
       thresholds: {
         lines: 95,
         branches: 95,
