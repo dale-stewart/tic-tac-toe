@@ -20,6 +20,7 @@ make install         # one-time — bun install --frozen-lockfile
 make lint            # ESLint (incl. complexity / max-lines / max-params rules)
 make typecheck       # tsc --noEmit
 make test            # Vitest + fast-check
+make coverage        # Vitest coverage over src/core (≥ 95%)
 make depcruise       # architectural boundary check
 make duplication     # jscpd copy-paste detection
 make complexity      # lizard cyclomatic complexity (via uvx)

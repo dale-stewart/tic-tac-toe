@@ -5,7 +5,7 @@
 .PHONY: help install dev build preview preview-pages \
         lint typecheck lint-and-typecheck \
         test test-watch test-unit test-e2e test-a11y \
-        depcruise duplication complexity mutation size lhci \
+        depcruise duplication complexity mutation coverage size lhci \
         check clean distclean hooks
 
 help: ## Show available targets
@@ -66,6 +66,9 @@ complexity: ## Cyclomatic complexity (lizard via uvx; requires uv)
 
 mutation: ## Mutation testing (Stryker over src/core; ≥ 80% kill rate)
 	bun run mutation
+
+coverage: ## Line/branch coverage (vitest over src/core; ≥ 95%)
+	bun run coverage
 
 size: ## Bundle-size budget (≤ 50 KB gzipped)
 	bun run size
