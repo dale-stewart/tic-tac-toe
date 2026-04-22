@@ -81,6 +81,10 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - uses: astral-sh/setup-uv@v8.1.0
+        with:
+          # This repo has no Python project; uv is only a launcher for lizard.
+          # Disable dependency-file caching to silence the "no file matched" warning.
+          enable-cache: false
       - run: uvx --from lizard lizard src -l typescript -C 10 -L 80 -a 5 -w
 
   # Gate 5 — build + artifact upload (feeds 6/7/8)
