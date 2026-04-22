@@ -4,3 +4,6 @@ playwright-report
 test-results
 coverage
 pnpm-lock.yaml
+# DES-managed artefacts (append-only; CLI controls formatting).
+docs/feature/**/deliver/execution-log.json
+docs/feature/**/deliver/.develop-progress.json

@@ -8,8 +8,8 @@
  * All pure logic lives in ./keyboard-pure. This module only handles DOM
  * translation (reading focused cell coords; calling focus()) and dispatch.
  */
-import type { Action } from '../../core/game';
-import { keyToDifficulty, keyToIntent, nextFocusFor } from './keyboard-pure';
+import type { Action, GameState } from '../../core/game';
+import { keyToDifficulty, keyToIntent, keyToMode, nextFocusFor } from './keyboard-pure';
 
 const readCoord = (element: Element): readonly [number, number] | null => {
   const rowAttr = element.getAttribute('data-row');
@@ -48,7 +48,11 @@ const handleIntent = (
   if (nextCell !== null) nextCell.focus();
 };
 
-export const attachKeyboard = (root: HTMLElement, dispatch: (action: Action) => void): void => {
+export const attachKeyboard = (
+  root: HTMLElement,
+  dispatch: (action: Action) => void,
+  getState?: () => GameState,
+): void => {
   root.addEventListener('keydown', (event) => {
     const target = event.target;
     if (!(target instanceof Element)) return;
@@ -61,6 +65,20 @@ export const attachKeyboard = (root: HTMLElement, dispatch: (action: Action) => 
     if (difficulty !== null) {
       event.preventDefault();
       dispatch({ type: 'SET_DIFFICULTY', difficulty });
+      return;
+    }
+
+    // Global mode toggle: H/h flips solo <-> hot-seat from anywhere. The reducer
+    // rejects mid-game as a correctness backstop, but we skip dispatch here when
+    // the store hook is available — avoids noisy no-op dispatches.
+    const modeSignal = keyToMode(event.key);
+    if (modeSignal !== null) {
+      event.preventDefault();
+      if (getState !== undefined) {
+        const state = getState();
+        const next = state.mode === 'solo' ? 'hot-seat' : 'solo';
+        dispatch({ type: 'SET_MODE', mode: next });
+      }
       return;
     }
 

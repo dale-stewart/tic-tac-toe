@@ -21,6 +21,10 @@ import {
   difficultyLabelText,
   difficultyRadioAriaLabel,
   DIFFICULTY_OPTIONS,
+  MODE_OPTIONS,
+  modeGroupAriaLabel,
+  modeLabelText,
+  modeRadioAriaLabel,
   turnIndicatorText,
 } from './render-strings';
 
@@ -41,6 +45,7 @@ export interface RenderView {
   readonly mode: GameMode;
   readonly difficulty: Difficulty;
   readonly difficultyDisabled: boolean;
+  readonly modeDisabled: boolean;
   readonly result: GameResult;
 }
 
@@ -61,8 +66,12 @@ const renderRow = (row: number, cells: readonly Cell[]): TemplateResult => html`
   <div role="row">${cells.map((cell, col) => renderCell(row, col, cell))}</div>
 `;
 
-const renderBanner = (result: GameResult, humanMark: Mark): TemplateResult | typeof nothing => {
-  const text = bannerTextFor(result, humanMark);
+const renderBanner = (
+  result: GameResult,
+  humanMark: Mark,
+  mode: GameMode,
+): TemplateResult | typeof nothing => {
+  const text = bannerTextFor(result, humanMark, mode);
   if (text === null) return nothing;
   return html`
     <div data-testid="result-banner" class="result-banner" role="status" aria-live="polite">
@@ -93,7 +102,7 @@ const renderDifficultyRadio = (
 const renderDifficultyGroup = (selected: Difficulty, disabled: boolean): TemplateResult => html`
   <div
     role="radiogroup"
-    class="difficulty-group"
+    class="segmented-control difficulty-group"
     data-testid="difficulty-group"
     aria-label=${difficultyGroupAriaLabel()}
     aria-disabled=${disabled ? 'true' : 'false'}
@@ -102,11 +111,44 @@ const renderDifficultyGroup = (selected: Difficulty, disabled: boolean): Templat
   </div>
 `;
 
+const renderModeRadio = (
+  option: GameMode,
+  selected: GameMode,
+  disabled: boolean,
+): TemplateResult => html`
+  <div
+    role="radio"
+    data-testid="mode-${option}"
+    data-mode-option=${option}
+    aria-checked=${option === selected ? 'true' : 'false'}
+    aria-disabled=${disabled ? 'true' : 'false'}
+    aria-label=${modeRadioAriaLabel(option)}
+    tabindex=${option === selected ? '0' : '-1'}
+  >
+    ${modeLabelText(option)}
+  </div>
+`;
+
+const renderModeGroup = (selected: GameMode, disabled: boolean): TemplateResult => html`
+  <div
+    role="radiogroup"
+    class="segmented-control mode-group"
+    data-testid="mode-group"
+    aria-label=${modeGroupAriaLabel()}
+    aria-disabled=${disabled ? 'true' : 'false'}
+  >
+    ${MODE_OPTIONS.map((option) => renderModeRadio(option, selected, disabled))}
+  </div>
+`;
+
 export const renderBoard = (view: RenderView): TemplateResult => html`
   <section class="game-shell">
-    ${renderDifficultyGroup(view.difficulty, view.difficultyDisabled)}
+    <div class="controls-row">
+      ${renderModeGroup(view.mode, view.modeDisabled)}
+      ${renderDifficultyGroup(view.difficulty, view.difficultyDisabled)}
+    </div>
     <p data-testid="turn-indicator" class="turn-indicator" aria-live="polite">
-      ${turnIndicatorText(view.turn)}
+      ${turnIndicatorText(view.turn, view.mode)}
     </p>
     <div
       role="grid"
@@ -117,7 +159,7 @@ export const renderBoard = (view: RenderView): TemplateResult => html`
     >
       ${view.board.map((row, rowIndex) => renderRow(rowIndex, row))}
     </div>
-    ${renderBanner(view.result, 'X')}
+    ${renderBanner(view.result, 'X', view.mode)}
   </section>
 `;
 

@@ -123,12 +123,19 @@ main {
 }
 
 /*
- * Difficulty radio-group — segmented control.
+ * Segmented control — reusable styles for the difficulty and mode radio-groups.
  * Selection indicated by filled background + stronger border + checkmark
  * prefix (don't rely on color alone — WCAG 1.4.1).
  * Disabled: muted palette + not-allowed cursor; still readable.
  */
-.difficulty-group {
+.controls-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.segmented-control {
   display: inline-flex;
   gap: 0.25rem;
   border: 1px solid #333333;
@@ -137,7 +144,7 @@ main {
   background: #ffffff;
 }
 
-.difficulty-group [role='radio'] {
+.segmented-control [role='radio'] {
   padding: 0.35rem 0.75rem;
   font-size: 0.9rem;
   border-radius: 4px;
@@ -148,30 +155,30 @@ main {
   text-transform: capitalize;
 }
 
-.difficulty-group [role='radio'][aria-checked='true'] {
+.segmented-control [role='radio'][aria-checked='true'] {
   background: #003b82;
   color: #ffffff;
   font-weight: 600;
 }
 
-.difficulty-group [role='radio'][aria-checked='true']::before {
+.segmented-control [role='radio'][aria-checked='true']::before {
   content: '✓ ';
 }
 
-.difficulty-group [role='radio']:hover:not([aria-disabled='true']):not([aria-checked='true']) {
+.segmented-control [role='radio']:hover:not([aria-disabled='true']):not([aria-checked='true']) {
   background: #e6efff;
 }
 
-.difficulty-group[aria-disabled='true'] {
+.segmented-control[aria-disabled='true'] {
   opacity: 0.55;
 }
 
-.difficulty-group[aria-disabled='true'] [role='radio'] {
+.segmented-control[aria-disabled='true'] [role='radio'] {
   cursor: not-allowed;
 }
 
-.difficulty-group [role='radio']:focus-visible,
-.difficulty-group [role='radio']:focus {
+.segmented-control [role='radio']:focus-visible,
+.segmented-control [role='radio']:focus {
   outline: 3px solid #003b82;
   outline-offset: 2px;
 }

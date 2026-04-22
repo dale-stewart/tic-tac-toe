@@ -118,6 +118,18 @@ const wireDifficultyClick = (app: HTMLElement, store: Store): void => {
   });
 };
 
+const wireModeClick = (app: HTMLElement, store: Store): void => {
+  app.addEventListener('click', (event) => {
+    const target = event.target;
+    if (!(target instanceof Element)) return;
+    const radio = target.closest<HTMLElement>('[role="radio"][data-mode-option]');
+    if (radio === null) return;
+    const option = radio.getAttribute('data-mode-option');
+    if (option !== 'solo' && option !== 'hot-seat') return;
+    store.dispatch({ type: 'SET_MODE', mode: option });
+  });
+};
+
 interface RuntimeContext {
   readonly app: HTMLElement;
   readonly store: Store;
@@ -139,6 +151,7 @@ const createRenderApp =
         mode: state.mode,
         difficulty: state.difficulty,
         difficultyDisabled: isMidGame(state),
+        modeDisabled: isMidGame(state),
         result: state.result,
       }),
       ctx.app,
@@ -201,9 +214,14 @@ const mount = (): void => {
   store.subscribe(renderApp);
 
   attachPointer(app, (action) => dispatchWithAnnounce(store, announcer, action));
-  attachKeyboard(app, (action) => dispatchWithAnnounce(store, announcer, action));
+  attachKeyboard(
+    app,
+    (action) => dispatchWithAnnounce(store, announcer, action),
+    () => store.getState(),
+  );
   wirePlayAgainClick(app, store);
   wireDifficultyClick(app, store);
+  wireModeClick(app, store);
 
   renderApp();
   focusInitialCell(app);

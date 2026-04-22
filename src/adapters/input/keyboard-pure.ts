@@ -14,6 +14,15 @@ export type KeyIntent =
   | { readonly kind: 'activate' };
 
 /**
+ * Map the H/h key to a mode-toggle signal. Returns null for any other key.
+ * The keyboard layer resolves 'toggle' to the opposite of the current mode.
+ */
+export const keyToMode = (key: string): 'toggle' | null => {
+  if (key === 'h' || key === 'H') return 'toggle';
+  return null;
+};
+
+/**
  * Map a number-key (top-row digits 1/2/3) to a difficulty level. Returns null
  * for any other key. The mapping is stable: 1=easy, 2=medium, 3=perfect.
  */

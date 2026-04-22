@@ -24,7 +24,8 @@ export interface GameState {
 export type Action =
   | { readonly type: 'PLACE_MARK'; readonly row: number; readonly col: number }
   | { readonly type: 'RESET' }
-  | { readonly type: 'SET_DIFFICULTY'; readonly difficulty: Difficulty };
+  | { readonly type: 'SET_DIFFICULTY'; readonly difficulty: Difficulty }
+  | { readonly type: 'SET_MODE'; readonly mode: GameMode };
 
 const nextTurn = (mark: Mark): Mark => (mark === 'X' ? 'O' : 'X');
 
@@ -78,6 +79,20 @@ const handleSetDifficulty = (state: GameState, difficulty: Difficulty): GameStat
   };
 };
 
+const handleSetMode = (state: GameState, mode: GameMode): GameState => {
+  // Reject mid-game. Reference-preserving no-op keeps announce/render quiet.
+  if (isMidGame(state)) return state;
+  if (state.mode === mode) return state;
+  // Accepted switch: reset the board (fresh game). Difficulty carries over.
+  return {
+    board: emptyBoard(),
+    turn: 'X',
+    mode,
+    difficulty: state.difficulty,
+    result: { status: 'in_progress' },
+  };
+};
+
 export const gameReducer = (state: GameState, action: Action): GameState => {
   switch (action.type) {
     case 'PLACE_MARK':
@@ -92,5 +107,7 @@ export const gameReducer = (state: GameState, action: Action): GameState => {
       };
     case 'SET_DIFFICULTY':
       return handleSetDifficulty(state, action.difficulty);
+    case 'SET_MODE':
+      return handleSetMode(state, action.mode);
   }
 };

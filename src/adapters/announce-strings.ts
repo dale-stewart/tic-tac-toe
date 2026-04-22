@@ -71,6 +71,12 @@ export const difficultyChangeText = (before: GameState, after: GameState): strin
   return `Difficulty: ${after.difficulty}`;
 };
 
+// Exported for direct mutation-kill coverage; not part of the adapter's public surface.
+export const modeChangeText = (before: GameState, after: GameState): string | null => {
+  if (before.mode === after.mode) return null;
+  return `Mode: ${after.mode}`;
+};
+
 export const diffToMessage = (
   before: GameState,
   after: GameState,
@@ -81,6 +87,9 @@ export const diffToMessage = (
   }
   // Stryker disable next-line ConditionalExpression: equivalent mutant — if this guard is bypassed (`false`), the reset-to-empty case falls through to placementText (returns null: no marks were added, only removed) and terminalMessage (returns null: after is in_progress), so combine(null, null) → null. Same observable result as the original early-return.
   if (isResetToEmpty(before, after)) return null;
+
+  const mode = modeChangeText(before, after);
+  if (mode !== null) return mode;
 
   const difficulty = difficultyChangeText(before, after);
   if (difficulty !== null) return difficulty;
