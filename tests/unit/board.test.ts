@@ -1,13 +1,15 @@
 /**
  * Unit tests for the pure `board` module.
  * Port-to-port at domain scope: the function signature IS the driving port.
- *
- * Slice 01 scope: empty-board construction and shape invariants only.
- * `placeMark`, `cellsRemaining`, `toReadableString` land in later slices.
  */
 import { describe, it, expect } from 'vitest';
 import fc from 'fast-check';
-import { emptyBoard, type BoardState, type Cell } from '../../src/core/board';
+import {
+  emptyBoard,
+  placeMark,
+  type BoardState,
+  type Cell,
+} from '../../src/core/board';
 
 describe('board.emptyBoard', () => {
   it('returns a 3x3 grid', () => {
@@ -43,5 +45,61 @@ describe('board.emptyBoard', () => {
       }),
       { numRuns: 50 },
     );
+  });
+});
+
+describe('board.placeMark', () => {
+  it('places an X in an empty cell and returns Ok', () => {
+    const result = placeMark(emptyBoard(), 1, 1, 'X');
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      expect(result.value[1][1]).toBe('X');
+      // Other cells untouched.
+      expect(result.value[0][0]).toBeNull();
+      expect(result.value[2][2]).toBeNull();
+    }
+  });
+
+  it('returns Err cell_taken when placing on a filled cell', () => {
+    const first = placeMark(emptyBoard(), 0, 0, 'X');
+    expect(first.ok).toBe(true);
+    if (!first.ok) return;
+    const second = placeMark(first.value, 0, 0, 'O');
+    expect(second.ok).toBe(false);
+    if (!second.ok) {
+      expect(second.error).toBe('cell_taken');
+    }
+  });
+
+  it('returns Err out_of_bounds for negative row', () => {
+    const result = placeMark(emptyBoard(), -1, 0, 'X');
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(result.error).toBe('out_of_bounds');
+    }
+  });
+
+  it('returns Err out_of_bounds for row>=3', () => {
+    const result = placeMark(emptyBoard(), 3, 0, 'X');
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(result.error).toBe('out_of_bounds');
+    }
+  });
+
+  it('returns Err out_of_bounds for col>=3', () => {
+    const result = placeMark(emptyBoard(), 0, 3, 'X');
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(result.error).toBe('out_of_bounds');
+    }
+  });
+
+  it('does not mutate the input board', () => {
+    const original = emptyBoard();
+    const result = placeMark(original, 0, 0, 'X');
+    expect(result.ok).toBe(true);
+    // Original still empty.
+    expect(original[0][0]).toBeNull();
   });
 });

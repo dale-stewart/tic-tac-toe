@@ -4,7 +4,11 @@ export default defineConfig({
   test: {
     globals: true,
     environment: 'node',
-    include: ['src/**/*.test.ts', 'tests/unit/**/*.test.ts'],
+    include: [
+      'src/**/*.test.ts',
+      'tests/unit/**/*.test.ts',
+      'tests/property/**/*.test.ts',
+    ],
     exclude: ['node_modules', 'dist', 'tests/e2e', 'tests/a11y'],
     coverage: {
       provider: 'v8',

@@ -1,16 +1,14 @@
 /**
- * Render adapter — pure function from domain state to a lit-html TemplateResult.
+ * Render adapter — pure function from view model to a lit-html TemplateResult.
  *
  * Contract:
  *   - No DOM access, no fetch, no schedule — only template construction.
  *   - Inputs (BoardState plus UI-level view data) are read-only.
  *   - Output is a TemplateResult; applying it is the caller's job (bootstrap).
- *
- * Slice 01 scope: empty-grid render + turn indicator + ancient-browser fallback
- * branch. Click/keyboard handlers land in slice 01-03.
  */
 import { html, type TemplateResult, nothing } from 'lit-html';
-import type { BoardState, Mark } from '../core/board';
+import type { BoardState, Cell, Mark } from '../core/board';
+import type { GameResult } from '../core/win-detector';
 
 export const ANCIENT_BROWSER_MESSAGE =
   'This game needs a modern browser. Try Firefox, Chrome, Safari, or Edge.';
@@ -23,27 +21,52 @@ export interface RenderView {
   readonly turn: Mark;
   readonly mode: GameMode;
   readonly difficulty: Difficulty;
+  readonly result: GameResult;
 }
 
 const turnIndicatorText = (turn: Mark): string => `Your turn (${turn}).`;
 
-const ariaLabelForCell = (row: number, col: number): string =>
-  `Row ${row + 1} column ${col + 1}, empty`;
+const ariaLabelForCell = (row: number, col: number, cell: Cell): string => {
+  const contents = cell === null ? 'empty' : cell;
+  return `Row ${row + 1} column ${col + 1}, ${contents}`;
+};
 
-const renderCell = (row: number, col: number): TemplateResult => html`
+const cellText = (cell: Cell): string => (cell === null ? '' : cell);
+
+const renderCell = (row: number, col: number, cell: Cell): TemplateResult => html`
   <div
     role="gridcell"
     data-row=${row}
     data-col=${col}
     data-testid="cell-${row}-${col}"
-    aria-label=${ariaLabelForCell(row, col)}
+    aria-label=${ariaLabelForCell(row, col, cell)}
     tabindex="-1"
-  ></div>
+  >${cellText(cell)}</div>
 `;
 
-const renderRow = (row: number, cells: readonly unknown[]): TemplateResult => html`
-  <div role="row">${cells.map((_cell, col) => renderCell(row, col))}</div>
+const renderRow = (row: number, cells: readonly Cell[]): TemplateResult => html`
+  <div role="row">${cells.map((cell, col) => renderCell(row, col, cell))}</div>
 `;
+
+export const bannerTextFor = (result: GameResult, humanMark: Mark): string | null => {
+  if (result.status === 'in_progress') return null;
+  if (result.status === 'draw') return 'Draw.';
+  return result.winner === humanMark ? 'You win!' : 'AI wins.';
+};
+
+const renderBanner = (result: GameResult, humanMark: Mark): TemplateResult | typeof nothing => {
+  const text = bannerTextFor(result, humanMark);
+  if (text === null) return nothing;
+  return html`
+    <div
+      data-testid="result-banner"
+      class="result-banner"
+      role="status"
+      aria-live="polite"
+    >${text}</div>
+    <button data-testid="play-again" class="play-again" type="button">Play again</button>
+  `;
+};
 
 export const renderBoard = (view: RenderView): TemplateResult => html`
   <section class="game-shell">
@@ -59,6 +82,7 @@ export const renderBoard = (view: RenderView): TemplateResult => html`
     >
       ${view.board.map((row, rowIndex) => renderRow(rowIndex, row))}
     </div>
+    ${renderBanner(view.result, 'X')}
   </section>
 `;
 

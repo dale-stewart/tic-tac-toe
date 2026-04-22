@@ -1,29 +1,52 @@
 /**
- * Composition root. Wires the initial paint of the walking-skeleton slice 01.
+ * Composition root. Wires the dispatch loop for slices 01+02.
  *
  * Responsibilities:
- *   1. Feature-detect a required modern capability. If absent, render the
- *      ancient-browser fallback and also copy the message to the live region.
- *   2. Otherwise, render the empty board + turn indicator with default mode
- *      (solo) and default difficulty (medium). No input wiring yet — that
- *      lands in slice 01-03.
+ *   1. Feature-detect a required modern capability; fall back cleanly if absent.
+ *   2. Hold the single GameState in a module-scoped store.
+ *   3. On each dispatch: reduce, render, manage focus, and schedule maybeRunAi.
+ *   4. Wire pointer input via delegated click + Play-again button.
  *
- * This module is the ONLY place with side effects at startup. The render
- * adapter is pure; the core board module is pure.
+ * This module is the ONLY place with side effects at startup.
  */
 import { render } from 'lit-html';
 import '../styles.css';
-import { emptyBoard } from '../core/board';
+import {
+  gameReducer,
+  initialState,
+  type Action,
+  type GameState,
+} from '../core/game';
+import { chooseRandomMove } from '../core/ai/easy';
 import {
   ANCIENT_BROWSER_MESSAGE,
+  bannerTextFor,
   renderAncientBrowserFallback,
   renderBoard,
-  type Difficulty,
-  type GameMode,
 } from './render';
+import { attachPointer } from './input/pointer';
 
-const DEFAULT_MODE: GameMode = 'solo';
-const DEFAULT_DIFFICULTY: Difficulty = 'medium';
+interface Store {
+  getState(): GameState;
+  dispatch(action: Action): void;
+  subscribe(listener: () => void): () => void;
+}
+
+const createStore = (initial: GameState): Store => {
+  let state = initial;
+  const listeners = new Set<() => void>();
+  return {
+    getState: () => state,
+    dispatch: (action: Action) => {
+      state = gameReducer(state, action);
+      for (const listener of listeners) listener();
+    },
+    subscribe: (listener) => {
+      listeners.add(listener);
+      return () => listeners.delete(listener);
+    },
+  };
+};
 
 const hasModernFeatures = (): boolean => {
   const globalScope = globalThis as unknown as Record<string, unknown>;
@@ -31,6 +54,25 @@ const hasModernFeatures = (): boolean => {
     typeof globalScope['queueMicrotask'] === 'function' &&
     typeof globalScope['customElements'] === 'object'
   );
+};
+
+const isAiDisabled = (): boolean => {
+  try {
+    const params = new URLSearchParams(window.location.search);
+    return params.get('ai') === 'off';
+  } catch {
+    return false;
+  }
+};
+
+const maybeRunAi = (store: Store, aiDisabled: boolean): void => {
+  if (aiDisabled) return;
+  const state = store.getState();
+  if (state.result.status !== 'in_progress') return;
+  if (state.mode !== 'solo') return;
+  if (state.turn !== 'O') return;
+  const [row, col] = chooseRandomMove(state.board, 'O');
+  store.dispatch({ type: 'PLACE_MARK', row, col });
 };
 
 const mount = (): void => {
@@ -49,17 +91,66 @@ const mount = (): void => {
     return;
   }
 
-  const board = emptyBoard();
-  const view = {
-    board,
-    turn: 'X' as const,
-    mode: DEFAULT_MODE,
-    difficulty: DEFAULT_DIFFICULTY,
+  const store = createStore(initialState());
+  const aiDisabled = isAiDisabled();
+
+  // Expose the store for e2e tests. No sensitive data; pure client UI state.
+  (window as unknown as { __store: Store }).__store = store;
+
+  const renderApp = (): void => {
+    const state = store.getState();
+    app.setAttribute('data-mode', state.mode);
+    app.setAttribute('data-difficulty', state.difficulty);
+    render(
+      renderBoard({
+        board: state.board,
+        turn: state.turn,
+        mode: state.mode,
+        difficulty: state.difficulty,
+        result: state.result,
+      }),
+      app,
+    );
+
+    // Focus management: on terminal state, focus Play again.
+    if (state.result.status !== 'in_progress') {
+      const playAgain = app.querySelector<HTMLButtonElement>('[data-testid="play-again"]');
+      if (playAgain !== null) playAgain.focus();
+    }
+
+    // Announce banner text via the shared live region when terminal.
+    if (announce !== null) {
+      const banner = bannerTextFor(state.result, 'X');
+      announce.textContent = banner ?? '';
+    }
+
+    // Schedule AI move on the microtask queue if it is its turn.
+    if (
+      state.result.status === 'in_progress' &&
+      state.mode === 'solo' &&
+      state.turn === 'O' &&
+      !aiDisabled
+    ) {
+      queueMicrotask(() => maybeRunAi(store, aiDisabled));
+    }
   };
-  // Mirror mode/difficulty onto the #app container for test/data introspection.
-  app.setAttribute('data-mode', view.mode);
-  app.setAttribute('data-difficulty', view.difficulty);
-  render(renderBoard(view), app);
+
+  store.subscribe(renderApp);
+
+  // Pointer input — delegated.
+  attachPointer(app, (action) => store.dispatch(action));
+
+  // Play-again: delegated click on the app container. Since the button is
+  // rendered anew each time, we rely on delegation on the app root.
+  app.addEventListener('click', (event) => {
+    const target = event.target;
+    if (target instanceof Element && target.closest('[data-testid="play-again"]') !== null) {
+      store.dispatch({ type: 'RESET' });
+    }
+  });
+
+  // Initial paint.
+  renderApp();
 };
 
 mount();
