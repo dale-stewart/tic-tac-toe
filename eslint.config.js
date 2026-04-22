@@ -10,6 +10,7 @@ export default [
       'playwright-report/**',
       'test-results/**',
       '.lighthouseci/**',
+      'reports/**',
     ],
   },
   {

@@ -10,10 +10,10 @@ export default defineConfig({
       provider: 'v8',
       reporter: ['text', 'html', 'lcov'],
       reportsDirectory: 'reports/coverage',
-      // Core only. Adapters wire the browser DOM and are exercised by
-      // Playwright, which vitest cannot observe. Their correctness is
-      // asserted by e2e + a11y suites, not line coverage here.
-      include: ['src/core/**/*.ts'],
+      // Core + vitest-observable adapters. DOM-entangled adapters
+      // (bootstrap, render's TemplateResult builders, pointer) are
+      // exercised by Playwright and excluded below.
+      include: ['src/core/**/*.ts', 'src/adapters/store.ts', 'src/adapters/render-strings.ts'],
       exclude: ['src/**/*.test.ts'],
       thresholds: {
         lines: 95,

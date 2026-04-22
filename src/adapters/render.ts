@@ -5,13 +5,28 @@
  *   - No DOM access, no fetch, no schedule — only template construction.
  *   - Inputs (BoardState plus UI-level view data) are read-only.
  *   - Output is a TemplateResult; applying it is the caller's job (bootstrap).
+ *
+ * Pure string helpers live in ./render-strings (unit-tested separately);
+ * this file only holds TemplateResult builders (exercised via Playwright).
  */
 import { html, type TemplateResult, nothing } from 'lit-html';
 import type { BoardState, Cell, Mark } from '../core/board';
 import type { GameResult } from '../core/win-detector';
+import {
+  ANCIENT_BROWSER_MESSAGE,
+  ariaLabelForCell,
+  bannerTextFor,
+  cellText,
+  turnIndicatorText,
+} from './render-strings';
 
-export const ANCIENT_BROWSER_MESSAGE =
-  'This game needs a modern browser. Try Firefox, Chrome, Safari, or Edge.';
+export {
+  ANCIENT_BROWSER_MESSAGE,
+  ariaLabelForCell,
+  bannerTextFor,
+  cellText,
+  turnIndicatorText,
+} from './render-strings';
 
 export type GameMode = 'solo' | 'hot-seat';
 export type Difficulty = 'easy' | 'medium' | 'perfect';
@@ -24,15 +39,6 @@ export interface RenderView {
   readonly result: GameResult;
 }
 
-const turnIndicatorText = (turn: Mark): string => `Your turn (${turn}).`;
-
-const ariaLabelForCell = (row: number, col: number, cell: Cell): string => {
-  const contents = cell === null ? 'empty' : cell;
-  return `Row ${row + 1} column ${col + 1}, ${contents}`;
-};
-
-const cellText = (cell: Cell): string => (cell === null ? '' : cell);
-
 const renderCell = (row: number, col: number, cell: Cell): TemplateResult => html`
   <div
     role="gridcell"
@@ -41,29 +47,22 @@ const renderCell = (row: number, col: number, cell: Cell): TemplateResult => htm
     data-testid="cell-${row}-${col}"
     aria-label=${ariaLabelForCell(row, col, cell)}
     tabindex="-1"
-  >${cellText(cell)}</div>
+  >
+    ${cellText(cell)}
+  </div>
 `;
 
 const renderRow = (row: number, cells: readonly Cell[]): TemplateResult => html`
   <div role="row">${cells.map((cell, col) => renderCell(row, col, cell))}</div>
 `;
 
-export const bannerTextFor = (result: GameResult, humanMark: Mark): string | null => {
-  if (result.status === 'in_progress') return null;
-  if (result.status === 'draw') return 'Draw.';
-  return result.winner === humanMark ? 'You win!' : 'AI wins.';
-};
-
 const renderBanner = (result: GameResult, humanMark: Mark): TemplateResult | typeof nothing => {
   const text = bannerTextFor(result, humanMark);
   if (text === null) return nothing;
   return html`
-    <div
-      data-testid="result-banner"
-      class="result-banner"
-      role="status"
-      aria-live="polite"
-    >${text}</div>
+    <div data-testid="result-banner" class="result-banner" role="status" aria-live="polite">
+      ${text}
+    </div>
     <button data-testid="play-again" class="play-again" type="button">Play again</button>
   `;
 };

@@ -11,12 +11,7 @@
  */
 import { render } from 'lit-html';
 import '../styles.css';
-import {
-  gameReducer,
-  initialState,
-  type Action,
-  type GameState,
-} from '../core/game';
+import { initialState } from '../core/game';
 import { chooseRandomMove } from '../core/ai/easy';
 import {
   ANCIENT_BROWSER_MESSAGE,
@@ -25,28 +20,7 @@ import {
   renderBoard,
 } from './render';
 import { attachPointer } from './input/pointer';
-
-interface Store {
-  getState(): GameState;
-  dispatch(action: Action): void;
-  subscribe(listener: () => void): () => void;
-}
-
-const createStore = (initial: GameState): Store => {
-  let state = initial;
-  const listeners = new Set<() => void>();
-  return {
-    getState: () => state,
-    dispatch: (action: Action) => {
-      state = gameReducer(state, action);
-      for (const listener of listeners) listener();
-    },
-    subscribe: (listener) => {
-      listeners.add(listener);
-      return () => listeners.delete(listener);
-    },
-  };
-};
+import { createStore, type Store } from './store';
 
 const hasModernFeatures = (): boolean => {
   const globalScope = globalThis as unknown as Record<string, unknown>;

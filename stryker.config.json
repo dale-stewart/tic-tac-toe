@@ -1,6 +1,6 @@
 {
   "$schema": "./node_modules/@stryker-mutator/core/schema/stryker-schema.json",
-  "_comment": "Mutates src/core/** only — pure FP domain covered by unit + property tests. Adapters are exercised by Playwright, which Stryker cannot drive.",
+  "_comment": "Mutates src/core/** plus the vitest-observable adapter slices (store + render-strings). DOM-entangled adapters (bootstrap, render.ts TemplateResult builders, pointer) are exercised by Playwright, which Stryker cannot drive.",
   "packageManager": "npm",
   "testRunner": "vitest",
   "vitest": {
@@ -8,7 +8,12 @@
   },
   "checkers": ["typescript"],
   "tsconfigFile": "tsconfig.json",
-  "mutate": ["src/core/**/*.ts", "!src/core/**/*.d.ts"],
+  "mutate": [
+    "src/core/**/*.ts",
+    "src/adapters/store.ts",
+    "src/adapters/render-strings.ts",
+    "!src/core/**/*.d.ts"
+  ],
   "coverageAnalysis": "perTest",
   "reporters": ["progress", "clear-text", "html"],
   "htmlReporter": {
