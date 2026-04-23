@@ -2,22 +2,13 @@
  * Unit tests for the perfect AI (minimax with memoization).
  */
 import { describe, it, expect } from 'vitest';
-import { emptyBoard, placeMark, type BoardState, type Mark } from '../../src/core/board';
+import { emptyBoard } from '../../src/core/board';
 import { boardKey, choosePerfectMove, opponent, pickBetter } from '../../src/core/ai/perfect';
-
-const play = (board: BoardState, moves: ReadonlyArray<[number, number, Mark]>): BoardState => {
-  let b = board;
-  for (const [row, col, mark] of moves) {
-    const result = placeMark(b, row, col, mark);
-    if (!result.ok) throw new Error(result.error);
-    b = result.value;
-  }
-  return b;
-};
+import { buildBoard } from '../support/board-builders';
 
 describe('choosePerfectMove', () => {
   it('takes the immediate win when available', () => {
-    const board = play(emptyBoard(), [
+    const board = buildBoard([
       [0, 0, 'O'],
       [1, 0, 'X'],
       [0, 1, 'O'],
@@ -27,7 +18,7 @@ describe('choosePerfectMove', () => {
   });
 
   it('blocks the opponent three-in-a-row', () => {
-    const board = play(emptyBoard(), [
+    const board = buildBoard([
       [0, 0, 'X'],
       [1, 0, 'O'],
       [0, 1, 'X'],
@@ -44,7 +35,7 @@ describe('choosePerfectMove', () => {
   });
 
   it('is deterministic across calls on the same board', () => {
-    const board = play(emptyBoard(), [
+    const board = buildBoard([
       [1, 1, 'X'],
       [0, 0, 'O'],
     ]);
@@ -55,7 +46,7 @@ describe('choosePerfectMove', () => {
     // Classic corner-trap: X at [0,0], O at center, X at [2,2]. O must not play
     // another corner (which would set up a double threat) — perfect plays a
     // side cell. We assert the move is an edge, not a corner.
-    const board = play(emptyBoard(), [
+    const board = buildBoard([
       [0, 0, 'X'],
       [1, 1, 'O'],
       [2, 2, 'X'],
@@ -73,7 +64,7 @@ describe('choosePerfectMove', () => {
 
   it('throws when called on a terminal board', () => {
     // Full draw board.
-    const board = play(emptyBoard(), [
+    const board = buildBoard([
       [0, 0, 'X'],
       [0, 1, 'O'],
       [0, 2, 'X'],
@@ -94,7 +85,7 @@ describe('boardKey', () => {
   });
 
   it('encodes marks in row-major order', () => {
-    const board = play(emptyBoard(), [
+    const board = buildBoard([
       [0, 0, 'X'],
       [1, 1, 'O'],
       [2, 2, 'X'],

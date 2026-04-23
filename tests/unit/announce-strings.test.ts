@@ -13,9 +13,8 @@ import {
   isResetToEmpty,
 } from '../../src/adapters/announce-strings';
 import { emptyBoard } from '../../src/core/board';
-import { gameReducer, initialState, type GameState } from '../../src/core/game';
-
-const fresh = (): GameState => initialState();
+import { gameReducer, type GameState } from '../../src/core/game';
+import { fresh } from '../support/game';
 
 describe('diffToMessage', () => {
   it('announces a placed mark by row and column (1-indexed)', () => {

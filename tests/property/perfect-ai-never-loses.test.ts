@@ -11,18 +11,7 @@ import { emptyBoard, placeMark, type BoardState, type Mark } from '../../src/cor
 import { detectResult, type GameResult } from '../../src/core/win-detector';
 import { chooseRandomMove } from '../../src/core/ai/easy';
 import { choosePerfectMove } from '../../src/core/ai/perfect';
-
-const seededRng = (seed: number): (() => number) => {
-  // Mulberry32 — tiny deterministic PRNG, same shape as tests/unit/ai-easy.test.ts.
-  let state = seed >>> 0;
-  return () => {
-    state = (state + 0x6d2b79f5) >>> 0;
-    let t = state;
-    t = Math.imul(t ^ (t >>> 15), t | 1);
-    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-  };
-};
+import { seededRng } from '../support/rng';
 
 type Outcome = 'perfect_wins' | 'draw' | 'perfect_loses';
 

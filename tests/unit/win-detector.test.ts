@@ -3,22 +3,9 @@
  * Pure functions: (BoardState) -> WinLine | null | boolean | GameResult.
  */
 import { describe, it, expect } from 'vitest';
-import { emptyBoard, placeMark, type BoardState, type Mark } from '../../src/core/board';
-import {
-  detectWin,
-  detectDraw,
-  detectResult,
-} from '../../src/core/win-detector';
-
-const build = (cells: ReadonlyArray<readonly [number, number, Mark]>): BoardState => {
-  let board = emptyBoard();
-  for (const [row, col, mark] of cells) {
-    const result = placeMark(board, row, col, mark);
-    if (!result.ok) throw new Error(`failed to place: ${result.error}`);
-    board = result.value;
-  }
-  return board;
-};
+import { emptyBoard } from '../../src/core/board';
+import { detectWin, detectDraw, detectResult } from '../../src/core/win-detector';
+import { buildBoard } from '../support/board-builders';
 
 describe('detectWin', () => {
   it('returns null for empty board', () => {
@@ -26,7 +13,7 @@ describe('detectWin', () => {
   });
 
   it('detects a top-row win for X', () => {
-    const board = build([
+    const board = buildBoard([
       [0, 0, 'X'],
       [0, 1, 'X'],
       [0, 2, 'X'],
@@ -41,7 +28,7 @@ describe('detectWin', () => {
   });
 
   it('detects a left-column win for O', () => {
-    const board = build([
+    const board = buildBoard([
       [0, 0, 'O'],
       [1, 0, 'O'],
       [2, 0, 'O'],
@@ -55,7 +42,7 @@ describe('detectWin', () => {
   });
 
   it('detects a main-diagonal win', () => {
-    const board = build([
+    const board = buildBoard([
       [0, 0, 'X'],
       [1, 1, 'X'],
       [2, 2, 'X'],
@@ -68,7 +55,7 @@ describe('detectWin', () => {
   });
 
   it('detects an anti-diagonal win', () => {
-    const board = build([
+    const board = buildBoard([
       [0, 2, 'X'],
       [1, 1, 'X'],
       [2, 0, 'X'],
@@ -81,7 +68,7 @@ describe('detectWin', () => {
   });
 
   it('returns null on mixed (non-winning) rows', () => {
-    const board = build([
+    const board = buildBoard([
       [0, 0, 'X'],
       [0, 1, 'O'],
       [0, 2, 'X'],
@@ -99,7 +86,7 @@ describe('detectDraw', () => {
     // X O X
     // X X O
     // O X O
-    const board = build([
+    const board = buildBoard([
       [0, 0, 'X'],
       [0, 1, 'O'],
       [0, 2, 'X'],
@@ -116,7 +103,7 @@ describe('detectDraw', () => {
 
   it('returns false for a full board that has a winner', () => {
     // Full but X wins top row.
-    const board = build([
+    const board = buildBoard([
       [0, 0, 'X'],
       [1, 0, 'O'],
       [0, 1, 'X'],
@@ -137,7 +124,7 @@ describe('detectResult', () => {
   });
 
   it('returns won with the winning line and mark', () => {
-    const board = build([
+    const board = buildBoard([
       [0, 0, 'X'],
       [0, 1, 'X'],
       [0, 2, 'X'],
@@ -155,7 +142,7 @@ describe('detectResult', () => {
   });
 
   it('returns draw for a full board with no winner', () => {
-    const board = build([
+    const board = buildBoard([
       [0, 0, 'X'],
       [0, 1, 'O'],
       [0, 2, 'X'],

@@ -2,28 +2,15 @@
  * Unit tests for the medium AI (one-ply: win > block > random).
  */
 import { describe, it, expect } from 'vitest';
-import { emptyBoard, placeMark, type BoardState, type Mark } from '../../src/core/board';
+import { emptyBoard } from '../../src/core/board';
 import { chooseMediumMove, findWinningMove } from '../../src/core/ai/medium';
-
-const play = (board: BoardState, moves: ReadonlyArray<[number, number, Mark]>): BoardState => {
-  let b = board;
-  for (const [row, col, mark] of moves) {
-    const result = placeMark(b, row, col, mark);
-    if (!result.ok) throw new Error(result.error);
-    b = result.value;
-  }
-  return b;
-};
-
-const fixedRng =
-  (value: number): (() => number) =>
-  () =>
-    value;
+import { buildBoard } from '../support/board-builders';
+import { fixedRng } from '../support/rng';
 
 describe('chooseMediumMove', () => {
   it('takes the immediate win when available', () => {
     // O has [0,0] and [0,1]; [0,2] wins.
-    const board = play(emptyBoard(), [
+    const board = buildBoard([
       [0, 0, 'O'],
       [1, 0, 'X'],
       [0, 1, 'O'],
@@ -34,7 +21,7 @@ describe('chooseMediumMove', () => {
 
   it('blocks the opponent three-in-a-row when no win is available', () => {
     // X threatens top row; O must block at [0,2].
-    const board = play(emptyBoard(), [
+    const board = buildBoard([
       [0, 0, 'X'],
       [1, 0, 'O'],
       [0, 1, 'X'],
@@ -44,7 +31,7 @@ describe('chooseMediumMove', () => {
 
   it('prefers win over block when both are available (win > block)', () => {
     // O can win at [0,2]; X would win at [2,2]. Medium must take the win.
-    const board = play(emptyBoard(), [
+    const board = buildBoard([
       [0, 0, 'O'],
       [2, 0, 'X'],
       [0, 1, 'O'],
@@ -73,7 +60,7 @@ describe('findWinningMove', () => {
   });
 
   it('finds the diagonal winning move for X', () => {
-    const board = play(emptyBoard(), [
+    const board = buildBoard([
       [0, 0, 'X'],
       [0, 1, 'O'],
       [1, 1, 'X'],
@@ -83,7 +70,7 @@ describe('findWinningMove', () => {
   });
 
   it('finds the column winning move for O', () => {
-    const board = play(emptyBoard(), [
+    const board = buildBoard([
       [0, 0, 'X'],
       [0, 2, 'O'],
       [1, 1, 'X'],

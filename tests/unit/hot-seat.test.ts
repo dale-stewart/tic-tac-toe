@@ -13,7 +13,8 @@
  */
 import { describe, it, expect } from 'vitest';
 import fc from 'fast-check';
-import { gameReducer, initialState, type GameState } from '../../src/core/game';
+import { gameReducer } from '../../src/core/game';
+import { fresh } from '../support/game';
 import type { GameResult, WinLine } from '../../src/core/win-detector';
 import {
   bannerTextFor,
@@ -25,8 +26,6 @@ import {
 } from '../../src/adapters/render-strings';
 import { modeChangeText, diffToMessage } from '../../src/adapters/announce-strings';
 import { keyToMode } from '../../src/adapters/input/keyboard-pure';
-
-const fresh = (): GameState => initialState();
 
 describe('gameReducer SET_MODE', () => {
   it('SET_MODE on a fresh board switches mode and resets (no-op on board) preserving difficulty', () => {

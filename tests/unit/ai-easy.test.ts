@@ -3,20 +3,10 @@
  * Pure function: (BoardState, Mark, rng?) -> [row, col].
  */
 import { describe, it, expect } from 'vitest';
-import { emptyBoard, placeMark, type BoardState } from '../../src/core/board';
+import { emptyBoard } from '../../src/core/board';
 import { chooseRandomMove } from '../../src/core/ai/easy';
-
-const seededRng = (seed: number): (() => number) => {
-  // Mulberry32 -- tiny deterministic PRNG.
-  let state = seed >>> 0;
-  return () => {
-    state = (state + 0x6d2b79f5) >>> 0;
-    let t = state;
-    t = Math.imul(t ^ (t >>> 15), t | 1);
-    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-  };
-};
+import { buildBoard } from '../support/board-builders';
+import { seededRng } from '../support/rng';
 
 describe('chooseRandomMove', () => {
   it('returns a legal move on an empty board', () => {
@@ -28,9 +18,8 @@ describe('chooseRandomMove', () => {
   });
 
   it('never picks a filled cell', () => {
-    let board: BoardState = emptyBoard();
     // Fill 8 cells, leaving (2,2) open.
-    const fills: Array<[number, number, 'X' | 'O']> = [
+    const board = buildBoard([
       [0, 0, 'X'],
       [0, 1, 'O'],
       [0, 2, 'X'],
@@ -39,12 +28,7 @@ describe('chooseRandomMove', () => {
       [1, 2, 'O'],
       [2, 0, 'X'],
       [2, 1, 'O'],
-    ];
-    for (const [row, col, mark] of fills) {
-      const result = placeMark(board, row, col, mark);
-      if (!result.ok) throw new Error(result.error);
-      board = result.value;
-    }
+    ]);
     const [row, col] = chooseRandomMove(board, 'X');
     expect([row, col]).toEqual([2, 2]);
   });
@@ -58,8 +42,7 @@ describe('chooseRandomMove', () => {
   });
 
   it('throws when called on a fully-occupied board', () => {
-    let board: BoardState = emptyBoard();
-    const fills: Array<[number, number, 'X' | 'O']> = [
+    const board = buildBoard([
       [0, 0, 'X'],
       [0, 1, 'O'],
       [0, 2, 'X'],
@@ -69,12 +52,7 @@ describe('chooseRandomMove', () => {
       [2, 0, 'O'],
       [2, 1, 'X'],
       [2, 2, 'O'],
-    ];
-    for (const [row, col, mark] of fills) {
-      const result = placeMark(board, row, col, mark);
-      if (!result.ok) throw new Error(result.error);
-      board = result.value;
-    }
+    ]);
     expect(() => chooseRandomMove(board, 'X')).toThrow(/no empty cells/);
   });
 
