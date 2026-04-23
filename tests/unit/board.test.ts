@@ -4,7 +4,13 @@
  */
 import { describe, it, expect } from 'vitest';
 import fc from 'fast-check';
-import { emptyBoard, placeMark, type BoardState, type Cell } from '../../src/core/board';
+import {
+  emptyBoard,
+  emptyCells,
+  placeMark,
+  type BoardState,
+  type Cell,
+} from '../../src/core/board';
 
 describe('board.emptyBoard', () => {
   it('returns a 3x3 grid', () => {
@@ -121,5 +127,65 @@ describe('board.placeMark', () => {
     expect(result.ok).toBe(true);
     // Original still empty.
     expect(original[0][0]).toBeNull();
+  });
+});
+
+describe('board.emptyCells', () => {
+  it('returns all nine coordinates in row-major order for an empty board', () => {
+    expect(emptyCells(emptyBoard())).toEqual([
+      [0, 0],
+      [0, 1],
+      [0, 2],
+      [1, 0],
+      [1, 1],
+      [1, 2],
+      [2, 0],
+      [2, 1],
+      [2, 2],
+    ]);
+  });
+
+  it('returns an empty array for a fully occupied board', () => {
+    const full: BoardState = [
+      ['X', 'O', 'X'],
+      ['O', 'X', 'O'],
+      ['O', 'X', 'O'],
+    ];
+    expect(emptyCells(full)).toEqual([]);
+  });
+
+  it('skips occupied cells while preserving row-major order for the rest', () => {
+    const state: BoardState = [
+      ['X', null, null],
+      [null, 'O', null],
+      [null, null, 'X'],
+    ];
+    expect(emptyCells(state)).toEqual([
+      [0, 1],
+      [0, 2],
+      [1, 0],
+      [1, 2],
+      [2, 0],
+      [2, 1],
+    ]);
+  });
+
+  it.each([
+    [0, 0],
+    [0, 2],
+    [1, 1],
+    [2, 0],
+    [2, 2],
+  ] as const)('omits the filled cell at (%i,%i) and returns the other eight', (row, col) => {
+    const board: Cell[][] = [
+      [null, null, null],
+      [null, null, null],
+      [null, null, null],
+    ];
+    board[row]![col] = 'X';
+    const state = board as unknown as BoardState;
+    const result = emptyCells(state);
+    expect(result).toHaveLength(8);
+    expect(result).not.toContainEqual([row, col]);
   });
 });

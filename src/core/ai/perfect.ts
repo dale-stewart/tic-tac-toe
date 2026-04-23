@@ -8,7 +8,7 @@
  * Signature matches the shared AiFn port (state, mark, rng?) => [row, col].
  * rng is accepted but unused (determinism is the whole point).
  */
-import { placeMark, type BoardState, type Mark } from '../board';
+import { emptyCells, placeMark, type BoardState, type Mark } from '../board';
 import { detectResult } from '../win-detector';
 
 type Rng = () => number;
@@ -35,18 +35,6 @@ interface Evaluation {
   readonly score: number;
   readonly move: readonly [number, number] | null;
 }
-
-const emptyCellsRowMajor = (state: BoardState): ReadonlyArray<readonly [number, number]> => {
-  const cells: Array<readonly [number, number]> = [];
-  for (let row = 0; row < 3; row += 1) {
-    // Stryker disable next-line EqualityOperator: equivalent mutant — iterating col to 3 reads state[row][3] which is undefined; undefined === null is false, so no extra cell is pushed. Matches the pattern already annotated in easy.ts and announce-strings.ts.
-    for (let col = 0; col < 3; col += 1) {
-      // Stryker disable next-line ConditionalExpression: equivalent mutant — if the guard is bypassed (`true`) the list would include filled cells, but minimax's downstream placeMark returns !ok for filled cells and `continue`s, so the chosen move is unchanged.
-      if (state[row]![col] === null) cells.push([row, col] as const);
-    }
-  }
-  return cells;
-};
 
 const terminalEvaluation = (state: BoardState, maximizer: Mark): Evaluation | null => {
   const result = detectResult(state);
@@ -89,7 +77,7 @@ const minimax = (
   const isMaxTurn = toPlay === maximizer;
   let best: Evaluation = { score: isMaxTurn ? -Infinity : Infinity, move: null };
 
-  for (const [row, col] of emptyCellsRowMajor(state)) {
+  for (const [row, col] of emptyCells(state)) {
     const placed = placeMark(state, row, col, toPlay);
     if (!placed.ok) continue;
     const child = minimax(placed.value, opponent(toPlay), maximizer, cache);

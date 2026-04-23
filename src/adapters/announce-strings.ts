@@ -4,7 +4,7 @@
  * Derive a screen-reader message from the diff between two GameStates.
  * DOM writes and debouncing live in announce.ts (DOM-entangled).
  */
-import type { BoardState, Mark } from '../core/board';
+import { emptyCells, type BoardState, type Mark } from '../core/board';
 import type { GameState } from '../core/game';
 
 export interface DiffOptions {
@@ -18,15 +18,9 @@ export const findPlacement = (
   before: BoardState,
   after: BoardState,
 ): { readonly row: number; readonly col: number; readonly mark: Mark } | null => {
-  for (let row = 0; row < 3; row += 1) {
-    // Stryker disable next-line EqualityOperator: equivalent mutant — extending the bound to `col <= 3` reads after[row][3] which is `undefined`; `undefined !== null` is true but `before[row][3]` is also undefined and `undefined === null` is false, so the guard never fires. No observable difference.
-    for (let col = 0; col < 3; col += 1) {
-      const beforeCell = before[row]![col]!;
-      const afterCell = after[row]![col]!;
-      if (beforeCell === null && afterCell !== null) {
-        return { row, col, mark: afterCell };
-      }
-    }
+  for (const [row, col] of emptyCells(before)) {
+    const afterCell = after[row]![col]!;
+    if (afterCell !== null) return { row, col, mark: afterCell };
   }
   return null;
 };

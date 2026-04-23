@@ -3,20 +3,9 @@
  * Pure when rng is provided; defaults to Math.random for the production path.
  * Signature fixed per architecture brief: (state, mark) => [row, col].
  */
-import type { BoardState, Mark } from '../board';
+import { emptyCells, type BoardState, type Mark } from '../board';
 
 type Rng = () => number;
-
-const emptyCells = (state: BoardState): ReadonlyArray<readonly [number, number]> => {
-  const cells: Array<readonly [number, number]> = [];
-  for (let row = 0; row < 3; row += 1) {
-    // Stryker disable next-line EqualityOperator: equivalent mutant — extending the bound to `col <= 3` reads state[row][3] which is `undefined`; `undefined === null` is false, so no extra cell is pushed. No observable behavior difference.
-    for (let col = 0; col < 3; col += 1) {
-      if (state[row]![col] === null) cells.push([row, col] as const);
-    }
-  }
-  return cells;
-};
 
 export const chooseRandomMove = (
   state: BoardState,

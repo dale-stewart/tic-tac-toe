@@ -11,7 +11,13 @@
  */
 import { render } from 'lit-html';
 import '../styles.css';
-import { initialState, isMidGame, type GameState } from '../core/game';
+import {
+  initialState,
+  isMidGame,
+  type Difficulty,
+  type GameMode,
+  type GameState,
+} from '../core/game';
 import { strategies } from '../core/ai';
 import { ANCIENT_BROWSER_MESSAGE, renderAncientBrowserFallback, renderBoard } from './render';
 import { attachPointer } from './input/pointer';
@@ -106,6 +112,11 @@ const wirePlayAgainClick = (app: HTMLElement, store: Store): void => {
   });
 };
 
+const isDifficulty = (v: string | null): v is Difficulty =>
+  v === 'easy' || v === 'medium' || v === 'perfect';
+
+const isGameMode = (v: string | null): v is GameMode => v === 'solo' || v === 'hot-seat';
+
 const wireDifficultyClick = (app: HTMLElement, store: Store): void => {
   app.addEventListener('click', (event) => {
     const target = event.target;
@@ -113,7 +124,7 @@ const wireDifficultyClick = (app: HTMLElement, store: Store): void => {
     const radio = target.closest<HTMLElement>('[role="radio"][data-difficulty-option]');
     if (radio === null) return;
     const option = radio.getAttribute('data-difficulty-option');
-    if (option !== 'easy' && option !== 'medium' && option !== 'perfect') return;
+    if (!isDifficulty(option)) return;
     store.dispatch({ type: 'SET_DIFFICULTY', difficulty: option });
   });
 };
@@ -125,7 +136,7 @@ const wireModeClick = (app: HTMLElement, store: Store): void => {
     const radio = target.closest<HTMLElement>('[role="radio"][data-mode-option]');
     if (radio === null) return;
     const option = radio.getAttribute('data-mode-option');
-    if (option !== 'solo' && option !== 'hot-seat') return;
+    if (!isGameMode(option)) return;
     store.dispatch({ type: 'SET_MODE', mode: option });
   });
 };
