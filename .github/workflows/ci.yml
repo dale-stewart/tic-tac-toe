@@ -193,6 +193,16 @@ jobs:
         with:
           bun-version: latest
       - run: bun install --frozen-lockfile
+      # Stryker incremental cache: subsequent runs only re-mutate changed files.
+      # Key rotates when stryker config changes; restore-keys fall back to any
+      # prior main-branch cache so incremental data is reused across commits.
+      - uses: actions/cache@v4
+        with:
+          path: reports/mutation/stryker-incremental.json
+          key: stryker-incremental-${{ hashFiles('stryker.config.json') }}-${{ github.sha }}
+          restore-keys: |
+            stryker-incremental-${{ hashFiles('stryker.config.json') }}-
+            stryker-incremental-
       - run: make mutation
       - uses: actions/upload-artifact@v7
         if: always()

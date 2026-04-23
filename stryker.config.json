@@ -30,5 +30,7 @@
   },
   "concurrency": 4,
   "timeoutMS": 10000,
-  "cleanTempDir": true
+  "cleanTempDir": true,
+  "incremental": true,
+  "incrementalFile": "reports/mutation/stryker-incremental.json"
 }
