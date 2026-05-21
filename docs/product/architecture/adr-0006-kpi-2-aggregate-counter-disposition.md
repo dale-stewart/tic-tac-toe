@@ -6,11 +6,11 @@ Accepted — 2026-04-21
 
 ## Context
 
-KPI-2 from `docs/feature/tic-tac-toe/discuss/outcome-kpis.md` targets a **≥ 70% game-completion rate** among players who make at least one move. Its stated measurement is: *"Aggregate counter: games started vs games completed (no per-user tracking)."* ADR-0004 sketches a compatible endpoint shape — single stateless endpoint, anonymous timing samples only, no per-session IDs, no cookies, no IP logging.
+KPI-2 from `docs/feature/tic-tac-toe/discuss/outcome-kpis.md` targets a **≥ 70% game-completion rate** among players who make at least one move. Its stated measurement is: _"Aggregate counter: games started vs games completed (no per-user tracking)."_ ADR-0004 sketches a compatible endpoint shape — single stateless endpoint, anonymous timing samples only, no per-session IDs, no cookies, no IP logging.
 
-The DESIGN peer-review note to DEVOPS was explicit: *"KPI-2 aggregate counter (if implemented): ADR-0004 specifies shape — single stateless endpoint, anonymous timing samples only, no per-session IDs / cookies / IP logging. DEVOPS picks runtime (Cloudflare Worker / Netlify Function). **Shipping v1 without instrumentation is acceptable.**"* (emphasis added)
+The DESIGN peer-review note to DEVOPS was explicit: _"KPI-2 aggregate counter (if implemented): ADR-0004 specifies shape — single stateless endpoint, anonymous timing samples only, no per-session IDs / cookies / IP logging. DEVOPS picks runtime (Cloudflare Worker / Netlify Function). **Shipping v1 without instrumentation is acceptable.**"_ (emphasis added)
 
-The DISCUSS product-owner review note was similarly explicit: *"Aggregate counter design (if implemented): flat-file daily totals, no cookies, no IPs, no fingerprints. **Acceptable to ship v1 without KPI-2 instrumentation if judged over-engineering.**"*
+The DISCUSS product-owner review note was similarly explicit: _"Aggregate counter design (if implemented): flat-file daily totals, no cookies, no IPs, no fingerprints. **Acceptable to ship v1 without KPI-2 instrumentation if judged over-engineering.**"_
 
 So the question before DEVOPS is: **ship the counter with v1, or defer?**
 

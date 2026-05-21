@@ -89,17 +89,17 @@ We believe **implementing 3x3 TTT with a minimax AI and keyboard-accessible UI**
 
 ## 3. Assumption-to-Hypothesis Map
 
-| Assumption (from Phase 1) | Test Hypothesis | Method | Category |
-|----------------------------|-----------------|--------|----------|
-| A1 No-signup want | H1, H6 | Fake-door + analytics | Value |
-| A2 "Kill 60s" JTBD | H1 | Session-length telemetry | Value |
-| A3 Classic 3x3 preferred | — (assumed for v1) | Variant A/B in v2 | Value |
-| A4 AI is table stakes | H2 | Prototype w/ AI levels | Value |
-| A5 Hot-seat covers two-human | H4 | Prototype test | Value |
-| A6 Networked MP is nice-to-have | — (deferred) | Fake-door "play with friend" | Value |
-| A7 No ads tolerance | H6 | Messaging test | Viability |
-| A9 a11y expected baseline | H5 | Assistive-tech user test | Usability |
-| A10 Solved-game frustration | H2 | Retention cohort | Value |
+| Assumption (from Phase 1)       | Test Hypothesis    | Method                       | Category  |
+| ------------------------------- | ------------------ | ---------------------------- | --------- |
+| A1 No-signup want               | H1, H6             | Fake-door + analytics        | Value     |
+| A2 "Kill 60s" JTBD              | H1                 | Session-length telemetry     | Value     |
+| A3 Classic 3x3 preferred        | — (assumed for v1) | Variant A/B in v2            | Value     |
+| A4 AI is table stakes           | H2                 | Prototype w/ AI levels       | Value     |
+| A5 Hot-seat covers two-human    | H4                 | Prototype test               | Value     |
+| A6 Networked MP is nice-to-have | — (deferred)       | Fake-door "play with friend" | Value     |
+| A7 No ads tolerance             | H6                 | Messaging test               | Viability |
+| A9 a11y expected baseline       | H5                 | Assistive-tech user test     | Usability |
+| A10 Solved-game frustration     | H2                 | Retention cohort             | Value     |
 
 ---
 
@@ -107,15 +107,15 @@ We believe **implementing 3x3 TTT with a minimax AI and keyboard-accessible UI**
 
 > `[ILLUSTRATIVE]`
 
-| Test | Method | N | Duration | Cost |
-|------|--------|---|----------|------|
-| H1 | Deployed prototype + analytics | 100+ real users | 1 week | Low |
-| H2 | Cohort analytics on difficulty selection | 100+ | 1 week | Low |
-| H3 | Unmoderated usertesting.com session | 5 | 1 day | Moderate |
-| H4 | Unmoderated usertesting.com session | 5 | 1 day | Moderate |
-| H5 | Moderated a11y session (keyboard + NVDA + VoiceOver) | 3 | 1 day | Moderate |
-| H6 | A/B messaging test | 100+ | 1 week | Low |
-| H7 | Engineering spike | 1 dev | 2 days | Low |
+| Test | Method                                               | N               | Duration | Cost     |
+| ---- | ---------------------------------------------------- | --------------- | -------- | -------- |
+| H1   | Deployed prototype + analytics                       | 100+ real users | 1 week   | Low      |
+| H2   | Cohort analytics on difficulty selection             | 100+            | 1 week   | Low      |
+| H3   | Unmoderated usertesting.com session                  | 5               | 1 day    | Moderate |
+| H4   | Unmoderated usertesting.com session                  | 5               | 1 day    | Moderate |
+| H5   | Moderated a11y session (keyboard + NVDA + VoiceOver) | 3               | 1 day    | Moderate |
+| H6   | A/B messaging test                                   | 100+            | 1 week   | Low      |
+| H7   | Engineering spike                                    | 1 dev           | 2 days   | Low      |
 
 Total: ~2 weeks, ~$1500 if outsourcing user tests.
 
@@ -125,26 +125,26 @@ Total: ~2 weeks, ~$1500 if outsourcing user tests.
 
 > `[ILLUSTRATIVE — Scout's best-guess priors, not data]`
 
-| Hypothesis | Predicted outcome | Confidence |
-|-----------|-------------------|------------|
-| H1 | Pass — TTT is trivially comprehensible, time-to-first-move should be near-instant | High |
-| H2 | Partial pass — day-1 retention for a solved game is hard regardless | Medium |
-| H3 | Pass — grid + X/O is culturally universal | High |
-| H4 | Likely pass if toggle is a clear segmented control | Medium-high |
-| H5 | Pass if built with a11y from start, fail if retrofitted | Medium |
-| H6 | Inconclusive — the tagline may be noticed but not a deciding factor | Low |
-| H7 | Pass — this is genuinely a small build | High |
+| Hypothesis | Predicted outcome                                                                 | Confidence  |
+| ---------- | --------------------------------------------------------------------------------- | ----------- |
+| H1         | Pass — TTT is trivially comprehensible, time-to-first-move should be near-instant | High        |
+| H2         | Partial pass — day-1 retention for a solved game is hard regardless               | Medium      |
+| H3         | Pass — grid + X/O is culturally universal                                         | High        |
+| H4         | Likely pass if toggle is a clear segmented control                                | Medium-high |
+| H5         | Pass if built with a11y from start, fail if retrofitted                           | Medium      |
+| H6         | Inconclusive — the tagline may be noticed but not a deciding factor               | Low         |
+| H7         | Pass — this is genuinely a small build                                            | High        |
 
 ---
 
 ## 6. G3 Gate Evaluation
 
-| Criterion | Target | Actual | Status |
-|-----------|--------|--------|--------|
-| Prototype tested with users | >=5 per iteration | 0 | **Fail (waived under practice exemption)** |
-| Task completion | >=80% | N/A | Conditional |
-| Value perception | >=70% "would use" | N/A | Conditional |
-| Comprehension | <10s | Predicted pass | Conditional |
-| Key assumptions validated | >=80% proven | 0/10 validated | **Fail (waived)** |
+| Criterion                   | Target            | Actual         | Status                                     |
+| --------------------------- | ----------------- | -------------- | ------------------------------------------ |
+| Prototype tested with users | >=5 per iteration | 0              | **Fail (waived under practice exemption)** |
+| Task completion             | >=80%             | N/A            | Conditional                                |
+| Value perception            | >=70% "would use" | N/A            | Conditional                                |
+| Comprehension               | <10s              | Predicted pass | Conditional                                |
+| Key assumptions validated   | >=80% proven      | 0/10 validated | **Fail (waived)**                          |
 
 **Gate decision: CONDITIONAL PASS under practice-exercise exemption.** Hypotheses are well-formed and would be testable in ~2 weeks; only the execution is skipped.

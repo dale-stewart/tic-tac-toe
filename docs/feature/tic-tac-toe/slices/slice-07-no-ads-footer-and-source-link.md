@@ -6,7 +6,7 @@
 
 ## Hypothesis
 
-`[BUILD]` *"Explicit trust messaging ('no ads, no signup, no tracking') and a source-code link are a one-file change. If we're editing three files, we've coupled content to something it should not be coupled to."*
+`[BUILD]` _"Explicit trust messaging ('no ads, no signup, no tracking') and a source-code link are a one-file change. If we're editing three files, we've coupled content to something it should not be coupled to."_
 
 ## User-observable outcome
 

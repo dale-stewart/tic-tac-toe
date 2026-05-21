@@ -1,4 +1,5 @@
 <!-- markdownlint-disable MD024 -->
+
 # User Stories: tic-tac-toe
 
 **Wave:** DISCUSS

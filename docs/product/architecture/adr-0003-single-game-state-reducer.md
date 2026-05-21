@@ -27,6 +27,7 @@ The reducer is the **only** code path that produces a new `GameState`. All adapt
 ## Consequences
 
 **Positive**
+
 - Single source of truth is enforced by construction.
 - Every transition is a named, typed action — trivially testable and greppable ("where can `turn` change? only in the reducer's `PLACE_MARK` branch").
 - Time-travel / undo (not required but easy) is a matter of storing a state history.
@@ -34,16 +35,20 @@ The reducer is the **only** code path that produces a new `GameState`. All adapt
 - AI invocation can be modelled cleanly: the reducer advances state after a human move; the bootstrap notices `turn` changed to the AI mark in solo mode and dispatches a follow-up `PLACE_MARK`. The reducer never runs non-determinism inline.
 
 **Negative**
+
 - Adding a new kind of transition means (a) adding an `Action` variant, (b) adding a reducer branch, (c) potentially an adapter change. This is a feature, not a bug — it makes new state pathways explicit.
 - Slightly more ceremony than "just call `game.placeMark(r,c)`" would be. Acceptable cost for the guarantee.
 
 ## Alternatives considered
 
 **Scattered reactive primitives** (e.g., per-value `$state` signals — Svelte, SolidJS, or hand-rolled observables).
-- *Rejected because:* DISCUSS peer review explicitly called this out — multiple independent signals re-create the problem the single-source-of-truth rule was written to prevent. If `boardState` lives in one signal and `turn` in another, an update-ordering bug can leave them inconsistent.
+
+- _Rejected because:_ DISCUSS peer review explicitly called this out — multiple independent signals re-create the problem the single-source-of-truth rule was written to prevent. If `boardState` lives in one signal and `turn` in another, an update-ordering bug can leave them inconsistent.
 
 **External store library** (Zustand, Redux Toolkit, XState).
-- *Rejected because:* (a) adds bundle cost (~1-3KB) for zero incremental value — our reducer is one function, stores provide subscribe/middleware/devtools machinery we don't need; (b) our AI turn scheduling is cleaner as a bootstrap concern than as middleware; (c) every state update is already a pure function — we're not missing any abstraction.
+
+- _Rejected because:_ (a) adds bundle cost (~1-3KB) for zero incremental value — our reducer is one function, stores provide subscribe/middleware/devtools machinery we don't need; (b) our AI turn scheduling is cleaner as a bootstrap concern than as middleware; (c) every state update is already a pure function — we're not missing any abstraction.
 
 **Class-based `Game` object with mutating methods** (`game.placeMark(r, c)`, `game.reset()`).
-- *Rejected because:* (a) directly violates ADR-0001 (FP paradigm); (b) introduces shared mutable state — the exact thing the single-source-of-truth constraint exists to prevent aliasing problems with; (c) makes property testing harder (need to reset / clone between trials).
+
+- _Rejected because:_ (a) directly violates ADR-0001 (FP paradigm); (b) introduces shared mutable state — the exact thing the single-source-of-truth constraint exists to prevent aliasing problems with; (c) makes property testing harder (need to reset / clone between trials).

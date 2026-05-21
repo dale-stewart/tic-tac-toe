@@ -172,18 +172,8 @@
     }
   ],
   "implementation_scope": {
-    "source_directories": [
-      "src/core/",
-      "src/core/ai/",
-      "src/adapters/",
-      "src/adapters/input/"
-    ],
-    "test_directories": [
-      "tests/unit/",
-      "tests/property/",
-      "tests/a11y/",
-      "tests/e2e/"
-    ],
+    "source_directories": ["src/core/", "src/core/ai/", "src/adapters/", "src/adapters/input/"],
+    "test_directories": ["tests/unit/", "tests/property/", "tests/a11y/", "tests/e2e/"],
     "excluded_patterns": [
       "node_modules/**",
       "dist/**",

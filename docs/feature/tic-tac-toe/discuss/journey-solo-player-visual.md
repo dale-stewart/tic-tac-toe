@@ -177,11 +177,11 @@ Emotional transitions are small by design. This is a 90-second interaction; larg
 
 ## Error & Recovery Paths (lightweight)
 
-| Error | What user sees | Recovery |
-|-------|----------------|----------|
-| Click on already-filled cell | No placement; gentle shake or no-op; ARIA announces "cell already taken" | No action needed; user tries another cell |
-| Page reload mid-game | Board state is lost (v1 accepts this; no server persistence) | Fresh board, same default mode. Acceptable per "no tracking" UVP |
-| Unsupported browser feature (e.g. ancient IE) | Static fallback message explains browser too old | User opens in any modern browser |
+| Error                                         | What user sees                                                           | Recovery                                                         |
+| --------------------------------------------- | ------------------------------------------------------------------------ | ---------------------------------------------------------------- |
+| Click on already-filled cell                  | No placement; gentle shake or no-op; ARIA announces "cell already taken" | No action needed; user tries another cell                        |
+| Page reload mid-game                          | Board state is lost (v1 accepts this; no server persistence)             | Fresh board, same default mode. Acceptable per "no tracking" UVP |
+| Unsupported browser feature (e.g. ancient IE) | Static fallback message explains browser too old                         | User opens in any modern browser                                 |
 
 Error paths are intentionally minimal for a 90-second solo game.
 

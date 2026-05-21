@@ -4,20 +4,12 @@
  */
 import { describe, it, expect } from 'vitest';
 import fc from 'fast-check';
-import {
-  emptyBoard,
-  placeMark,
-  type BoardState,
-  type Mark,
-} from '../../src/core/board';
+import { emptyBoard, placeMark, type BoardState, type Mark } from '../../src/core/board';
 
 const markArb = fc.constantFrom<Mark>('X', 'O');
 const coordArb = fc.integer({ min: 0, max: 2 });
 // Use larger numbers to cover OOB; skip the in-range case to guarantee OOB.
-const oobCoordArb = fc.oneof(
-  fc.integer({ min: -100, max: -1 }),
-  fc.integer({ min: 3, max: 100 }),
-);
+const oobCoordArb = fc.oneof(fc.integer({ min: -100, max: -1 }), fc.integer({ min: 3, max: 100 }));
 
 const markCount = (board: BoardState): number => {
   let count = 0;

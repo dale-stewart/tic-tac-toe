@@ -40,16 +40,12 @@ describe('gameReducer properties', () => {
 
   it('[property] PLACE_MARK on a filled cell leaves state unchanged', () => {
     fc.assert(
-      fc.property(
-        fc.integer({ min: 0, max: 2 }),
-        fc.integer({ min: 0, max: 2 }),
-        (row, col) => {
-          const s0 = initialState();
-          const s1 = gameReducer(s0, { type: 'PLACE_MARK', row, col });
-          const s2 = gameReducer(s1, { type: 'PLACE_MARK', row, col });
-          expect(s2).toBe(s1);
-        },
-      ),
+      fc.property(fc.integer({ min: 0, max: 2 }), fc.integer({ min: 0, max: 2 }), (row, col) => {
+        const s0 = initialState();
+        const s1 = gameReducer(s0, { type: 'PLACE_MARK', row, col });
+        const s2 = gameReducer(s1, { type: 'PLACE_MARK', row, col });
+        expect(s2).toBe(s1);
+      }),
     );
   });
 

@@ -17,7 +17,7 @@ The project is:
 - Unlikely to need serverless functions in v1 (KPI-2 counter deferred; see ADR-0006).
 - Expected to have trivial traffic — a portfolio-visitor volume, not a production-product volume.
 
-The DESIGN reviewer's handoff note to DEVOPS was explicit: *"Static host preference order (per ADR-0004): GitHub Pages / Cloudflare Pages / Netlify. No technical blocker for any; pick on cost and familiarity."* The present ADR converts that permission into a concrete selection.
+The DESIGN reviewer's handoff note to DEVOPS was explicit: _"Static host preference order (per ADR-0004): GitHub Pages / Cloudflare Pages / Netlify. No technical blocker for any; pick on cost and familiarity."_ The present ADR converts that permission into a concrete selection.
 
 ## Decision
 
@@ -34,12 +34,12 @@ The DESIGN reviewer's handoff note to DEVOPS was explicit: *"Static host prefere
 
 GitHub Pages does **not** permit customising response headers (no `_headers` file, no edge config). This is a known limitation and the reason Cloudflare Pages and Netlify were considered. For the current threat model — a static SPA with no authenticated state and no form submissions — the consequences are absorbed as follows:
 
-| Header | Pages supports? | Workaround |
-| --- | --- | --- |
-| `Content-Security-Policy` | No (as HTTP header) | Set via `<meta http-equiv="Content-Security-Policy" …>` in the HTML shell. Equivalent for script/style blocking, inferior for `frame-ancestors` (meta-tag CSP ignores this directive per spec — acceptable since we also set `frame-ancestors 'none'` and verify via user-agent behaviour; if clickjacking risk rises, revisit). |
-| `Strict-Transport-Security` | Pages sets it automatically on `*.github.io` | Accepted vendor-managed default |
-| `X-Content-Type-Options` | Pages sets `nosniff` automatically | Accepted vendor-managed default |
-| `Referrer-Policy` | Not set by default | Set via `<meta name="referrer" content="no-referrer">` in HTML shell |
+| Header                      | Pages supports?                              | Workaround                                                                                                                                                                                                                                                                                                                       |
+| --------------------------- | -------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Content-Security-Policy`   | No (as HTTP header)                          | Set via `<meta http-equiv="Content-Security-Policy" …>` in the HTML shell. Equivalent for script/style blocking, inferior for `frame-ancestors` (meta-tag CSP ignores this directive per spec — acceptable since we also set `frame-ancestors 'none'` and verify via user-agent behaviour; if clickjacking risk rises, revisit). |
+| `Strict-Transport-Security` | Pages sets it automatically on `*.github.io` | Accepted vendor-managed default                                                                                                                                                                                                                                                                                                  |
+| `X-Content-Type-Options`    | Pages sets `nosniff` automatically           | Accepted vendor-managed default                                                                                                                                                                                                                                                                                                  |
+| `Referrer-Policy`           | Not set by default                           | Set via `<meta name="referrer" content="no-referrer">` in HTML shell                                                                                                                                                                                                                                                             |
 
 This is the single real tradeoff vs. Cloudflare Pages / Netlify. For a static SPA with no inputs beyond click/keyboard on a 3x3 grid, it is an acceptable tradeoff.
 

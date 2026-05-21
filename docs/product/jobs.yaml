@@ -12,37 +12,37 @@
 schema_version: 1
 
 jobs:
-  - id: "J-TTT-01"
-    label: "Kill 60 seconds with a trivially familiar game"
+  - id: 'J-TTT-01'
+    label: 'Kill 60 seconds with a trivially familiar game'
     primary: true
-    source: "docs/feature/tic-tac-toe/discover/problem-validation.md §2"
-    owning_feature: "tic-tac-toe"
-    opportunities: ["O1", "O2", "O4"]
+    source: 'docs/feature/tic-tac-toe/discover/problem-validation.md §2'
+    owning_feature: 'tic-tac-toe'
+    opportunities: ['O1', 'O2', 'O4']
 
-  - id: "J-TTT-02"
-    label: "Teach a young child turn-taking and basic strategy"
+  - id: 'J-TTT-02'
+    label: 'Teach a young child turn-taking and basic strategy'
     primary: false
-    source: "docs/feature/tic-tac-toe/discover/problem-validation.md §2"
-    owning_feature: "tic-tac-toe"
-    opportunities: ["O3", "O5"]
+    source: 'docs/feature/tic-tac-toe/discover/problem-validation.md §2'
+    owning_feature: 'tic-tac-toe'
+    opportunities: ['O3', 'O5']
 
-  - id: "J-TTT-03"
-    label: "Brief face-to-face social bond"
+  - id: 'J-TTT-03'
+    label: 'Brief face-to-face social bond'
     primary: false
-    source: "docs/feature/tic-tac-toe/discover/problem-validation.md §2"
-    owning_feature: "tic-tac-toe"
-    opportunities: ["O3", "O5"]
+    source: 'docs/feature/tic-tac-toe/discover/problem-validation.md §2'
+    owning_feature: 'tic-tac-toe'
+    opportunities: ['O3', 'O5']
 
 deferred_jobs:
-  - id: "J-TTT-04"
-    label: "Remote social bond (networked multiplayer)"
-    reason: "Out of scope per DISCOVER D1"
+  - id: 'J-TTT-04'
+    label: 'Remote social bond (networked multiplayer)'
+    reason: 'Out of scope per DISCOVER D1'
 
-  - id: "J-TTT-05"
-    label: "Sharpen the game itself (variants for hobbyists)"
-    reason: "Out of scope per DISCOVER D2"
+  - id: 'J-TTT-05'
+    label: 'Sharpen the game itself (variants for hobbyists)'
+    reason: 'Out of scope per DISCOVER D2'
 
 changelog:
-  - date: "2026-04-21"
-    feature: "tic-tac-toe"
-    change: "Bootstrapped during DISCUSS wave as cross-reference to DISCOVER opportunity tree (D4=NO)"
+  - date: '2026-04-21'
+    feature: 'tic-tac-toe'
+    change: 'Bootstrapped during DISCUSS wave as cross-reference to DISCOVER opportunity tree (D4=NO)'

@@ -25,44 +25,44 @@ wave's property-test + unit-test surface.
 
 ## Scenario budget
 
-| Priority | Count | Rationale |
-| --- | --- | --- |
-| walking-skeleton | 11 | Slices 01+02 — the thinnest end-to-end user journey, plus the cross-cutting privacy guardrail (zero third-party requests) that must hold from the first deploy |
-| r1 | 35 | Core v1 — a11y baseline, difficulty levels, hot-seat mode |
-| r2 | 16 | Craft polish — animation, palette, footer, perf/bundle CI gates |
-| **Total** | **62** | |
+| Priority         | Count  | Rationale                                                                                                                                                      |
+| ---------------- | ------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| walking-skeleton | 11     | Slices 01+02 — the thinnest end-to-end user journey, plus the cross-cutting privacy guardrail (zero third-party requests) that must hold from the first deploy |
+| r1               | 35     | Core v1 — a11y baseline, difficulty levels, hot-seat mode                                                                                                      |
+| r2               | 16     | Craft polish — animation, palette, footer, perf/bundle CI gates                                                                                                |
+| **Total**        | **62** |                                                                                                                                                                |
 
 Error-path and boundary scenarios: 25 / 62 ≈ 40% (meets mandate).
 
 ## Tool breakdown
 
-| Tool | Count | Where |
-| --- | --- | --- |
-| Playwright (DOM interaction) | 47 | Bulk of scenarios |
-| axe-core (a11y audit against rendered state) | 5 | 4 canonical states + no-regression |
-| Vitest + fast-check (property test) | 2 | Perfect-AI-never-loses; shared-signature legality |
-| Network assertion (request interception) | 2 | Third-party requests + cookies/beacons |
-| Lighthouse CI | 4 | Bundle, perf, a11y score, crosscutting |
-| Static / bundle delta | 2 | No-runtime-JS-added in footer, CSP compliance |
+| Tool                                         | Count | Where                                             |
+| -------------------------------------------- | ----- | ------------------------------------------------- |
+| Playwright (DOM interaction)                 | 47    | Bulk of scenarios                                 |
+| axe-core (a11y audit against rendered state) | 5     | 4 canonical states + no-regression                |
+| Vitest + fast-check (property test)          | 2     | Perfect-AI-never-loses; shared-signature legality |
+| Network assertion (request interception)     | 2     | Third-party requests + cookies/beacons            |
+| Lighthouse CI                                | 4     | Bundle, perf, a11y score, crosscutting            |
+| Static / bundle delta                        | 2     | No-runtime-JS-added in footer, CSP compliance     |
 
 Total exceeds 62 because some scenarios use multiple tools (e.g., Playwright
-navigation + network interception together). Cell marked by the *primary* tool
+navigation + network interception together). Cell marked by the _primary_ tool
 in the traceability matrix.
 
 ## Seams exercised
 
-| Seam | Why it matters | Scenarios |
-| --- | --- | --- |
-| render (lit-html port) | Every state→DOM transition is deterministic — visible to the user | 27 |
-| bootstrap (maybeRunAi orchestration) | Mode-dependent control flow — solo schedules AI, hot-seat never | 11 |
-| announce (ARIA live region) | 1s debounce, every state change, WCAG 2.2 AA | 5 |
-| AI interface (uniform signature) | Three interchangeable pure functions; perfect-never-loses invariant | 6 |
-| win-detector (shared module) | Same detector across solo and hot-seat; must not diverge | 8 |
-| cross-cutting (CSP, network, bundle) | Guardrails that never degrade | 5 |
+| Seam                                 | Why it matters                                                      | Scenarios |
+| ------------------------------------ | ------------------------------------------------------------------- | --------- |
+| render (lit-html port)               | Every state→DOM transition is deterministic — visible to the user   | 27        |
+| bootstrap (maybeRunAi orchestration) | Mode-dependent control flow — solo schedules AI, hot-seat never     | 11        |
+| announce (ARIA live region)          | 1s debounce, every state change, WCAG 2.2 AA                        | 5         |
+| AI interface (uniform signature)     | Three interchangeable pure functions; perfect-never-loses invariant | 6         |
+| win-detector (shared module)         | Same detector across solo and hot-seat; must not diverge            | 8         |
+| cross-cutting (CSP, network, bundle) | Guardrails that never degrade                                       | 5         |
 
 ## Walking skeleton strategy
 
-Two walking-skeleton *journeys* (solo + hot-seat) collapse into the thinnest
+Two walking-skeleton _journeys_ (solo + hot-seat) collapse into the thinnest
 end-to-end solo flow shipped by slices 01+02 — nine scenarios exercising the
 full driving-port surface.
 
@@ -132,24 +132,24 @@ each AI module). That is the inner TDD loop — not DISTILL's scope.
 
 ## Tag reference
 
-| Tag category | Tags |
-| --- | --- |
-| Priority | `@priority:walking-skeleton`, `@priority:r1`, `@priority:r2` |
-| Slice | `@slice:01`..`@slice:07`, `@slice:crosscutting` |
-| Seam | `@seam:render`, `@seam:ai`, `@seam:announce`, `@seam:bootstrap`, `@seam:win-detector` |
-| Tool | `@tool:playwright`, `@tool:axe`, `@tool:vitest-property`, `@tool:network`, `@tool:lighthouse` |
-| AC trace | `@ac:US-0N-keyword` or `@ac:KPI-N-keyword` |
-| Other | `@a11y` (existing tag on keyboard scenarios), `@property` (universal-invariant scenarios for crafter wave) |
+| Tag category | Tags                                                                                                       |
+| ------------ | ---------------------------------------------------------------------------------------------------------- |
+| Priority     | `@priority:walking-skeleton`, `@priority:r1`, `@priority:r2`                                               |
+| Slice        | `@slice:01`..`@slice:07`, `@slice:crosscutting`                                                            |
+| Seam         | `@seam:render`, `@seam:ai`, `@seam:announce`, `@seam:bootstrap`, `@seam:win-detector`                      |
+| Tool         | `@tool:playwright`, `@tool:axe`, `@tool:vitest-property`, `@tool:network`, `@tool:lighthouse`              |
+| AC trace     | `@ac:US-0N-keyword` or `@ac:KPI-N-keyword`                                                                 |
+| Other        | `@a11y` (existing tag on keyboard scenarios), `@property` (universal-invariant scenarios for crafter wave) |
 
 ## KPI coverage summary
 
-| KPI | Where asserted |
-| --- | --- |
-| KPI-1 (TTFM ≤ 3s; bundle ≤ 50KB) | `feature-crosscutting.feature` via Lighthouse CI + bundle-size gate |
-| KPI-2 (game-completion rate ≥ 70%) | **Not E2E-asserted.** Requires aggregate counter → DEVOPS wave. See wave-decisions §graceful-degradation |
-| KPI-3 (Lighthouse a11y ≥ 95; axe-core 0) | `feature-keyboard-aria.feature` 4 canonical states + `feature-crosscutting.feature` Lighthouse |
-| KPI-4 (Lighthouse perf ≥ 90; CLS ≤ 0.1; FMP ≤ 500ms) | `feature-crosscutting.feature` |
-| KPI-5 (0 third-party requests; 0 PII) | `feature-crosscutting.feature` network assertion |
+| KPI                                                  | Where asserted                                                                                           |
+| ---------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| KPI-1 (TTFM ≤ 3s; bundle ≤ 50KB)                     | `feature-crosscutting.feature` via Lighthouse CI + bundle-size gate                                      |
+| KPI-2 (game-completion rate ≥ 70%)                   | **Not E2E-asserted.** Requires aggregate counter → DEVOPS wave. See wave-decisions §graceful-degradation |
+| KPI-3 (Lighthouse a11y ≥ 95; axe-core 0)             | `feature-keyboard-aria.feature` 4 canonical states + `feature-crosscutting.feature` Lighthouse           |
+| KPI-4 (Lighthouse perf ≥ 90; CLS ≤ 0.1; FMP ≤ 500ms) | `feature-crosscutting.feature`                                                                           |
+| KPI-5 (0 third-party requests; 0 PII)                | `feature-crosscutting.feature` network assertion                                                         |
 
 ## Handoff criteria to DELIVER
 

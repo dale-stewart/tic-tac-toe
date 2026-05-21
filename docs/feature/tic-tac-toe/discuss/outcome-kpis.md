@@ -16,12 +16,12 @@ Ship a trivially familiar, friction-free, accessible, privacy-respecting tic-tac
 
 ### Outcome KPIs
 
-| # | Who | Does What | By How Much | Baseline | Measured By | Type |
-|---|-----|-----------|-------------|----------|-------------|------|
-| KPI-1 | First-time visitors | Reach an interactive board | Median time-to-first-move ≤ 3s on commodity mobile hardware | 0 (greenfield) | Synthetic Lighthouse runs in CI; optional aggregate client-side Performance API counter (no PII) | Leading |
-| KPI-2 | Players who make ≥ 1 move | Reach a terminal state (win/loss/draw) in session | ≥ 70% game-completion rate *(see note ¹)* | 0 (greenfield) | Aggregate counter: games started vs games completed (no per-user tracking) | Leading |
+| #     | Who                       | Does What                                         | By How Much                                                 | Baseline       | Measured By                                                                                      | Type    |
+| ----- | ------------------------- | ------------------------------------------------- | ----------------------------------------------------------- | -------------- | ------------------------------------------------------------------------------------------------ | ------- |
+| KPI-1 | First-time visitors       | Reach an interactive board                        | Median time-to-first-move ≤ 3s on commodity mobile hardware | 0 (greenfield) | Synthetic Lighthouse runs in CI; optional aggregate client-side Performance API counter (no PII) | Leading |
+| KPI-2 | Players who make ≥ 1 move | Reach a terminal state (win/loss/draw) in session | ≥ 70% game-completion rate _(see note ¹)_                   | 0 (greenfield) | Aggregate counter: games started vs games completed (no per-user tracking)                       | Leading |
 
-*¹ The 70% target is authored under the practice-exercise framing; it is not calibrated against a comparable-project baseline. On a production effort this threshold would be recalibrated after first usable-prototype user tests. See "Honest caveat" below.*
+_¹ The 70% target is authored under the practice-exercise framing; it is not calibrated against a comparable-project baseline. On a production effort this threshold would be recalibrated after first usable-prototype user tests. See "Honest caveat" below._
 | KPI-3 | All users including assistive-tech | Pass WCAG 2.2 AA baseline | Lighthouse a11y score ≥ 95; axe-core 0 violations | 0 (greenfield) | Synthetic Lighthouse + axe-core in CI | Leading (quality gate) |
 | KPI-4 | All users | Experience responsive performance | Lighthouse performance ≥ 90; FMP ≤ 500ms; CLS ≤ 0.1 | 0 (greenfield) | Lighthouse CI | Leading (quality gate) |
 | KPI-5 | All users | Trust the no-tracking claim | 0 server-persisted PII; 0 third-party requests on page load; 0 cookies beyond legal minimum | 0 (greenfield) | Automated network-request assertion; cookie audit; CI link checker on source URL | Guardrail |
@@ -45,13 +45,13 @@ They are honest because they are targets for **how the code is built**, not for 
 
 ### Measurement Plan
 
-| KPI | Data Source | Collection Method | Frequency | Owner |
-|-----|------------|-------------------|-----------|-------|
-| KPI-1 (time-to-interactive) | Lighthouse CI | Synthetic run on every PR | Per PR + weekly scheduled | DELIVER wave (CI setup) |
-| KPI-2 (completion rate) | Aggregate counter | Privacy-preserving aggregate increment (no cookies, no IPs, no fingerprints); daily total written to a flat log | Daily | DEVOPS wave (if aggregate counter is in scope) |
-| KPI-3 (a11y) | Lighthouse + axe-core | CI job | Per PR | DELIVER wave |
-| KPI-4 (perf) | Lighthouse | CI job | Per PR | DELIVER wave |
-| KPI-5 (privacy) | Automated network-request assertion | Playwright / Puppeteer script in CI | Per PR | DELIVER wave |
+| KPI                         | Data Source                         | Collection Method                                                                                               | Frequency                 | Owner                                          |
+| --------------------------- | ----------------------------------- | --------------------------------------------------------------------------------------------------------------- | ------------------------- | ---------------------------------------------- |
+| KPI-1 (time-to-interactive) | Lighthouse CI                       | Synthetic run on every PR                                                                                       | Per PR + weekly scheduled | DELIVER wave (CI setup)                        |
+| KPI-2 (completion rate)     | Aggregate counter                   | Privacy-preserving aggregate increment (no cookies, no IPs, no fingerprints); daily total written to a flat log | Daily                     | DEVOPS wave (if aggregate counter is in scope) |
+| KPI-3 (a11y)                | Lighthouse + axe-core               | CI job                                                                                                          | Per PR                    | DELIVER wave                                   |
+| KPI-4 (perf)                | Lighthouse                          | CI job                                                                                                          | Per PR                    | DELIVER wave                                   |
+| KPI-5 (privacy)             | Automated network-request assertion | Playwright / Puppeteer script in CI                                                                             | Per PR                    | DELIVER wave                                   |
 
 ### Hypothesis
 
@@ -60,6 +60,7 @@ We believe that a **zero-friction, no-signup, a11y-first tic-tac-toe web app** f
 We will know this is true when **KPI-1 through KPI-5 are all met in production**.
 
 We will know this is false (or that the evidence is too thin to conclude) if:
+
 - KPI-2 < 50% (below half-completion suggests something in the build is broken for real users)
 - Any a11y or perf KPI regresses after a release
 

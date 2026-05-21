@@ -11,7 +11,7 @@
 ## Backbone (user activities, left-to-right)
 
 | Arrive | See Board | Pick Mode | Take Turns | End Game | Replay |
-|--------|-----------|-----------|------------|----------|--------|
+| ------ | --------- | --------- | ---------- | -------- | ------ |
 
 User activities, in chronological order, for BOTH personas (same spine, different mode toggle).
 
@@ -23,9 +23,9 @@ User activities, in chronological order, for BOTH personas (same spine, differen
 Arrive              See Board           Pick Mode            Take Turns             End Game              Replay
 -----------------   -----------------   ------------------   -------------------    -------------------   -----------------
 Load SPA from URL   Render empty        (default: solo       Place mark (click)     Detect win/           Reset board
-                    3x3 grid            medium — no pick     Place mark (keyboard)  loss/draw             
-                                        needed)              Invalid-move no-op     Show result banner    
-                                                             Turn indicator flip    Highlight win line    
+                    3x3 grid            medium — no pick     Place mark (keyboard)  loss/draw
+                                        needed)              Invalid-move no-op     Show result banner
+                                                             Turn indicator flip    Highlight win line
 ....................................................................  <-- walking skeleton line
 Announce via        Render status       Toggle to hot-seat   AI generates move      Announce result via   Preserve mode
 ARIA live           text "turn ind"                          (solo only)            ARIA live             across replay
@@ -44,6 +44,7 @@ no PII)
 ```
 
 Legend:
+
 - Above skeleton line = Walking Skeleton (shipped first)
 - Between skeleton and Release 1 = Release 1 (ships next, makes the core v1 usable)
 - Between Release 1 and Release 2 = Release 2 (craft polish completing v1)
@@ -64,7 +65,7 @@ Tasks in the walking skeleton (one per activity):
 5. **End Game** — win / loss / draw detected; banner shows `"You win!"` / `"AI wins."` / `"Draw."`
 6. **Replay** — "Play again" clears the board
 
-**Craft hypothesis for walking skeleton:** *"We can ship a deployable, a11y-skeleton-bearing, testable end-to-end slice in one day if we keep scope to a random-move AI and no visual polish. If it takes more than one day, our choice of framework, test harness, or deployment pipeline is too heavy for a toy project."*
+**Craft hypothesis for walking skeleton:** _"We can ship a deployable, a11y-skeleton-bearing, testable end-to-end slice in one day if we keep scope to a random-move AI and no visual polish. If it takes more than one day, our choice of framework, test harness, or deployment pipeline is too heavy for a toy project."_
 
 This is a **learning-about-the-build** hypothesis, not a learning-about-the-market one. On a toy project, genuine market hypotheses would be forced — see the `prioritization.md` note.
 

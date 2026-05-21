@@ -48,12 +48,12 @@ For each interview, a real log entry would include:
 
 ## Minimum Interview Counts by Phase (for reference)
 
-| Phase | Minimum | Cumulative |
-|-------|---------|-----------|
-| 1 — Problem Validation | 5 | 5 |
-| 2 — Opportunity Mapping | 5 more | 10 |
-| 3 — Solution Testing | 5 per iteration | 15+ |
-| 4 — Market Viability | 5 + stakeholders | 20+ |
+| Phase                   | Minimum          | Cumulative |
+| ----------------------- | ---------------- | ---------- |
+| 1 — Problem Validation  | 5                | 5          |
+| 2 — Opportunity Mapping | 5 more           | 10         |
+| 3 — Solution Testing    | 5 per iteration  | 15+        |
+| 4 — Market Viability    | 5 + stakeholders | 20+        |
 
 **None of these minimums were met.** Gates G1-G3 are conditional passes under the practice-exercise exemption; see `wave-decisions.md`.
 

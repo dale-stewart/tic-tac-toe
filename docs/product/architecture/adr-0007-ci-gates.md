@@ -8,7 +8,7 @@ Accepted — 2026-04-21
 
 The DESIGN peer-review note to DEVOPS listed five non-negotiable gate requirements derived from the five outcome KPIs plus the architectural invariant: bundle ≤50KB gzipped, CSP `default-src 'self'`, `dependency-cruiser` rule forbidding core-to-adapter imports, Lighthouse perf ≥90, a11y ≥95 with axe-core zero violations, and a network-request assertion proving zero third-party requests on load.
 
-DISCUSS peer-review reinforced this with the standalone non-negotiable list: *"Non-negotiable CI gates per PR: Lighthouse a11y ≥95, performance ≥90, axe-core 0 violations, 0 third-party requests, bundle ≤50KB gzipped."*
+DISCUSS peer-review reinforced this with the standalone non-negotiable list: _"Non-negotiable CI gates per PR: Lighthouse a11y ≥95, performance ≥90, axe-core 0 violations, 0 third-party requests, bundle ≤50KB gzipped."_
 
 A CI gate set is a collective decision: adding too few lets regressions through; adding too many slows the development loop and creates flaky noise. The present ADR fixes the **exact gate count, scope, and break-conditions** so the crafter wave is writing to a precise target, not a wishlist.
 
@@ -18,38 +18,38 @@ A CI gate set is a collective decision: adding too few lets regressions through;
 
 ### The gate set
 
-| # | Gate | Type | Threshold / break condition | Traces to |
-| --- | --- | --- | --- | --- |
-| 1 | `lint-and-typecheck` | Blocking | Any ESLint error; any `tsc --noEmit` error | DESIGN constraint #10 (OSS-only, source-link footer requires compile cleanliness); general code-quality baseline |
-| 2 | `unit-and-property` | Blocking | Any failing test; any fast-check counterexample; coverage below repo-level threshold (target: core ≥90% line, whole-repo ≥80% line — exact numbers locked in DELIVER) | DESIGN constraint #8 (property-test obligations); DISCUSS US-01..US-07 ACs |
-| 3 | `dependency-cruiser` | Blocking | `src/core/**` imports from `src/adapters/**`; any circular dependency; any orphan module | DESIGN constraint #2 (core-adapter direction inward only); DESIGN peer-review note to DEVOPS item 3 |
-| 4 | `bundle-size-check` | Blocking | Total gzipped `dist/**/*.{js,css}` > 50 KB; warn at > 45 KB | DESIGN constraint #1 (bundle ceiling); DISCUSS KPI guardrail; DESIGN peer-review note to DEVOPS item 1 |
-| 5 | `lighthouse-ci` | Blocking | Perf score < 0.90; a11y score < 0.95; CLS > 0.1; FMP > 500 ms; total byte-weight > 50 KB | KPI-1, KPI-3, KPI-4; DESIGN peer-review note to DEVOPS item 1 |
-| 6 | `axe-core-a11y` | Blocking | Any violation at severity `minor`+ on any of 4 canonical board states (empty / mid-game / won / draw) | KPI-3; DESIGN constraint #9 (4 canonical states); DISCUSS user-story US-03 |
-| 7 | `network-assertion` | Blocking | Any request to a non-`self` origin on load; any `Set-Cookie`; any `document.cookie` present | KPI-5; DESIGN constraint #5 (no runtime third-party requests); DESIGN peer-review note item 2 (CSP) |
-| 8 | `build` | Blocking (implicit) | Vite exits non-zero; expected outputs missing | Prerequisite for gates 4–7 |
+| #   | Gate                 | Type                | Threshold / break condition                                                                                                                                           | Traces to                                                                                                        |
+| --- | -------------------- | ------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| 1   | `lint-and-typecheck` | Blocking            | Any ESLint error; any `tsc --noEmit` error                                                                                                                            | DESIGN constraint #10 (OSS-only, source-link footer requires compile cleanliness); general code-quality baseline |
+| 2   | `unit-and-property`  | Blocking            | Any failing test; any fast-check counterexample; coverage below repo-level threshold (target: core ≥90% line, whole-repo ≥80% line — exact numbers locked in DELIVER) | DESIGN constraint #8 (property-test obligations); DISCUSS US-01..US-07 ACs                                       |
+| 3   | `dependency-cruiser` | Blocking            | `src/core/**` imports from `src/adapters/**`; any circular dependency; any orphan module                                                                              | DESIGN constraint #2 (core-adapter direction inward only); DESIGN peer-review note to DEVOPS item 3              |
+| 4   | `bundle-size-check`  | Blocking            | Total gzipped `dist/**/*.{js,css}` > 50 KB; warn at > 45 KB                                                                                                           | DESIGN constraint #1 (bundle ceiling); DISCUSS KPI guardrail; DESIGN peer-review note to DEVOPS item 1           |
+| 5   | `lighthouse-ci`      | Blocking            | Perf score < 0.90; a11y score < 0.95; CLS > 0.1; FMP > 500 ms; total byte-weight > 50 KB                                                                              | KPI-1, KPI-3, KPI-4; DESIGN peer-review note to DEVOPS item 1                                                    |
+| 6   | `axe-core-a11y`      | Blocking            | Any violation at severity `minor`+ on any of 4 canonical board states (empty / mid-game / won / draw)                                                                 | KPI-3; DESIGN constraint #9 (4 canonical states); DISCUSS user-story US-03                                       |
+| 7   | `network-assertion`  | Blocking            | Any request to a non-`self` origin on load; any `Set-Cookie`; any `document.cookie` present                                                                           | KPI-5; DESIGN constraint #5 (no runtime third-party requests); DESIGN peer-review note item 2 (CSP)              |
+| 8   | `build`              | Blocking (implicit) | Vite exits non-zero; expected outputs missing                                                                                                                         | Prerequisite for gates 4–7                                                                                       |
 
 Gate 8 (`build`) is named in the ADR for visibility even though it's structurally a precondition rather than a threshold gate. The reason it's listed as a distinct numbered gate: the build itself can break independently of tests (e.g., a Vite plugin misconfiguration) and the failure message is qualitatively different from the test-family gates — so crafting it as a separately-visible job improves diagnosability.
 
 Plus:
 
-| # | Gate | Type | Threshold | Runs when |
-| --- | --- | --- | --- | --- |
-| 9 | `deploy-smoke` | Blocking (advisory rollback) | HTTP 200 on `/`; HTML content-type; CSP meta tag present; `data-build-sha` matches commit | After `main` deploy only |
+| #   | Gate           | Type                         | Threshold                                                                                 | Runs when                |
+| --- | -------------- | ---------------------------- | ----------------------------------------------------------------------------------------- | ------------------------ |
+| 9   | `deploy-smoke` | Blocking (advisory rollback) | HTTP 200 on `/`; HTML content-type; CSP meta tag present; `data-build-sha` matches commit | After `main` deploy only |
 
 Gate 9 is **advisory** in the rollback sense — its failure does not trigger an automatic revert (there is no auto-revert infrastructure for GitHub Pages, and an auto-revert on a false-positive smoke failure would be worse than the false positive itself). Instead, smoke failure flags the commit red; the response is a manual `git revert` if the smoke actually indicates a bad deployment.
 
 ### Explicitly not gated in v1
 
-| Not a gate | Rationale |
-| --- | --- |
-| CodeQL / other SAST | ESLint + small well-known dependency set covers realistic threat model at this scope |
-| License compliance check | All dependencies pre-verified permissive (DESIGN tech-stack table); revisit when dependency list grows |
-| Mutation testing | Principle 9 recommendation is per-feature Stryker strategy; NOT installed without Dale's explicit CLAUDE.md-persist approval. Flagged in platform brief §Open items. |
-| Visual regression | Not in scope; trivial UI (3×3 grid); axe-core + Playwright behavioural coverage is sufficient |
-| Contract tests | No external contracts (no backend, no API consumers) |
-| Load / capacity tests | Static CDN; capacity is vendor concern |
-| Chaos engineering | No distributed runtime; incoherent at this scale |
+| Not a gate               | Rationale                                                                                                                                                            |
+| ------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| CodeQL / other SAST      | ESLint + small well-known dependency set covers realistic threat model at this scope                                                                                 |
+| License compliance check | All dependencies pre-verified permissive (DESIGN tech-stack table); revisit when dependency list grows                                                               |
+| Mutation testing         | Principle 9 recommendation is per-feature Stryker strategy; NOT installed without Dale's explicit CLAUDE.md-persist approval. Flagged in platform brief §Open items. |
+| Visual regression        | Not in scope; trivial UI (3×3 grid); axe-core + Playwright behavioural coverage is sufficient                                                                        |
+| Contract tests           | No external contracts (no backend, no API consumers)                                                                                                                 |
+| Load / capacity tests    | Static CDN; capacity is vendor concern                                                                                                                               |
+| Chaos engineering        | No distributed runtime; incoherent at this scale                                                                                                                     |
 
 This is not laziness — each omission traces to an explicit scope or threat-model condition that removes the need.
 

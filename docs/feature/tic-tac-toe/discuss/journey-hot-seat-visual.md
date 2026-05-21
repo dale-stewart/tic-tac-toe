@@ -133,11 +133,11 @@ Same pattern, mirror.
 
 ## Error & Recovery Paths
 
-| Error | What user sees | Recovery |
-|-------|----------------|----------|
-| Click on filled cell | No placement; ARIA "cell already taken"; turn does NOT change | Current player tries another cell |
-| Accidental toggle to solo mid-game | Mode switch is discarded mid-game, OR prompts "Abandon current game?" | v1 choice: toggle is disabled mid-game (simpler); re-enable after game ends |
-| Page reload | Same as solo — state lost (v1 accepts); bring-back expectations are low | Fresh board |
+| Error                              | What user sees                                                          | Recovery                                                                    |
+| ---------------------------------- | ----------------------------------------------------------------------- | --------------------------------------------------------------------------- |
+| Click on filled cell               | No placement; ARIA "cell already taken"; turn does NOT change           | Current player tries another cell                                           |
+| Accidental toggle to solo mid-game | Mode switch is discarded mid-game, OR prompts "Abandon current game?"   | v1 choice: toggle is disabled mid-game (simpler); re-enable after game ends |
+| Page reload                        | Same as solo — state lost (v1 accepts); bring-back expectations are low | Fresh board                                                                 |
 
 ---
 

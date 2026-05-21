@@ -6,7 +6,7 @@
 
 ## Hypothesis
 
-`[BUILD]` *"We can ship a static SPA with a keyboard-focusable 3x3 grid and an ARIA-labeled turn indicator in half a day. If we can't, our framework / build pipeline choice is too heavy for a toy project."*
+`[BUILD]` _"We can ship a static SPA with a keyboard-focusable 3x3 grid and an ARIA-labeled turn indicator in half a day. If we can't, our framework / build pipeline choice is too heavy for a toy project."_
 
 ## User-observable outcome
 

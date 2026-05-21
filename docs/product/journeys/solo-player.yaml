@@ -11,25 +11,25 @@
 schema_version: 1
 
 journey:
-  name: "Solo Player (vs AI)"
-  goal: "Complete a satisfying tic-tac-toe game vs AI in <90s with zero setup"
-  persona: "Casual-Idle-Time Player"
-  platform: "web"
-  evidence_tier: "C"
-  owning_feature: "tic-tac-toe"
+  name: 'Solo Player (vs AI)'
+  goal: 'Complete a satisfying tic-tac-toe game vs AI in <90s with zero setup'
+  persona: 'Casual-Idle-Time Player'
+  platform: 'web'
+  evidence_tier: 'C'
+  owning_feature: 'tic-tac-toe'
 
   emotional_arc:
-    pattern: "Discovery Joy"
-    start: "Curious"
-    middle: "Focused"
-    end: "Satisfied"
+    pattern: 'Discovery Joy'
+    start: 'Curious'
+    middle: 'Focused'
+    end: 'Satisfied'
 
-source_of_truth_for_feature: "docs/feature/tic-tac-toe/discuss/journey-solo-player.yaml"
+source_of_truth_for_feature: 'docs/feature/tic-tac-toe/discuss/journey-solo-player.yaml'
 
 cross_references:
-  problem_validation: "docs/feature/tic-tac-toe/discover/problem-validation.md"
-  opportunities_addressed: ["O1", "O2", "O4", "O6"]
-  stories: ["US-01", "US-02", "US-03", "US-04"]
+  problem_validation: 'docs/feature/tic-tac-toe/discover/problem-validation.md'
+  opportunities_addressed: ['O1', 'O2', 'O4', 'O6']
+  stories: ['US-01', 'US-02', 'US-03', 'US-04']
 
 note: |
   For the full step-by-step schema (steps, mockups, Gherkin, integration_validation),
@@ -38,6 +38,6 @@ note: |
   brief so it doesn't drift from the feature-level authored copy.
 
 changelog:
-  - date: "2026-04-21"
-    feature: "tic-tac-toe"
-    change: "Bootstrapped during DISCUSS wave (practice exercise, Tier C)"
+  - date: '2026-04-21'
+    feature: 'tic-tac-toe'
+    change: 'Bootstrapped during DISCUSS wave (practice exercise, Tier C)'

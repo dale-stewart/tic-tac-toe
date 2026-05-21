@@ -20,10 +20,7 @@ export const actionFromClick = (target: EventTarget | null): Action | null => {
   return { type: 'PLACE_MARK', row, col };
 };
 
-export const attachPointer = (
-  root: HTMLElement,
-  dispatch: (action: Action) => void,
-): void => {
+export const attachPointer = (root: HTMLElement, dispatch: (action: Action) => void): void => {
   root.addEventListener('click', (event) => {
     const action = actionFromClick(event.target);
     if (action !== null) dispatch(action);

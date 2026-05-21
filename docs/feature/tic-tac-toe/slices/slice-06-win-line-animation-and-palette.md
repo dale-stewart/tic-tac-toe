@@ -6,7 +6,7 @@
 
 ## Hypothesis
 
-`[BUILD]` *"Win-line animation and a color-blind-safe palette can be added without regressing the a11y audit from Slice 3. If the a11y score drops, our visual layer is now conflicting with our semantic layer."*
+`[BUILD]` _"Win-line animation and a color-blind-safe palette can be added without regressing the a11y audit from Slice 3. If the a11y score drops, our visual layer is now conflicting with our semantic layer."_
 
 ## User-observable outcome
 

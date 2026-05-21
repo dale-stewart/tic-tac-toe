@@ -6,9 +6,33 @@
  * Slice 01 scope: grid layout, ≥44px touch targets, reserved dimensions to
  * avoid CLS on first paint. Colours, hover states, and win-line animations
  * arrive in later slices.
- */
+ *
+ * Theme Customization: CSS variables for theming have been added. Use
+ * setTheme() function to switch between themes. Available themes: light, dark, retro.
+  /* Theme variables - light theme (default) */
+--bg-color: #ffffff;
+--text-color: #111111;
+--board-bg: #f7f7f7;
+--accent-color: #003b82;
+--hover-color: #e6efff;
 
-:root {
+/* Theme variables - dark theme */
+/* Dark theme can be activated with class 'theme-dark' */
+--dark-bg-color: #121212;
+--dark-text-color: #e0e0e0;
+--dark-board-bg: #1e1e1e;
+--dark-accent-color: #82a0ff;
+--dark-hover-color: #2d2d2d;
+
+/* Theme variables - retro theme */
+/* Retro theme can be activated with class 'theme-retro' */
+--retro-bg-color: #000000;
+--retro-text-color: #00ff00;
+--retro-board-bg: #111111;
+--retro-accent-color: #ff00ff;
+--retro-hover-color: #222222;
+
+*/ :root {
   --cell-size: clamp(44px, 28vw, 120px);
   --board-gap: 4px;
   --color-board-border: #333333;

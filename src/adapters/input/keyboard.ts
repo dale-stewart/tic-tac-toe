@@ -10,6 +10,8 @@
  */
 import type { Action, GameState } from '../../core/game';
 import { keyToDifficulty, keyToIntent, keyToMode, nextFocusFor } from './keyboard-pure';
+// Import theme functions
+import { toggleTheme, setTheme } from '../theme-manager/theme';
 
 const readCoord = (element: Element): readonly [number, number] | null => {
   const rowAttr = element.getAttribute('data-row');
@@ -89,6 +91,31 @@ export const attachKeyboard = (
         const state = getState();
         const next = state.mode === 'solo' ? 'hot-seat' : 'solo';
         dispatch({ type: 'SET_MODE', mode: next });
+      }
+      // Handle theme toggle keyboard shortcut (T key)
+      if (e.key === 't' || e.key === 'T') {
+        e.preventDefault();
+        toggleTheme();
+        return;
+      }
+
+      // Handle theme selection with number keys (4, 5, 6)
+      if (e.key === '4') {
+        e.preventDefault();
+        setTheme('light');
+        return;
+      }
+
+      if (e.key === '5') {
+        e.preventDefault();
+        setTheme('dark');
+        return;
+      }
+
+      if (e.key === '6') {
+        e.preventDefault();
+        setTheme('retro');
+        return;
       }
       return;
     }

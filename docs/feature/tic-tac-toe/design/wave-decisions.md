@@ -1,7 +1,7 @@
 # DESIGN Decisions — tic-tac-toe
 
-*Wave: DESIGN. Architect: Morgan (solution-architect). Date: 2026-04-21.*
-*Interaction mode: Propose (confirmed by Dale on three forks A/B/C).*
+_Wave: DESIGN. Architect: Morgan (solution-architect). Date: 2026-04-21._
+_Interaction mode: Propose (confirmed by Dale on three forks A/B/C)._
 
 ## Key Decisions
 
@@ -33,23 +33,23 @@
 
 ## Reuse Analysis
 
-| Existing component | Location | Intended reuse | Extension required | Notes |
-| --- | --- | --- | --- | --- |
-| N/A — greenfield | — | — | N/A | No prior codebase in this repository; all modules are new. Verified by directory inspection at DESIGN start. |
+| Existing component | Location | Intended reuse | Extension required | Notes                                                                                                        |
+| ------------------ | -------- | -------------- | ------------------ | ------------------------------------------------------------------------------------------------------------ |
+| N/A — greenfield   | —        | —              | N/A                | No prior codebase in this repository; all modules are new. Verified by directory inspection at DESIGN start. |
 
 ## Technology Stack
 
-| Technology | License | Rationale |
-| --- | --- | --- |
-| TypeScript (≥5.4) | Apache-2.0 | Strong types for discriminated-union `Action`, compile-time enforcement of reducer exhaustiveness, zero runtime cost. |
-| lit-html (≥3.x) | BSD-3-Clause | ~4KB gzipped templating library; pairs cleanly with pure `state → template` render function. |
-| Vite (≥5) | MIT | Fast dev loop, esbuild+rollup production bundle, built-in bundle analysis. Zero config for this scope. |
-| Vitest (≥1) | MIT | Vite-native unit test runner; fast watch mode; jest-compatible API. |
-| fast-check (≥3) | MIT | Property-based testing for core invariants (reducer never overfills board, perfect AI never loses). |
-| Playwright (≥1.40) | Apache-2.0 | DOM-level integration tests for accepted-move / win-banner / announce flows. Not used for unit coverage — narrow by design. |
-| axe-core (≥4) | MPL-2.0 | Accessibility gate in CI against rendered snapshots (empty, mid-game, won, draw). |
-| Lighthouse CI (≥0.13) | Apache-2.0 | Perf budget enforcement: Lighthouse perf ≥90, CLS ≤0.1, bundle ≤50KB, FMP ≤500ms. |
-| dependency-cruiser (≥16) | MIT | Enforces `core/**` cannot import `adapters/**` — the architectural invariant from D5. |
+| Technology               | License      | Rationale                                                                                                                   |
+| ------------------------ | ------------ | --------------------------------------------------------------------------------------------------------------------------- |
+| TypeScript (≥5.4)        | Apache-2.0   | Strong types for discriminated-union `Action`, compile-time enforcement of reducer exhaustiveness, zero runtime cost.       |
+| lit-html (≥3.x)          | BSD-3-Clause | ~4KB gzipped templating library; pairs cleanly with pure `state → template` render function.                                |
+| Vite (≥5)                | MIT          | Fast dev loop, esbuild+rollup production bundle, built-in bundle analysis. Zero config for this scope.                      |
+| Vitest (≥1)              | MIT          | Vite-native unit test runner; fast watch mode; jest-compatible API.                                                         |
+| fast-check (≥3)          | MIT          | Property-based testing for core invariants (reducer never overfills board, perfect AI never loses).                         |
+| Playwright (≥1.40)       | Apache-2.0   | DOM-level integration tests for accepted-move / win-banner / announce flows. Not used for unit coverage — narrow by design. |
+| axe-core (≥4)            | MPL-2.0      | Accessibility gate in CI against rendered snapshots (empty, mid-game, won, draw).                                           |
+| Lighthouse CI (≥0.13)    | Apache-2.0   | Perf budget enforcement: Lighthouse perf ≥90, CLS ≤0.1, bundle ≤50KB, FMP ≤500ms.                                           |
+| dependency-cruiser (≥16) | MIT          | Enforces `core/**` cannot import `adapters/**` — the architectural invariant from D5.                                       |
 
 No proprietary dependencies. All licenses are permissive (MIT / Apache-2.0 / BSD-3-Clause / MPL-2.0). No AGPL/GPL touching the shipped bundle.
 
@@ -105,9 +105,11 @@ No upstream revision requested.
 **Critical:** none. **High:** none.
 
 **Medium (1):**
+
 - **Bootstrap DOM-element resolution lacks error handling.** `document.querySelector('#app')!` and `#announce` use non-null assertions. If either is missing from the HTML shell, the app crashes silently. Deferred to crafter wave — recommendation: either defensive checks with a user-facing error or an acceptance-test gate on HTML shell validation.
 
 **Minor (1):**
+
 - **L3 C4 diagram doesn't visualize the runtime event loop.** The text explains input → dispatch → reduce → render → announce clearly, but the diagram alone doesn't show the loop. Optional enhancement: add a sequence or state-machine diagram. Not required for approval.
 
 ### Required Revisions

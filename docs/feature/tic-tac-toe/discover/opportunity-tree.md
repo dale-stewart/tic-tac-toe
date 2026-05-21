@@ -73,15 +73,15 @@ Desired Outcome: Complete a satisfying TTT game in <90s, zero friction
 
 Formula: **Score = Importance + Max(0, Importance - Satisfaction)**. Max 20. Pursue if > 8.
 
-| # | Opportunity | Importance (1-10) | Satisfaction with alternatives (1-10) | Score | Action |
-|---|-------------|-------------------|---------------------------------------|-------|--------|
-| O1 | Reduce time-to-first-move | 9 | 4 | 14 | Pursue |
-| O2 | Solo play fun despite solved-game | 8 | 3 | 13 | Pursue |
-| O3 | Frictionless two-human play | 7 | 3 | 11 | Pursue (secondary) |
-| O4 | Trustworthy (no ads, no dark patterns) | 8 | 4 | 12 | Pursue |
-| O5 | Support "teach a child" JTBD | 6 | 3 | 9 | Evaluate |
-| O6 | Accessibility baseline | 6 | 4 | 8 | Evaluate (non-negotiable for WCAG compliance regardless of score) |
-| O7 | Hobbyist deeper-game | 5 | 4 | 6 | Deprioritize for v1 |
+| #   | Opportunity                            | Importance (1-10) | Satisfaction with alternatives (1-10) | Score | Action                                                            |
+| --- | -------------------------------------- | ----------------- | ------------------------------------- | ----- | ----------------------------------------------------------------- |
+| O1  | Reduce time-to-first-move              | 9                 | 4                                     | 14    | Pursue                                                            |
+| O2  | Solo play fun despite solved-game      | 8                 | 3                                     | 13    | Pursue                                                            |
+| O3  | Frictionless two-human play            | 7                 | 3                                     | 11    | Pursue (secondary)                                                |
+| O4  | Trustworthy (no ads, no dark patterns) | 8                 | 4                                     | 12    | Pursue                                                            |
+| O5  | Support "teach a child" JTBD           | 6                 | 3                                     | 9     | Evaluate                                                          |
+| O6  | Accessibility baseline                 | 6                 | 4                                     | 8     | Evaluate (non-negotiable for WCAG compliance regardless of score) |
+| O7  | Hobbyist deeper-game                   | 5                 | 4                                     | 6     | Deprioritize for v1                                               |
 
 ### Rationale on satisfaction priors
 
@@ -110,16 +110,16 @@ O6 (accessibility) is not top-3 by score but is treated as a **non-negotiable ba
 
 Mapping opportunities to the universal job-map steps for the "play a quick TTT game" job:
 
-| Job step | Covered by | Status |
-|----------|-----------|--------|
-| Define (decide to play) | O1 | Covered |
-| Locate (find a place to play) | O1, O4 | Covered |
-| Prepare (set up the game) | O1 | Covered |
-| Confirm (ready to play) | O1 | Covered |
-| Execute (play the moves) | O2, O3, O6 | Covered |
-| Monitor (track turn/state) | O6 | Covered |
-| Modify (undo, reset) | — | **Gap** — not explicitly covered; flagged as potential O8 |
-| Conclude (end, play again) | O2, O5 | Covered |
+| Job step                      | Covered by | Status                                                    |
+| ----------------------------- | ---------- | --------------------------------------------------------- |
+| Define (decide to play)       | O1         | Covered                                                   |
+| Locate (find a place to play) | O1, O4     | Covered                                                   |
+| Prepare (set up the game)     | O1         | Covered                                                   |
+| Confirm (ready to play)       | O1         | Covered                                                   |
+| Execute (play the moves)      | O2, O3, O6 | Covered                                                   |
+| Monitor (track turn/state)    | O6         | Covered                                                   |
+| Modify (undo, reset)          | —          | **Gap** — not explicitly covered; flagged as potential O8 |
+| Conclude (end, play again)    | O2, O5     | Covered                                                   |
 
 **Job step coverage: 7 of 8 = 87.5%** — meets 80% target.
 
@@ -129,12 +129,12 @@ Potential **O8: Graceful undo/reset flow** (score estimate 7) deferred to backlo
 
 ## 6. G2 Gate Evaluation
 
-| Criterion | Target | Actual | Status |
-|-----------|--------|--------|--------|
-| Opportunities identified | 5+ | 7 | Pass |
-| Top scores > 8 | 2-3 opportunities | 4 opportunities > 8 | Pass |
-| Job step coverage | >=80% | 87.5% | Pass |
-| Team alignment | Stakeholder confirmed | N/A (solo practice) | Conditional |
-| Interview-sourced scores | >=5 interviews | 0 | **Fail (waived under practice-exercise exemption)** |
+| Criterion                | Target                | Actual              | Status                                              |
+| ------------------------ | --------------------- | ------------------- | --------------------------------------------------- |
+| Opportunities identified | 5+                    | 7                   | Pass                                                |
+| Top scores > 8           | 2-3 opportunities     | 4 opportunities > 8 | Pass                                                |
+| Job step coverage        | >=80%                 | 87.5%               | Pass                                                |
+| Team alignment           | Stakeholder confirmed | N/A (solo practice) | Conditional                                         |
+| Interview-sourced scores | >=5 interviews        | 0                   | **Fail (waived under practice-exercise exemption)** |
 
 **Gate decision: CONDITIONAL PASS.** The structural work (tree, coverage, scoring mechanics) is sound; only the evidence underlying the scores is illustrative.

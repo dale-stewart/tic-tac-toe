@@ -31,13 +31,13 @@ Casual web users in short-idle-time windows lack a frictionless, no-signup, no-a
 
 > `[ILLUSTRATIVE — derived from common-sense observation of how tic-tac-toe is used in daily life, not from interview data]`
 
-| JTBD | Context | Desired outcome |
-|------|---------|-----------------|
-| **Kill 60 seconds** | Solo, mid-task break | Complete a diverting activity with zero setup cost |
-| **Teach a young child** | Parent + 4-7 year old | Shared, rule-bounded play that teaches turn-taking and basic strategy |
-| **Brief face-to-face social bond** | Two people, same room or same device | Share a playful, low-stakes interaction |
-| **Remote social bond** | Two people, different locations | Share the same low-stakes interaction asynchronously or synchronously |
-| **Sharpen the game itself** | Hobbyist / puzzle-curious | Explore harder variants (Ultimate TTT, misere, NxN) where the classic game's solved status does not apply |
+| JTBD                               | Context                              | Desired outcome                                                                                           |
+| ---------------------------------- | ------------------------------------ | --------------------------------------------------------------------------------------------------------- |
+| **Kill 60 seconds**                | Solo, mid-task break                 | Complete a diverting activity with zero setup cost                                                        |
+| **Teach a young child**            | Parent + 4-7 year old                | Shared, rule-bounded play that teaches turn-taking and basic strategy                                     |
+| **Brief face-to-face social bond** | Two people, same room or same device | Share a playful, low-stakes interaction                                                                   |
+| **Remote social bond**             | Two people, different locations      | Share the same low-stakes interaction asynchronously or synchronously                                     |
+| **Sharpen the game itself**        | Hobbyist / puzzle-curious            | Explore harder variants (Ultimate TTT, misere, NxN) where the classic game's solved status does not apply |
 
 Primary JTBD for a greenfield build is likely **Kill 60 seconds** (highest frequency, lowest friction requirement). Secondary: **Teach a young child**.
 
@@ -53,18 +53,18 @@ Each assumption is scored on the standard rubric:
 
 Risk score = (Impact x 3) + (Uncertainty x 2) + (Ease x 1). Max 18.
 
-| # | Assumption | Category | Impact | Uncertainty | Ease | Score | Priority | Would-be test |
-|---|-----------|----------|--------|-------------|------|-------|----------|---------------|
-| A1 | Casual-game users want a no-signup tic-tac-toe | Value | 3 | 2 | 1 | 14 | Test first | Fake-door landing page |
-| A2 | Primary JTBD is "kill 60 seconds" not "play a deep game" | Value | 2 | 2 | 1 | 11 | Test soon | Mom Test interviews, session-length telemetry |
-| A3 | Classic 3x3 is the preferred variant for casual users (vs Ultimate / NxN) | Value | 2 | 2 | 1 | 11 | Test soon | A/B variant selector, engagement data |
-| A4 | AI opponent is table stakes for solo play | Value | 3 | 1 | 1 | 12 | Test first | Prototype with/without AI |
-| A5 | Hot-seat (same-device) multiplayer covers most "play with my kid/friend" needs | Value | 2 | 2 | 1 | 11 | Test soon | Interview + prototype |
-| A6 | Networked multiplayer is a *nice-to-have*, not a must-have, for v1 | Value | 2 | 3 | 2 | 14 | Test first | Survey, fake-door "play with a friend" button |
-| A7 | Users will not tolerate ads on a game this trivial | Viability | 3 | 2 | 2 | 15 | Test first | Pricing / monetization survey |
-| A8 | A web (browser) distribution is preferred over native app for this use case | Usability | 1 | 1 | 1 | 6 | Backlog | Channel research |
-| A9 | Accessibility (keyboard nav, screen reader, color-blind palette) is expected baseline | Usability | 2 | 1 | 1 | 9 | Test soon | WCAG audit, assistive-tech user test |
-| A10 | The solved-game nature of 3x3 TTT will frustrate adult repeat users | Value | 2 | 2 | 1 | 11 | Test soon | Retention cohort analysis |
+| #   | Assumption                                                                            | Category  | Impact | Uncertainty | Ease | Score | Priority   | Would-be test                                 |
+| --- | ------------------------------------------------------------------------------------- | --------- | ------ | ----------- | ---- | ----- | ---------- | --------------------------------------------- |
+| A1  | Casual-game users want a no-signup tic-tac-toe                                        | Value     | 3      | 2           | 1    | 14    | Test first | Fake-door landing page                        |
+| A2  | Primary JTBD is "kill 60 seconds" not "play a deep game"                              | Value     | 2      | 2           | 1    | 11    | Test soon  | Mom Test interviews, session-length telemetry |
+| A3  | Classic 3x3 is the preferred variant for casual users (vs Ultimate / NxN)             | Value     | 2      | 2           | 1    | 11    | Test soon  | A/B variant selector, engagement data         |
+| A4  | AI opponent is table stakes for solo play                                             | Value     | 3      | 1           | 1    | 12    | Test first | Prototype with/without AI                     |
+| A5  | Hot-seat (same-device) multiplayer covers most "play with my kid/friend" needs        | Value     | 2      | 2           | 1    | 11    | Test soon  | Interview + prototype                         |
+| A6  | Networked multiplayer is a _nice-to-have_, not a must-have, for v1                    | Value     | 2      | 3           | 2    | 14    | Test first | Survey, fake-door "play with a friend" button |
+| A7  | Users will not tolerate ads on a game this trivial                                    | Viability | 3      | 2           | 2    | 15    | Test first | Pricing / monetization survey                 |
+| A8  | A web (browser) distribution is preferred over native app for this use case           | Usability | 1      | 1           | 1    | 6     | Backlog    | Channel research                              |
+| A9  | Accessibility (keyboard nav, screen reader, color-blind palette) is expected baseline | Usability | 2      | 1           | 1    | 9     | Test soon  | WCAG audit, assistive-tech user test          |
+| A10 | The solved-game nature of 3x3 TTT will frustrate adult repeat users                   | Value     | 2      | 2           | 1    | 11    | Test soon  | Retention cohort analysis                     |
 
 **Top-3 highest-risk assumptions to test first:** A7 (ad tolerance), A1 (no-signup want), A6 (multiplayer necessity).
 
@@ -74,13 +74,13 @@ Risk score = (Impact x 3) + (Uncertainty x 2) + (Ease x 1). Max 18.
 
 > `[ILLUSTRATIVE]`
 
-| Metric | Target for Phase 1 pass | Illustrative position |
-|--------|------------------------|-----------------------|
-| Problem frequency | Weekly+ | Likely daily for target segment (idle moments are ubiquitous) |
-| Current spending | >$0 on workarounds | Likely $0 direct; "cost" is ad exposure and attention hijack on existing free alternatives |
-| Emotional intensity | Frustration evident | Mild. This is a low-stakes problem. Frustration shows up as aversion to existing ad-heavy options, not as acute pain |
+| Metric              | Target for Phase 1 pass | Illustrative position                                                                                                |
+| ------------------- | ----------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| Problem frequency   | Weekly+                 | Likely daily for target segment (idle moments are ubiquitous)                                                        |
+| Current spending    | >$0 on workarounds      | Likely $0 direct; "cost" is ad exposure and attention hijack on existing free alternatives                           |
+| Emotional intensity | Frustration evident     | Mild. This is a low-stakes problem. Frustration shows up as aversion to existing ad-heavy options, not as acute pain |
 
-**Honest note:** emotional intensity is low, which would normally be a *kill* signal in a real DISCOVER. For the practice exercise we proceed anyway, but a real PM should read this as "this is a hobby build, not a venture-scale opportunity."
+**Honest note:** emotional intensity is low, which would normally be a _kill_ signal in a real DISCOVER. For the practice exercise we proceed anyway, but a real PM should read this as "this is a hobby build, not a venture-scale opportunity."
 
 ---
 
@@ -100,12 +100,12 @@ The **dominant free alternative** (Google's inline widget when you search "tic t
 
 ## 6. G1 Gate Evaluation
 
-| Criterion | Target | Actual | Status |
-|-----------|--------|--------|--------|
-| 5+ interviews conducted | >=5 | 0 | **Fail (waived under practice-exercise exemption)** |
-| Problem confirmation | >60% | N/A (no interviews) | Conditional |
-| Problem in customer words | Yes | Inferred, labeled illustrative | Conditional |
-| 3+ concrete examples | Yes | 5 JTBD contexts named, unvalidated | Conditional |
+| Criterion                 | Target | Actual                             | Status                                              |
+| ------------------------- | ------ | ---------------------------------- | --------------------------------------------------- |
+| 5+ interviews conducted   | >=5    | 0                                  | **Fail (waived under practice-exercise exemption)** |
+| Problem confirmation      | >60%   | N/A (no interviews)                | Conditional                                         |
+| Problem in customer words | Yes    | Inferred, labeled illustrative     | Conditional                                         |
+| 3+ concrete examples      | Yes    | 5 JTBD contexts named, unvalidated | Conditional                                         |
 
 **Gate decision: CONDITIONAL PASS under practice-exercise exemption.** A real project would not proceed to Phase 2 from here. See `wave-decisions.md` for rationale.
 

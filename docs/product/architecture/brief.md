@@ -4,7 +4,7 @@
 
 ## Application Architecture
 
-*Owner: solution-architect (Morgan). Wave: DESIGN. Date: 2026-04-21.*
+_Owner: solution-architect (Morgan). Wave: DESIGN. Date: 2026-04-21._
 
 ### Overview
 
@@ -16,16 +16,16 @@ This shape delivers three things the DISCUSS constraints demand: (1) a single au
 
 ### Quality attributes → architecture drivers
 
-| Quality attribute (ISO 25010) | Requirement (from DISCUSS) | Architecture driver |
-| --- | --- | --- |
-| Performance Efficiency | Lighthouse perf ≥90; FMP ≤500ms; CLS ≤0.1; TTFM ≤3s on commodity mobile | Static bundle; no framework runtime; lit-html ~4KB; zero network on load; no web fonts; reserved grid height to prevent CLS |
-| Functional Suitability | Classic 3x3 rules; three AI difficulties; perfect AI never loses | Pure core with property-based tests; minimax with memoization for perfect AI |
-| Usability (Accessibility) | WCAG 2.2 AA; full keyboard; ARIA live region with 1s debounce | Dedicated `input/keyboard` adapter; dedicated `announce` adapter; semantic grid; focus management in render diff |
-| Security | No tracking; no third-party fetches on load; no cookies | Static hosting; no runtime external calls; ADR-0004 |
-| Reliability | AI never crashes; invalid moves never corrupt state | Typed `Result<T, E>` returns from core; reducer validates actions; no throws across the port |
-| Maintainability | Easy to add a new AI difficulty; testable in isolation | Uniform AI signature + strategies lookup; pure functions; core isolated from adapters |
-| Portability | Runs on any modern browser from any static host | No server-side rendering dependency; no host-specific API |
-| Compatibility | Modern evergreen browsers (ES2022) | TypeScript → ES2022 target; no polyfills beyond tsc lib.d.ts defaults |
+| Quality attribute (ISO 25010) | Requirement (from DISCUSS)                                              | Architecture driver                                                                                                         |
+| ----------------------------- | ----------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| Performance Efficiency        | Lighthouse perf ≥90; FMP ≤500ms; CLS ≤0.1; TTFM ≤3s on commodity mobile | Static bundle; no framework runtime; lit-html ~4KB; zero network on load; no web fonts; reserved grid height to prevent CLS |
+| Functional Suitability        | Classic 3x3 rules; three AI difficulties; perfect AI never loses        | Pure core with property-based tests; minimax with memoization for perfect AI                                                |
+| Usability (Accessibility)     | WCAG 2.2 AA; full keyboard; ARIA live region with 1s debounce           | Dedicated `input/keyboard` adapter; dedicated `announce` adapter; semantic grid; focus management in render diff            |
+| Security                      | No tracking; no third-party fetches on load; no cookies                 | Static hosting; no runtime external calls; ADR-0004                                                                         |
+| Reliability                   | AI never crashes; invalid moves never corrupt state                     | Typed `Result<T, E>` returns from core; reducer validates actions; no throws across the port                                |
+| Maintainability               | Easy to add a new AI difficulty; testable in isolation                  | Uniform AI signature + strategies lookup; pure functions; core isolated from adapters                                       |
+| Portability                   | Runs on any modern browser from any static host                         | No server-side rendering dependency; no host-specific API                                                                   |
+| Compatibility                 | Modern evergreen browsers (ES2022)                                      | TypeScript → ES2022 target; no polyfills beyond tsc lib.d.ts defaults                                                       |
 
 ### Component decomposition
 
@@ -53,6 +53,7 @@ This shape delivers three things the DISCUSS constraints demand: (1) a single au
   - `{ type: 'SET_DIFFICULTY'; difficulty: Difficulty }`
 
   State shape:
+
   ```
   GameState = {
     board: BoardState;
@@ -63,6 +64,7 @@ This shape delivers three things the DISCUSS constraints demand: (1) a single au
     winLine: WinLine | null;             // populated iff result ∈ {x_wins, o_wins}
   }
   ```
+
   The reducer: validates action against state, computes `board'`, calls `detectWin` / `detectDraw`, sets `result` + `winLine`, advances `turn`. In solo mode, after a human move completes and the game is still in progress, the reducer emits a deterministic "AI to move" marker; the bootstrap loop handles invoking the AI function and dispatching a follow-up `PLACE_MARK` (keeps the reducer pure — AI invocation is I/O-shaped in the sense that easy-mode calls `Math.random`).
 
 **Adapters** (depend on core types; each is narrow, swappable, and independently testable):
@@ -115,25 +117,25 @@ type Result<T, E> = { ok: true; value: T } | { ok: false; error: E };
 
 ### KPI → architecture mapping
 
-| KPI (from DISCUSS) | How this architecture achieves it |
-| --- | --- |
-| KPI-1: Bundle ≤50KB gzipped | lit-html (~4KB) + TS-compiled core (~3-5KB) + adapters (~2-3KB) ≈ 9-12KB well under ceiling. No framework runtime. |
+| KPI (from DISCUSS)                         | How this architecture achieves it                                                                                                                        |
+| ------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| KPI-1: Bundle ≤50KB gzipped                | lit-html (~4KB) + TS-compiled core (~3-5KB) + adapters (~2-3KB) ≈ 9-12KB well under ceiling. No framework runtime.                                       |
 | KPI-2: TTFM ≤3s median on commodity mobile | Static file from CDN; single HTML+JS+CSS; no render-blocking third-party requests. Optional instrumentation as aggregate-counter endpoint — DEVOPS wave. |
-| KPI-3: Zero third-party network on load | No fonts, analytics, telemetry, or CDN-hosted libraries. Every asset self-hosted. Enforced by CSP header (DEVOPS). |
-| KPI-4: WCAG 2.2 AA | Dedicated `announce` adapter + keyboard adapter; axe-core gates in CI. |
-| KPI-5: Lighthouse perf ≥90 / CLS ≤0.1 | Reserved grid dimensions in CSS; no layout shift; no JS-injected above-the-fold content after paint. |
-| KPI-6: OSS posture with source link | `render` includes footer with source-repo link; SPDX headers on files. |
+| KPI-3: Zero third-party network on load    | No fonts, analytics, telemetry, or CDN-hosted libraries. Every asset self-hosted. Enforced by CSP header (DEVOPS).                                       |
+| KPI-4: WCAG 2.2 AA                         | Dedicated `announce` adapter + keyboard adapter; axe-core gates in CI.                                                                                   |
+| KPI-5: Lighthouse perf ≥90 / CLS ≤0.1      | Reserved grid dimensions in CSS; no layout shift; no JS-injected above-the-fold content after paint.                                                     |
+| KPI-6: OSS posture with source link        | `render` includes footer with source-repo link; SPDX headers on files.                                                                                   |
 
 ### Bundle composition estimate
 
-| Piece | Estimate (gzipped) |
-| --- | --- |
-| lit-html runtime | ~4.0 KB |
-| Pure core (board, win-detector, ai×3, game reducer) | ~3.5 KB |
-| Adapters (render template, keyboard, pointer, announce, bootstrap) | ~2.5 KB |
-| CSS (grid, palette, win-line animation) | ~1.5 KB |
-| HTML shell | ~0.5 KB |
-| **Total** | **~12 KB** |
+| Piece                                                              | Estimate (gzipped) |
+| ------------------------------------------------------------------ | ------------------ |
+| lit-html runtime                                                   | ~4.0 KB            |
+| Pure core (board, win-detector, ai×3, game reducer)                | ~3.5 KB            |
+| Adapters (render template, keyboard, pointer, announce, bootstrap) | ~2.5 KB            |
+| CSS (grid, palette, win-line animation)                            | ~1.5 KB            |
+| HTML shell                                                         | ~0.5 KB            |
+| **Total**                                                          | **~12 KB**         |
 
 **Budget: 50 KB gzipped. Headroom: ~38 KB (≈ 76% of budget unused).** Comfortable margin for slice-06 win-line animation and any small copy/asset additions.
 
@@ -243,7 +245,7 @@ C4Component
 
 ## System Architecture
 
-*Owner: system-designer (Titan). Wave: DESIGN.*
+_Owner: system-designer (Titan). Wave: DESIGN._
 
 **N/A — client-side SPA, no distributed system.** This feature has no multi-service topology, no message broker, no backend processes. Deployment topology (static host selection, CDN configuration, CI/CD) is covered in the DEVOPS wave by platform-architect. No system-designer invocation is needed for this feature; should a later feature add server components (e.g., online multiplayer, account system), Titan will author this section before Morgan's section is revised.
 
@@ -251,6 +253,6 @@ C4Component
 
 ## Domain Model
 
-*Owner: domain-architect (Hera). Wave: DESIGN.*
+_Owner: domain-architect (Hera). Wave: DESIGN._
 
 **N/A — no complex domain.** The problem domain is the rules of classic 3x3 tic-tac-toe, fully expressed by the `GameState` type and the `board` / `win-detector` modules described in Application Architecture §Component decomposition. There are no bounded contexts, no aggregates beyond the single `GameState`, no ubiquitous-language tensions between stakeholder groups. DDD strategic or tactical patterns add no value at this scale; `GameState` IS the domain model. No domain-architect invocation is needed for this feature.

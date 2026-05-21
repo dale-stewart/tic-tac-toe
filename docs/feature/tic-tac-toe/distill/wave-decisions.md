@@ -20,20 +20,20 @@
 
 ## 2. Reconciliation with DESIGN reviewer's DISTILL notes
 
-| DESIGN note | Honored? | Evidence |
-|---|---|---|
-| Core-adapter ports as test boundaries | ✓ | D1, D2 — scenarios enter at driving port; inner test surface is crafter's |
-| AI interface seam property tests | ✓ | D4 — `feature-difficulty-levels.feature:65, 73` tagged `@tool:vitest-property` |
-| Bootstrap `maybeRunAi` branching coverage | ✓ | Walking-skeleton scenarios + hot-seat "no AI fires" scenarios both exercise the branch explicitly |
-| Recommended CI gate sequence | ✓ (for reference) | CI gate execution is DEVOPS's concern; DISTILL aligns scenario tools with their tooling slots |
-| ACs already observable-behavior phrased | ✓ | 0 AC required rewording; direct 1:1 translation to Given-When-Then |
+| DESIGN note                               | Honored?          | Evidence                                                                                          |
+| ----------------------------------------- | ----------------- | ------------------------------------------------------------------------------------------------- |
+| Core-adapter ports as test boundaries     | ✓                 | D1, D2 — scenarios enter at driving port; inner test surface is crafter's                         |
+| AI interface seam property tests          | ✓                 | D4 — `feature-difficulty-levels.feature:65, 73` tagged `@tool:vitest-property`                    |
+| Bootstrap `maybeRunAi` branching coverage | ✓                 | Walking-skeleton scenarios + hot-seat "no AI fires" scenarios both exercise the branch explicitly |
+| Recommended CI gate sequence              | ✓ (for reference) | CI gate execution is DEVOPS's concern; DISTILL aligns scenario tools with their tooling slots     |
+| ACs already observable-behavior phrased   | ✓                 | 0 AC required rewording; direct 1:1 translation to Given-When-Then                                |
 
 ## 3. Reuse Analysis
 
-| Existing artifact | File | Overlap | Decision | Justification |
-|---|---|---|---|---|
+| Existing artifact     | File                                                                      | Overlap                                     | Decision           | Justification                                                                                                                                                                                            |
+| --------------------- | ------------------------------------------------------------------------- | ------------------------------------------- | ------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Journey-level Gherkin | `discuss/journey-solo-player.feature`, `discuss/journey-hot-seat.feature` | Same domain, same user-observable behaviors | EXTEND & FORMALIZE | Journey files were narrative Gherkin exploring the happy-path + errors; this wave formalizes into executable, tagged, traceable acceptance-test suite. Journey files preserved as-is (DISCUSS artifact). |
-| Slice briefs | `feature/tic-tac-toe/slices/slice-NN-*.md` | AC listed per slice | USE AS SOURCE | Each scenario traces back to a slice + AC bullet via `@slice:` and `@ac:` tags. |
+| Slice briefs          | `feature/tic-tac-toe/slices/slice-NN-*.md`                                | AC listed per slice                         | USE AS SOURCE      | Each scenario traces back to a slice + AC bullet via `@slice:` and `@ac:` tags.                                                                                                                          |
 
 ## 4. Graceful Degradation
 
@@ -43,7 +43,7 @@
 
 **Impact:** KPI-2 cannot be verified by the automated test suite in v1. The other four KPIs (KPI-1/3/4/5) have full E2E + CI coverage.
 
-**Mitigation:** the DEVOPS ADR documents a resurrection trigger (sustained >500 sessions/month for 2 consecutive months). If adopted in v2, this DISTILL wave grows one scenario in `feature-crosscutting.feature`: *"the aggregate counter increments by exactly 1 per started game and again by 1 per terminal state"*.
+**Mitigation:** the DEVOPS ADR documents a resurrection trigger (sustained >500 sessions/month for 2 consecutive months). If adopted in v2, this DISTILL wave grows one scenario in `feature-crosscutting.feature`: _"the aggregate counter increments by exactly 1 per started game and again by 1 per terminal state"_.
 
 **Transparency:** noted explicitly in `acceptance-tests.md` §KPI coverage summary and in the traceability matrix's orphan/gap report. Not silently omitted.
 
@@ -52,6 +52,7 @@
 **None.** 0 ambiguous ACs encountered during scenario authoring. Every AC in `discuss/user-stories.md` translated 1:1 into ≥1 scenario without requiring DISCUSS to clarify. No back-propagation to DISCUSS required.
 
 Cross-checked against:
+
 - `docs/feature/tic-tac-toe/discuss/user-stories.md` — 51 AC bullets, 100% mapped
 - `docs/feature/tic-tac-toe/discuss/shared-artifacts-registry.md` — 6 shared variables (gameMode, boardState, turnIndicator, gameResult, winningLine, initialFocusCell) all asserted at least once in scenarios
 - `docs/feature/tic-tac-toe/design/wave-decisions.md` §10 peer-review DISTILL notes — 3/3 items honoured (§2 table above)
@@ -59,14 +60,14 @@ Cross-checked against:
 
 ## 6. Mandate Compliance
 
-| Requirement | Status |
-|---|---|
-| 100% AC coverage | ✓ 56/56 AC tags mapped in `traceability-matrix.md` |
-| Error-path coverage ≥40% | ✓ 25/62 = 40.3% |
-| Business-language only (no technical term leaks) | ✓ `grep -E "lit-html|private|Function\.prototype|\$\$|impl"` on feature files returns zero hits |
-| Walking-skeleton scenarios use real adapters | ✓ Strategy C declared (D3) |
-| Every driving port has ≥1 scenario | ✓ browser URL port fully covered |
-| Personas from DISCUSS used throughout | ✓ Sam/Priya/Jae/Marcus/Alex/Dana appear per story |
+| Requirement                                      | Status                                             |
+| ------------------------------------------------ | -------------------------------------------------- | ------- | ------------------- | ---- | ----------------------------------------- |
+| 100% AC coverage                                 | ✓ 56/56 AC tags mapped in `traceability-matrix.md` |
+| Error-path coverage ≥40%                         | ✓ 25/62 = 40.3%                                    |
+| Business-language only (no technical term leaks) | ✓ `grep -E "lit-html                               | private | Function\.prototype | \$\$ | impl"` on feature files returns zero hits |
+| Walking-skeleton scenarios use real adapters     | ✓ Strategy C declared (D3)                         |
+| Every driving port has ≥1 scenario               | ✓ browser URL port fully covered                   |
+| Personas from DISCUSS used throughout            | ✓ Sam/Priya/Jae/Marcus/Alex/Dana appear per story  |
 
 ## 7. Peer Review Status
 
@@ -107,7 +108,7 @@ Expected review dimensions: port-to-port discipline, business-language enforceme
 
 ### Strengths
 
-- **Port-to-port principle enforced.** Every scenario enters through the browser page (driving port); no scenario imports or invokes internal components (board, win-detector, ai/*, game reducer, render, input/*, announce, bootstrap). All assertions target user-observable behaviour.
+- **Port-to-port principle enforced.** Every scenario enters through the browser page (driving port); no scenario imports or invokes internal components (board, win-detector, ai/_, game reducer, render, input/_, announce, bootstrap). All assertions target user-observable behaviour.
 - **Business-language purity.** Grep across all 7 feature files returned zero technical term leaks (no framework names, no `function`/`class`/`private`/`impl` in step text). Persona names (Sam, Priya, Jae, Marcus, Alex, Dana) applied consistently with device/viewport context from DISCUSS.
 - **AC coverage completeness.** Traceability matrix maps 56/56 AC tags (51 user-story + 5 crosscutting) across 62 scenarios. Zero orphan scenarios, zero uncovered ACs.
 - **Walking-skeleton boundary strategy solid.** Strategy C (all real adapters, no in-memory substitutes) declared and observed — no `@in-memory` marker on any walking-skeleton scenario; real browser + real lit-html render + real ARIA + real bootstrap.
@@ -123,17 +124,18 @@ Expected review dimensions: port-to-port discipline, business-language enforceme
 
 ### Mandate Compliance
 
-| Mandate | Status |
-|---|---|
-| CM-A — Hexagonal Boundary | PASS |
-| CM-B — Business Language | PASS |
-| CM-C — User Journey Completeness | PASS |
+| Mandate                          | Status |
+| -------------------------------- | ------ |
+| CM-A — Hexagonal Boundary        | PASS   |
+| CM-B — Business Language         | PASS   |
+| CM-C — User Journey Completeness | PASS   |
 
 ### Issues Found
 
 None rising to blocker / mandate-failure threshold.
 
 **Minor (non-blocking):**
+
 - Scenario count reported as 62 in `acceptance-tests.md`; outline-row expansion yields ~67 logical Playwright test cases. Documentation clarity issue (outline-counting convention), not a design issue. The crafter will naturally expand outline rows 1:1 into `.spec.ts` cases.
 - Property-test scenarios (`US-04-perfect-never-loses`, `US-04-shared-signature`) are expressed in Gherkin for specification continuity but run as Vitest + fast-check, not Playwright. Tagged `@tool:vitest-property` — the crafter implements accordingly.
 

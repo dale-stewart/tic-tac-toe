@@ -26,24 +26,24 @@ Standard evidence gates G1-G4 (which strictly require interview data) are record
 
 ## 2. Scope Decisions
 
-| ID | Decision | Rationale | Status |
-|----|----------|-----------|--------|
-| D1 | **v1 scope: solo vs AI + hot-seat (same-device) multiplayer. No networked multiplayer in v1.** | Classic 3x3 + AI + hot-seat covers the top-3 opportunities (O1, O2, O4) without backend complexity. Networked MP (A6) is explicitly deferred as nice-to-have. | Scout decision, not pinged to user — fits the "develop a web-based tic-tac-toe" seed and is the lowest-friction MVP |
-| D2 | **Variant: classic 3x3 only for v1. Ultimate TTT, NxN, misere deferred.** | O7 scored lowest (6) and serves a narrow hobbyist segment. | Scout decision |
-| D3 | **Monetization: none / donation-only.** | Phase 4 viability analysis shows zero viable ad-based model given Google's dominance on the TTT SERP; donation-only is consistent with the "no ads" UVP. | Scout decision |
-| D4 | **Accessibility: WCAG 2.2 AA as hard baseline.** | Non-negotiable regardless of opportunity score. Keyboard nav, ARIA live regions, color-blind-safe palette. | Scout decision |
-| D5 | **Open-source posture.** | Supports the "trustworthy" UVP (O4) by making "no tracking" claims verifiable. Also supports the only viable channel beyond direct share. | Scout decision |
+| ID  | Decision                                                                                       | Rationale                                                                                                                                                     | Status                                                                                                              |
+| --- | ---------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| D1  | **v1 scope: solo vs AI + hot-seat (same-device) multiplayer. No networked multiplayer in v1.** | Classic 3x3 + AI + hot-seat covers the top-3 opportunities (O1, O2, O4) without backend complexity. Networked MP (A6) is explicitly deferred as nice-to-have. | Scout decision, not pinged to user — fits the "develop a web-based tic-tac-toe" seed and is the lowest-friction MVP |
+| D2  | **Variant: classic 3x3 only for v1. Ultimate TTT, NxN, misere deferred.**                      | O7 scored lowest (6) and serves a narrow hobbyist segment.                                                                                                    | Scout decision                                                                                                      |
+| D3  | **Monetization: none / donation-only.**                                                        | Phase 4 viability analysis shows zero viable ad-based model given Google's dominance on the TTT SERP; donation-only is consistent with the "no ads" UVP.      | Scout decision                                                                                                      |
+| D4  | **Accessibility: WCAG 2.2 AA as hard baseline.**                                               | Non-negotiable regardless of opportunity score. Keyboard nav, ARIA live regions, color-blind-safe palette.                                                    | Scout decision                                                                                                      |
+| D5  | **Open-source posture.**                                                                       | Supports the "trustworthy" UVP (O4) by making "no tracking" claims verifiable. Also supports the only viable channel beyond direct share.                     | Scout decision                                                                                                      |
 
 ---
 
 ## 3. Gate Results
 
-| Gate | Phase Transition | Criteria | Evidence Tier | Status |
-|------|------------------|----------|---------------|--------|
-| **G1** | 1 -> 2 | 5+ interviews, >60% confirmation, customer words, 3+ examples | Tier C — no interviews | **Conditional pass** (practice exemption) |
-| **G2** | 2 -> 3 | OST complete, top 2-3 scored >8, job-step coverage >=80%, team alignment | Tier C — scores are reasoned priors | **Conditional pass** — structural work sound, scores illustrative |
-| **G3** | 3 -> 4 | 5+ users tested, >=80% task completion, core flow validated | Tier C — no user tests | **Conditional pass** — hypotheses well-formed, untested |
-| **G4** | 4 -> handoff | Lean Canvas complete, 4 risks acceptable, go/no-go, stakeholder signoff | Tier C — no stakeholder review | **Conditional pass** — viability honestly marked red under "build a business" framing, green under "portfolio project" framing |
+| Gate   | Phase Transition | Criteria                                                                 | Evidence Tier                       | Status                                                                                                                         |
+| ------ | ---------------- | ------------------------------------------------------------------------ | ----------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| **G1** | 1 -> 2           | 5+ interviews, >60% confirmation, customer words, 3+ examples            | Tier C — no interviews              | **Conditional pass** (practice exemption)                                                                                      |
+| **G2** | 2 -> 3           | OST complete, top 2-3 scored >8, job-step coverage >=80%, team alignment | Tier C — scores are reasoned priors | **Conditional pass** — structural work sound, scores illustrative                                                              |
+| **G3** | 3 -> 4           | 5+ users tested, >=80% task completion, core flow validated              | Tier C — no user tests              | **Conditional pass** — hypotheses well-formed, untested                                                                        |
+| **G4** | 4 -> handoff     | Lean Canvas complete, 4 risks acceptable, go/no-go, stakeholder signoff  | Tier C — no stakeholder review      | **Conditional pass** — viability honestly marked red under "build a business" framing, green under "portfolio project" framing |
 
 ### Honesty ledger
 

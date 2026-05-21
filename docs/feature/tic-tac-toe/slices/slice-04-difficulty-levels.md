@@ -6,7 +6,7 @@
 
 ## Hypothesis
 
-`[BUILD]` *"Easy / medium / perfect can be implemented as three small pure functions sharing a signature `(boardState) -> [row, col]`. If we need per-difficulty state or special casing, the abstraction is wrong."*
+`[BUILD]` _"Easy / medium / perfect can be implemented as three small pure functions sharing a signature `(boardState) -> [row, col]`. If we need per-difficulty state or special casing, the abstraction is wrong."_
 
 ## User-observable outcome
 

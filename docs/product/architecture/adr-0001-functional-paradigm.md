@@ -25,6 +25,7 @@ CLAUDE.md records this choice so downstream crafter invocations route to `@nw-fu
 ## Consequences
 
 **Positive**
+
 - Property-based testing is natural: pure functions + immutable data = ideal fast-check targets.
 - "Single source of truth" is enforced by construction — the reducer is the only producer of new `GameState`.
 - Uniform AI signature is trivial: three functions, same shape.
@@ -32,13 +33,16 @@ CLAUDE.md records this choice so downstream crafter invocations route to `@nw-fu
 - Refactoring is safer — no hidden mutable state aliased across call sites.
 
 **Negative**
+
 - TypeScript's support for sum types and pattern matching is less ergonomic than ML-family languages; discriminated unions + `switch` are the workaround.
 - Persistent data structures are done by hand (spread operators) rather than via a library; acceptable at 3×3 scale, would want Immer or an equivalent at larger scale.
 
 ## Alternatives considered
 
 **OOP with strategy pattern** — `Board` class with `placeMark(move)` mutation, `Game` aggregate owning a `Board`, `AiStrategy` interface with `Easy`/`Medium`/`Perfect` subclasses.
-- *Rejected because:* (a) encourages mutation of `Board` which undermines the DISCUSS-flagged single-source-of-truth constraint; (b) the strategy pattern is a well-known OOP attempt to simulate what FP gives you for free (swappable functions with a common signature); (c) property testing pure functions is easier than property testing objects with hidden state; (d) the problem is small and rule-dense — exactly where FP shines and where OOP adds ceremony with no payoff.
+
+- _Rejected because:_ (a) encourages mutation of `Board` which undermines the DISCUSS-flagged single-source-of-truth constraint; (b) the strategy pattern is a well-known OOP attempt to simulate what FP gives you for free (swappable functions with a common signature); (c) property testing pure functions is easier than property testing objects with hidden state; (d) the problem is small and rule-dense — exactly where FP shines and where OOP adds ceremony with no payoff.
 
 **Hybrid: FP core + OOP bootstrap** — pure-FP domain, class-based adapter layer.
-- *Rejected because:* the adapter layer is ~30 lines of wiring plus four small modules. Introducing classes for that would be ceremony at cost of uniformity. Plain module-scoped functions are sufficient and consistent with the core.
+
+- _Rejected because:_ the adapter layer is ~30 lines of wiring plus four small modules. Introducing classes for that would be ceremony at cost of uniformity. Plain module-scoped functions are sufficient and consistent with the core.

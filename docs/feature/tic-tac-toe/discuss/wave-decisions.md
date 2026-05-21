@@ -26,18 +26,18 @@ User confirmed decisions at start of wave:
 
 ## 2. Scope & Artifact Decisions
 
-| ID | Decision | Rationale | Status |
-|----|----------|-----------|--------|
-| D-DISCUSS-5 | **Two personas in scope:** Casual-Idle-Time Player (primary, solo vs AI), Hot-Seat Pair (secondary). | Derived from DISCOVER problem-validation JTBDs 1 and 2/3. Covers the locked v1 scope. | Luna decision, not pinged |
-| D-DISCUSS-6 | **Walking skeleton prioritizes solo-vs-AI (easy random) over hot-seat.** | Solo is primary JTBD; hot-seat is a vocabulary change over the same board + win detector. Solo exercises the AI code path, which is the riskier build asset. | Luna decision — single-question ping was considered and not issued because (a) hot-seat reuses the solo codebase so ordering has no throwaway-work cost, (b) Dale explicitly chose "keep user pings minimal" and "lightweight" |
-| D-DISCUSS-7 | **7 stories total (US-01..US-07), sliced into 7 deliverables ≤ 1 day each.** Walking skeleton = US-01 + US-02. Release 1 = US-03, US-04, US-05. Release 2 = US-06, US-07. | Passes all Elephant Carpaccio taste tests (`prioritization.md`). | Luna decision |
-| D-DISCUSS-8 | **Hot-seat v1 rule: P1 always starts as X.** Alternating starters deferred. | Simpler mental model, matches solo-vs-AI. Alternating starter is a backlog item if real user testing shows it matters. | Luna decision |
-| D-DISCUSS-9 | **Difficulty default: medium.** | DISCOVER solution scope specifies medium as default; consistent with H2 (multi-difficulty drives replay — medium is the "interesting" pivot). | Luna decision (restates DISCOVER) |
-| D-DISCUSS-10 | **Mode and difficulty controls disabled mid-game.** | Prevents accidental board reset; Hick's Law reduction of error paths; simpler state machine. | Luna decision |
-| D-DISCUSS-11 | **No session persistence in v1 (reload = fresh game).** | DISCOVER D3 "no tracking" + "no accounts" posture; persistence would require localStorage with timestamps which crosses the line for a practice project with no privacy-policy apparatus. | Luna decision |
-| D-DISCUSS-12 | **Aggregate counter KPI instrumentation is privacy-preserving only.** No per-session IDs, no cookies, no IPs logged. | Required to stay consistent with "No tracking" UVP (DISCOVER O4). Platform-architect in DEVOPS may propose a flat-file aggregate counter. | Luna decision — flagged for DEVOPS |
-| D-DISCUSS-13 | **Outcome KPIs reframed for portfolio project.** Performance, a11y, privacy, game-completion. Growth / revenue KPIs intentionally absent per task-brief guidance. | See `outcome-kpis.md` § "Why these KPIs and not engagement / revenue / retention". | Luna decision |
-| D-DISCUSS-14 | **Bootstrap `docs/product/` SSOT this wave.** Create `journeys/solo-player.yaml`, `journeys/solo-player-visual.md`, `journeys/hot-seat.yaml`, `journeys/hot-seat-visual.md`. `jobs.yaml` created with minimal cross-reference to DISCOVER opportunity tree (D4 = no fresh JTBD). | Greenfield-equivalent; migration gate per task brief. | Luna decision |
+| ID           | Decision                                                                                                                                                                                                                                                                         | Rationale                                                                                                                                                                                 | Status                                                                                                                                                                                                                         |
+| ------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| D-DISCUSS-5  | **Two personas in scope:** Casual-Idle-Time Player (primary, solo vs AI), Hot-Seat Pair (secondary).                                                                                                                                                                             | Derived from DISCOVER problem-validation JTBDs 1 and 2/3. Covers the locked v1 scope.                                                                                                     | Luna decision, not pinged                                                                                                                                                                                                      |
+| D-DISCUSS-6  | **Walking skeleton prioritizes solo-vs-AI (easy random) over hot-seat.**                                                                                                                                                                                                         | Solo is primary JTBD; hot-seat is a vocabulary change over the same board + win detector. Solo exercises the AI code path, which is the riskier build asset.                              | Luna decision — single-question ping was considered and not issued because (a) hot-seat reuses the solo codebase so ordering has no throwaway-work cost, (b) Dale explicitly chose "keep user pings minimal" and "lightweight" |
+| D-DISCUSS-7  | **7 stories total (US-01..US-07), sliced into 7 deliverables ≤ 1 day each.** Walking skeleton = US-01 + US-02. Release 1 = US-03, US-04, US-05. Release 2 = US-06, US-07.                                                                                                        | Passes all Elephant Carpaccio taste tests (`prioritization.md`).                                                                                                                          | Luna decision                                                                                                                                                                                                                  |
+| D-DISCUSS-8  | **Hot-seat v1 rule: P1 always starts as X.** Alternating starters deferred.                                                                                                                                                                                                      | Simpler mental model, matches solo-vs-AI. Alternating starter is a backlog item if real user testing shows it matters.                                                                    | Luna decision                                                                                                                                                                                                                  |
+| D-DISCUSS-9  | **Difficulty default: medium.**                                                                                                                                                                                                                                                  | DISCOVER solution scope specifies medium as default; consistent with H2 (multi-difficulty drives replay — medium is the "interesting" pivot).                                             | Luna decision (restates DISCOVER)                                                                                                                                                                                              |
+| D-DISCUSS-10 | **Mode and difficulty controls disabled mid-game.**                                                                                                                                                                                                                              | Prevents accidental board reset; Hick's Law reduction of error paths; simpler state machine.                                                                                              | Luna decision                                                                                                                                                                                                                  |
+| D-DISCUSS-11 | **No session persistence in v1 (reload = fresh game).**                                                                                                                                                                                                                          | DISCOVER D3 "no tracking" + "no accounts" posture; persistence would require localStorage with timestamps which crosses the line for a practice project with no privacy-policy apparatus. | Luna decision                                                                                                                                                                                                                  |
+| D-DISCUSS-12 | **Aggregate counter KPI instrumentation is privacy-preserving only.** No per-session IDs, no cookies, no IPs logged.                                                                                                                                                             | Required to stay consistent with "No tracking" UVP (DISCOVER O4). Platform-architect in DEVOPS may propose a flat-file aggregate counter.                                                 | Luna decision — flagged for DEVOPS                                                                                                                                                                                             |
+| D-DISCUSS-13 | **Outcome KPIs reframed for portfolio project.** Performance, a11y, privacy, game-completion. Growth / revenue KPIs intentionally absent per task-brief guidance.                                                                                                                | See `outcome-kpis.md` § "Why these KPIs and not engagement / revenue / retention".                                                                                                        | Luna decision                                                                                                                                                                                                                  |
+| D-DISCUSS-14 | **Bootstrap `docs/product/` SSOT this wave.** Create `journeys/solo-player.yaml`, `journeys/solo-player-visual.md`, `journeys/hot-seat.yaml`, `journeys/hot-seat-visual.md`. `jobs.yaml` created with minimal cross-reference to DISCOVER opportunity tree (D4 = no fresh JTBD). | Greenfield-equivalent; migration gate per task brief.                                                                                                                                     | Luna decision                                                                                                                                                                                                                  |
 
 ---
 
@@ -63,12 +63,12 @@ All other DISCUSS decisions fall below the "genuine fork where Dale's preference
 
 ## 5. Gate Results
 
-| Gate | Phase Transition | Criteria | Evidence Tier | Status |
-|------|------------------|----------|---------------|--------|
-| **Scope Assessment** (Elephant Carpaccio) | End of Phase 2.5 | ≤ 10 stories, ≤ 3 bounded contexts, ≤ 5 integration points, ≤ 2 weeks effort, single user outcome | Verified | **PASS** — 7 stories, 1 context, ~2 days, all slices ≤ 1 day |
-| **DoR Gate** (9 items) | End of Phase 3 | All 9 items pass per story with evidence | Tier C (partial exemption) | **PASSED under practice-exercise exemption** — 55 full passes + 8 conditional passes citing `discover/wave-decisions.md` §6. See `dor-validation.md`. |
-| **Requirements Completeness** | End of Phase 3 | Score > 0.95 | Honest composite | **0.98** — see `dor-validation.md` § "Completeness score calculation" |
-| **Peer Review** | Before handoff | Reviewer approved, critical/high issues resolved | N/A | **NOT INVOKED** — Luna is not able to dispatch the peer-reviewer subagent herself in this execution. See §7. |
+| Gate                                      | Phase Transition | Criteria                                                                                          | Evidence Tier              | Status                                                                                                                                                |
+| ----------------------------------------- | ---------------- | ------------------------------------------------------------------------------------------------- | -------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Scope Assessment** (Elephant Carpaccio) | End of Phase 2.5 | ≤ 10 stories, ≤ 3 bounded contexts, ≤ 5 integration points, ≤ 2 weeks effort, single user outcome | Verified                   | **PASS** — 7 stories, 1 context, ~2 days, all slices ≤ 1 day                                                                                          |
+| **DoR Gate** (9 items)                    | End of Phase 3   | All 9 items pass per story with evidence                                                          | Tier C (partial exemption) | **PASSED under practice-exercise exemption** — 55 full passes + 8 conditional passes citing `discover/wave-decisions.md` §6. See `dor-validation.md`. |
+| **Requirements Completeness**             | End of Phase 3   | Score > 0.95                                                                                      | Honest composite           | **0.98** — see `dor-validation.md` § "Completeness score calculation"                                                                                 |
+| **Peer Review**                           | Before handoff   | Reviewer approved, critical/high issues resolved                                                  | N/A                        | **NOT INVOKED** — Luna is not able to dispatch the peer-reviewer subagent herself in this execution. See §7.                                          |
 
 ---
 
@@ -138,13 +138,13 @@ See `outcome-kpis.md` § "Measurement Plan":
 
 **Not invoked by Luna in this execution.**
 
-Per task-brief direction: *"Peer review via `@nw-product-owner-reviewer` with explicit practice-exemption framing so reviewer does not reject for missing interview evidence that was intentionally excluded in DISCOVER. If you cannot dispatch the reviewer yourself, explicitly flag that the orchestrator must dispatch."*
+Per task-brief direction: _"Peer review via `@nw-product-owner-reviewer` with explicit practice-exemption framing so reviewer does not reject for missing interview evidence that was intentionally excluded in DISCOVER. If you cannot dispatch the reviewer yourself, explicitly flag that the orchestrator must dispatch."_
 
 Luna in this subagent execution does not have access to the Task-dispatch tool for invoking `nw-product-owner-reviewer`. **The orchestrator (or Dale) must dispatch the reviewer with the following framing context:**
 
 ### Framing to pass to `nw-product-owner-reviewer`
 
-> *"Review DISCUSS artifacts for tic-tac-toe. This is a methodology-practice exercise. Tier-C evidence framing is carried forward from DISCOVER (see `docs/feature/tic-tac-toe/discover/wave-decisions.md` §§1, 6). Do NOT reject for missing customer-interview evidence — it was explicitly excluded from DISCOVER under the practice-exercise exemption, and `dor-validation.md` documents which items are conditional-pass under that exemption with citation. DO still apply all other review dimensions: confirmation-bias detection, NFR completeness, clarity & measurability, testability, and priority validation. The two known conditional-pass dimensions are (a) persona grounding for the Casual-Idle-Time and Hot-Seat personas and (b) outcome-KPI baselines (greenfield, no baseline data possible). Everything else should meet the full bar."*
+> _"Review DISCUSS artifacts for tic-tac-toe. This is a methodology-practice exercise. Tier-C evidence framing is carried forward from DISCOVER (see `docs/feature/tic-tac-toe/discover/wave-decisions.md` §§1, 6). Do NOT reject for missing customer-interview evidence — it was explicitly excluded from DISCOVER under the practice-exercise exemption, and `dor-validation.md` documents which items are conditional-pass under that exemption with citation. DO still apply all other review dimensions: confirmation-bias detection, NFR completeness, clarity & measurability, testability, and priority validation. The two known conditional-pass dimensions are (a) persona grounding for the Casual-Idle-Time and Hot-Seat personas and (b) outcome-KPI baselines (greenfield, no baseline data possible). Everything else should meet the full bar."_
 
 ### Expected review scope
 
@@ -203,9 +203,9 @@ Luna (product-owner) is satisfied that:
 
 **Minor (3, all low severity):**
 
-1. `journey-hot-seat.feature:19` — scenario title mixed design rationale ("to prevent accidental reset") into outcome vocabulary. *Resolved: reworded to "Mode toggle becomes unavailable once a move is placed".*
-2. `outcome-kpis.md` KPI-2 — 70% game-completion target lacked a table-level provenance flag (honest caveat exists lower in the doc but table readers could miss it). *Resolved: added footnote ¹ linking to the Honest caveat section.*
-3. `user-stories.md` US-04 AC — mode/difficulty disable scope was ambiguous across Slices 2/4/5 (walking skeleton has no toggle; disable behavior begins Slice 4). *Resolved: added explicit scope-note AC bullet clarifying that the behavior applies from Slice 04 onward.*
+1. `journey-hot-seat.feature:19` — scenario title mixed design rationale ("to prevent accidental reset") into outcome vocabulary. _Resolved: reworded to "Mode toggle becomes unavailable once a move is placed"._
+2. `outcome-kpis.md` KPI-2 — 70% game-completion target lacked a table-level provenance flag (honest caveat exists lower in the doc but table readers could miss it). _Resolved: added footnote ¹ linking to the Honest caveat section._
+3. `user-stories.md` US-04 AC — mode/difficulty disable scope was ambiguous across Slices 2/4/5 (walking skeleton has no toggle; disable behavior begins Slice 4). _Resolved: added explicit scope-note AC bullet clarifying that the behavior applies from Slice 04 onward._
 
 ### Required Revisions — APPLIED
 
@@ -213,22 +213,22 @@ All three minor revisions have been applied directly after the review. See edits
 
 ### Gate Validation Summary
 
-| Dimension | Verdict |
-|---|---|
-| Journey coherence | PASS |
-| Emotional arc quality | PASS |
-| Example data quality | PASS |
-| Bug patterns (version/URL/path/commands) | PASS |
-| DoR validation (9 items × 7 stories) | PASS (55 full + 8 conditional, exemption cited) |
-| Antipattern detection (8 patterns) | PASS (1 minor title — resolved) |
-| Story-to-slice traceability | PASS |
-| Elephant Carpaccio taste tests | PASS (all 7) |
-| Requirements completeness | PASS (0.98 > 0.95 target) |
-| Confirmation bias | PASS (absent) |
-| Clarity & measurability | PASS (1 minor flag — resolved) |
-| Testability | PASS |
-| Priority validation | PASS (pipeline derisking first, a11y in R1 not R2) |
-| Practice-exemption honesty | PASS |
+| Dimension                                | Verdict                                            |
+| ---------------------------------------- | -------------------------------------------------- |
+| Journey coherence                        | PASS                                               |
+| Emotional arc quality                    | PASS                                               |
+| Example data quality                     | PASS                                               |
+| Bug patterns (version/URL/path/commands) | PASS                                               |
+| DoR validation (9 items × 7 stories)     | PASS (55 full + 8 conditional, exemption cited)    |
+| Antipattern detection (8 patterns)       | PASS (1 minor title — resolved)                    |
+| Story-to-slice traceability              | PASS                                               |
+| Elephant Carpaccio taste tests           | PASS (all 7)                                       |
+| Requirements completeness                | PASS (0.98 > 0.95 target)                          |
+| Confirmation bias                        | PASS (absent)                                      |
+| Clarity & measurability                  | PASS (1 minor flag — resolved)                     |
+| Testability                              | PASS                                               |
+| Priority validation                      | PASS (pipeline derisking first, a11y in R1 not R2) |
+| Practice-exemption honesty               | PASS                                               |
 
 ### Notes for DESIGN (nw-solution-architect)
 

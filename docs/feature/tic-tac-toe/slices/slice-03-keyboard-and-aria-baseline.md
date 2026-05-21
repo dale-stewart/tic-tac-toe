@@ -6,7 +6,7 @@
 
 ## Hypothesis
 
-`[BUILD]` *"WCAG 2.2 AA baseline (keyboard nav, ARIA live, visible focus) passes an automated a11y audit on the first try if built with semantic HTML from the start. If we fail, we retrofitted a11y instead of starting with it — a known anti-pattern from DISCOVER H5."*
+`[BUILD]` _"WCAG 2.2 AA baseline (keyboard nav, ARIA live, visible focus) passes an automated a11y audit on the first try if built with semantic HTML from the start. If we fail, we retrofitted a11y instead of starting with it — a known anti-pattern from DISCOVER H5."_
 
 ## User-observable outcome
 

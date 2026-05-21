@@ -167,12 +167,36 @@ const renderWinLine = (result: GameResult): TemplateResult | typeof nothing => {
   `;
 };
 
+// Theme selection UI elements
+const renderThemeSelector = (selectedTheme: string): TemplateResult => html`
+  <div class="theme-selector">
+    <label for="theme-select">Theme:</label>
+    <select id="theme-select" data-testid="theme-select">
+      <option value="light" ?selected=${selectedTheme === 'light'}>Light</option>
+      <option value="dark" ?selected=${selectedTheme === 'dark'}>Dark</option>
+      <option value="retro" ?selected=${selectedTheme === 'retro'}>Retro</option>
+    </select>
+  </div>
+`;
+
+// Add button for theme toggling
+const renderThemeToggle = (): TemplateResult => html`
+  <button
+    type="button"
+    class="theme-toggle"
+    data-testid="theme-toggle"
+    aria-label="Toggle between light and dark themes"
+  >
+    🌞/🌙
+  </button>
+`;
 export const renderBoard = (view: RenderView): TemplateResult => html`
   <section class="game-shell">
     <div class="controls-row">
       ${renderModeGroup(view.mode, view.modeDisabled)}
       ${renderDifficultyGroup(view.difficulty, view.difficultyDisabled)}
-    </div>
+      ${renderThemeSelector(getCurrentTheme())}
+      ${renderThemeToggle()}
     <p data-testid="turn-indicator" class="turn-indicator" aria-live="polite">
       ${turnIndicatorText(view.turn, view.mode)}
     </p>

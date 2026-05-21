@@ -6,7 +6,7 @@
 
 ## Hypothesis
 
-`[BUILD]` *"Hot-seat reuses the same `boardState` and win detector as solo — adding hot-seat is a vocabulary-and-gating change, not a new game model. If we find ourselves writing a second win detector or a second board state, we're wrong."*
+`[BUILD]` _"Hot-seat reuses the same `boardState` and win detector as solo — adding hot-seat is a vocabulary-and-gating change, not a new game model. If we find ourselves writing a second win detector or a second board state, we're wrong."_
 
 ## User-observable outcome
 
@@ -36,7 +36,7 @@ Two humans on one device can now:
 
 ## Integration points
 
-- `gameMode` formatter now branches on "solo-*" vs "hot-seat" for turn indicator and result banner vocabulary
+- `gameMode` formatter now branches on "solo-\*" vs "hot-seat" for turn indicator and result banner vocabulary
 - Mode-toggle disabled-mid-game rule is shared with difficulty selector (Slice 4)
 
 ## Traces to

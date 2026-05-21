@@ -6,7 +6,7 @@
 
 ## Hypothesis
 
-`[BUILD]` *"We can turn the grid into a playable game with a random-move AI, win detection, and a Play-again reset, in half a day. If not, our test / state model is too heavy for the problem."*
+`[BUILD]` _"We can turn the grid into a playable game with a random-move AI, win detection, and a Play-again reset, in half a day. If not, our test / state model is too heavy for the problem."_
 
 ## User-observable outcome
 

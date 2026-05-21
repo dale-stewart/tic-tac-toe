@@ -101,14 +101,14 @@ This registry tracks every `${variable}` used in mockups, scenarios, and user-st
 
 Solo and hot-seat journeys share the ENTIRE artifact set. This is deliberate: one board, one win detector, one state model, only the vocabulary differs by mode.
 
-| Artifact | Solo journey uses | Hot-seat journey uses | Single source? |
-|----------|-------------------|-----------------------|----------------|
-| `gameMode` | yes (default `solo-medium`) | yes (`hot-seat`) | yes |
-| `boardState` | yes | yes | yes |
-| `turnIndicator` | yes (`"Your turn (X)."` / `"AI is thinking..."`) | yes (`"P1's turn (X)."` / `"P2's turn (O)."`) | yes (formatter branches on `gameMode`) |
-| `gameResult` | yes (`"You win!"` / `"AI wins."` / `"Draw."`) | yes (`"P1 wins!"` / `"P2 wins!"` / `"Draw."`) | yes (formatter branches on `gameMode`) |
-| `winningLine` | yes | yes | yes |
-| `initialFocusCell` | yes | yes | yes |
+| Artifact           | Solo journey uses                                | Hot-seat journey uses                         | Single source?                         |
+| ------------------ | ------------------------------------------------ | --------------------------------------------- | -------------------------------------- |
+| `gameMode`         | yes (default `solo-medium`)                      | yes (`hot-seat`)                              | yes                                    |
+| `boardState`       | yes                                              | yes                                           | yes                                    |
+| `turnIndicator`    | yes (`"Your turn (X)."` / `"AI is thinking..."`) | yes (`"P1's turn (X)."` / `"P2's turn (O)."`) | yes (formatter branches on `gameMode`) |
+| `gameResult`       | yes (`"You win!"` / `"AI wins."` / `"Draw."`)    | yes (`"P1 wins!"` / `"P2 wins!"` / `"Draw."`) | yes (formatter branches on `gameMode`) |
+| `winningLine`      | yes                                              | yes                                           | yes                                    |
+| `initialFocusCell` | yes                                              | yes                                           | yes                                    |
 
 ---
 
