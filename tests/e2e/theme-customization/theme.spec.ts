@@ -1,5 +1,4 @@
 import { expect, test } from '@playwright/test';
-import { setupTestPage } from '../../utils/page-setup';
 
 // Helper to wait for a condition with timeout
 const waitForCondition = async (fn: () => Promise<boolean>, timeout = 5000) => {
@@ -13,7 +12,7 @@ const waitForCondition = async (fn: () => Promise<boolean>, timeout = 5000) => {
 
 test.describe('Theme Customization', () => {
   test.beforeEach(async ({ page }) => {
-    await setupTestPage(page);
+    await page.goto('/tic-tac-toe/');
     await page.waitForFunction(() => document.body.classList.contains('theme-light'));
   });
 

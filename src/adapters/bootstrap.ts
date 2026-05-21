@@ -12,7 +12,7 @@
 import { render } from 'lit-html';
 import '../styles.css';
 // Initialize theme manager
-import { initTheme } from './theme-manager/theme';
+import { initTheme } from '../theme-manager/theme';
 initTheme();
 import {
   initialState,

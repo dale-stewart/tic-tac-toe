@@ -11,7 +11,7 @@
 import type { Action, GameState } from '../../core/game';
 import { keyToDifficulty, keyToIntent, keyToMode, nextFocusFor } from './keyboard-pure';
 // Import theme functions
-import { toggleTheme, setTheme } from '../theme-manager/theme';
+import { toggleTheme, setTheme } from '../../theme-manager/theme';
 
 const readCoord = (element: Element): readonly [number, number] | null => {
   const rowAttr = element.getAttribute('data-row');
@@ -93,27 +93,27 @@ export const attachKeyboard = (
         dispatch({ type: 'SET_MODE', mode: next });
       }
       // Handle theme toggle keyboard shortcut (T key)
-      if (e.key === 't' || e.key === 'T') {
-        e.preventDefault();
+      if (event.key === 't' || event.key === 'T') {
+        event.preventDefault();
         toggleTheme();
         return;
       }
 
       // Handle theme selection with number keys (4, 5, 6)
-      if (e.key === '4') {
-        e.preventDefault();
+      if (event.key === '4') {
+        event.preventDefault();
         setTheme('light');
         return;
       }
 
-      if (e.key === '5') {
-        e.preventDefault();
+      if (event.key === '5') {
+        event.preventDefault();
         setTheme('dark');
         return;
       }
 
-      if (e.key === '6') {
-        e.preventDefault();
+      if (event.key === '6') {
+        event.preventDefault();
         setTheme('retro');
         return;
       }

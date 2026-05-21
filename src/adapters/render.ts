@@ -28,6 +28,8 @@ import {
   turnIndicatorText,
   winLineEndpoints,
 } from './render-strings';
+// Import theme functions
+import { getCurrentTheme } from '../theme-manager/theme';
 
 export {
   ANCIENT_BROWSER_MESSAGE,

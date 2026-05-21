@@ -4,7 +4,7 @@ import {
   setTheme,
   initTheme,
   toggleTheme,
-} from '../../src/adapters/theme-manager/theme';
+} from '../../../src/theme-manager/theme';
 
 // Mock localStorage
 const localStorageMock = {
