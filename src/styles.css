@@ -7,44 +7,51 @@
  * avoid CLS on first paint. Colours, hover states, and win-line animations
  * arrive in later slices.
  *
- * Theme Customization: CSS variables for theming have been added. Use
- * setTheme() function to switch between themes. Available themes: light, dark, retro.
-  /* Theme variables - light theme (default) */
---bg-color: #ffffff;
---text-color: #111111;
---board-bg: #f7f7f7;
---accent-color: #003b82;
---hover-color: #e6efff;
-
-/* Theme variables - dark theme */
-/* Dark theme can be activated with class 'theme-dark' */
---dark-bg-color: #121212;
---dark-text-color: #e0e0e0;
---dark-board-bg: #1e1e1e;
---dark-accent-color: #82a0ff;
---dark-hover-color: #2d2d2d;
-
-/* Theme variables - retro theme */
-/* Retro theme can be activated with class 'theme-retro' */
---retro-bg-color: #000000;
---retro-text-color: #00ff00;
---retro-board-bg: #111111;
---retro-accent-color: #ff00ff;
---retro-hover-color: #222222;
-
-*/ :root {
+ * Theme Customization: every themeable colour is a CSS custom property. :root
+ * holds the light defaults; body.theme-dark / body.theme-retro override them.
+ * The theme adapter (src/theme-manager) sets exactly one theme class on <body>,
+ * so swapping themes re-cascades these variables with no per-element JS.
+ */
+:root {
   --cell-size: clamp(44px, 28vw, 120px);
   --board-gap: 4px;
-  --color-board-border: #333333;
-  --color-cell-bg: #f7f7f7;
+
+  /* Light theme (default). */
+  --bg-color: #ffffff;
+  --text-color: #111111;
+  --board-border: #333333;
+  --cell-bg: #f7f7f7;
+  --accent-color: #003b82;
+  --on-accent-color: #ffffff;
+  --hover-color: #e6efff;
+}
+
+body.theme-dark {
+  --bg-color: #121212;
+  --text-color: #e0e0e0;
+  --board-border: #555555;
+  --cell-bg: #1e1e1e;
+  --accent-color: #82a0ff;
+  --on-accent-color: #121212;
+  --hover-color: #2d2d2d;
+}
+
+body.theme-retro {
+  --bg-color: #000000;
+  --text-color: #00ff00;
+  --board-border: #00ff00;
+  --cell-bg: #111111;
+  --accent-color: #ff00ff;
+  --on-accent-color: #000000;
+  --hover-color: #003300;
 }
 
 html,
 body {
   margin: 0;
   padding: 0;
-  background: #ffffff;
-  color: #111111;
+  background: var(--bg-color);
+  color: var(--text-color);
   font-family:
     system-ui,
     -apple-system,
@@ -83,7 +90,7 @@ main {
   width: calc(var(--cell-size) * 3 + var(--board-gap) * 2);
   height: calc(var(--cell-size) * 3 + var(--board-gap) * 2);
   max-width: 100%;
-  background: var(--color-board-border);
+  background: var(--board-border);
   padding: var(--board-gap);
   border-radius: 4px;
   /* Positioning context for the absolutely-positioned .win-line overlay. */
@@ -95,7 +102,8 @@ main {
 }
 
 .board [role='gridcell'] {
-  background: var(--color-cell-bg);
+  background: var(--cell-bg);
+  color: var(--text-color);
   min-width: 44px;
   min-height: 44px;
   display: flex;
@@ -126,25 +134,25 @@ main {
  */
 .board [role='gridcell']:focus-visible,
 .board [role='gridcell']:focus {
-  outline: 4px solid #003b82;
+  outline: 4px solid var(--accent-color);
   outline-offset: 2px;
-  background: #e6efff;
-  box-shadow: inset 0 0 0 2px #003b82;
+  background: var(--hover-color);
+  box-shadow: inset 0 0 0 2px var(--accent-color);
 }
 
 .play-again {
   padding: 0.5rem 1rem;
   font-size: 1rem;
-  background: #ffffff;
-  color: #111111;
-  border: 1px solid #333333;
+  background: var(--bg-color);
+  color: var(--text-color);
+  border: 1px solid var(--board-border);
   border-radius: 4px;
   cursor: pointer;
 }
 
 .play-again:focus-visible,
 .play-again:focus {
-  outline: 3px solid #003b82;
+  outline: 3px solid var(--accent-color);
   outline-offset: 2px;
 }
 
@@ -164,10 +172,10 @@ main {
 .segmented-control {
   display: inline-flex;
   gap: 0.25rem;
-  border: 1px solid #333333;
+  border: 1px solid var(--board-border);
   border-radius: 6px;
   padding: 2px;
-  background: #ffffff;
+  background: var(--bg-color);
 }
 
 .segmented-control [role='radio'] {
@@ -176,14 +184,14 @@ main {
   border-radius: 4px;
   cursor: pointer;
   user-select: none;
-  color: #111111;
+  color: var(--text-color);
   background: transparent;
   text-transform: capitalize;
 }
 
 .segmented-control [role='radio'][aria-checked='true'] {
-  background: #003b82;
-  color: #ffffff;
+  background: var(--accent-color);
+  color: var(--on-accent-color);
   font-weight: 600;
 }
 
@@ -192,7 +200,7 @@ main {
 }
 
 .segmented-control [role='radio']:hover:not([aria-disabled='true']):not([aria-checked='true']) {
-  background: #e6efff;
+  background: var(--hover-color);
 }
 
 .segmented-control[aria-disabled='true'] {
@@ -205,7 +213,36 @@ main {
 
 .segmented-control [role='radio']:focus-visible,
 .segmented-control [role='radio']:focus {
-  outline: 3px solid #003b82;
+  outline: 3px solid var(--accent-color);
+  outline-offset: 2px;
+}
+
+/*
+ * Theme selector — a native <select> labelled "Theme:", living in the
+ * controls row beside the mode/difficulty groups. Colours track the active
+ * theme so the control itself reflects the palette it switches between.
+ */
+.theme-selector {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.9rem;
+  color: var(--text-color);
+}
+
+.theme-selector select {
+  font: inherit;
+  padding: 0.3rem 0.5rem;
+  border: 1px solid var(--board-border);
+  border-radius: 6px;
+  background: var(--bg-color);
+  color: var(--text-color);
+  cursor: pointer;
+}
+
+.theme-selector select:focus-visible,
+.theme-selector select:focus {
+  outline: 3px solid var(--accent-color);
   outline-offset: 2px;
 }
 
@@ -232,7 +269,7 @@ main {
 }
 
 .win-line-stroke {
-  stroke: #003b82;
+  stroke: var(--accent-color);
   /* Stroke width is in viewBox units; 0.12 ≈ 12% of one cell — clearly
      visible without obscuring the X/O glyphs at the endpoints. */
   stroke-width: 0.12;
@@ -275,7 +312,7 @@ main {
   gap: 0.75rem;
   padding: 0.75rem 1rem;
   font-size: 0.9rem;
-  color: #111111;
+  color: var(--text-color);
 }
 
 .site-footer .no-ads-copy {
@@ -283,13 +320,13 @@ main {
 }
 
 .site-footer .source-link {
-  color: #003b82;
+  color: var(--accent-color);
   text-decoration: underline;
 }
 
 .site-footer .source-link:focus-visible,
 .site-footer .source-link:focus {
-  outline: 3px solid #003b82;
+  outline: 3px solid var(--accent-color);
   outline-offset: 2px;
   border-radius: 2px;
 }

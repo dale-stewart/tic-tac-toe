@@ -21,6 +21,10 @@ export default defineConfig({
         'src/adapters/announce.ts',
         'src/adapters/input/pointer.ts',
         'src/adapters/input/keyboard.ts',
+        // DOM-entangled theme shell (document/localStorage/matchMedia); the
+        // pure decisions it delegates to live in theme-pure.ts and ARE covered.
+        // Playwright covers the DOM wiring end-to-end.
+        'src/theme-manager/theme.ts',
       ],
       thresholds: {
         lines: 95,

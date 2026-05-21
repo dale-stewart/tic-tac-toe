@@ -28,8 +28,7 @@ import {
   turnIndicatorText,
   winLineEndpoints,
 } from './render-strings';
-// Import theme functions
-import { getCurrentTheme } from '../theme-manager/theme';
+import { THEMES, themeLabelText, type Theme } from '../theme-manager/theme-pure';
 
 export {
   ANCIENT_BROWSER_MESSAGE,
@@ -50,6 +49,7 @@ export interface RenderView {
   readonly difficultyDisabled: boolean;
   readonly modeDisabled: boolean;
   readonly result: GameResult;
+  readonly theme: Theme;
 }
 
 const renderCell = (row: number, col: number, cell: Cell): TemplateResult => html`
@@ -169,36 +169,30 @@ const renderWinLine = (result: GameResult): TemplateResult | typeof nothing => {
   `;
 };
 
-// Theme selection UI elements
-const renderThemeSelector = (selectedTheme: string): TemplateResult => html`
+// Theme selector — a single native <select> covering every theme. `.value`
+// is bound from the view model so the control reflects the active theme on
+// every render; the change handler (bootstrap) drives setTheme.
+const renderThemeSelector = (selected: Theme): TemplateResult => html`
   <div class="theme-selector">
     <label for="theme-select">Theme:</label>
     <select id="theme-select" data-testid="theme-select">
-      <option value="light" ?selected=${selectedTheme === 'light'}>Light</option>
-      <option value="dark" ?selected=${selectedTheme === 'dark'}>Dark</option>
-      <option value="retro" ?selected=${selectedTheme === 'retro'}>Retro</option>
+      ${THEMES.map(
+        (theme) =>
+          html`<option value=${theme} ?selected=${theme === selected}>
+            ${themeLabelText(theme)}
+          </option>`,
+      )}
     </select>
   </div>
 `;
 
-// Add button for theme toggling
-const renderThemeToggle = (): TemplateResult => html`
-  <button
-    type="button"
-    class="theme-toggle"
-    data-testid="theme-toggle"
-    aria-label="Toggle between light and dark themes"
-  >
-    🌞/🌙
-  </button>
-`;
 export const renderBoard = (view: RenderView): TemplateResult => html`
   <section class="game-shell">
     <div class="controls-row">
       ${renderModeGroup(view.mode, view.modeDisabled)}
       ${renderDifficultyGroup(view.difficulty, view.difficultyDisabled)}
-      ${renderThemeSelector(getCurrentTheme())}
-      ${renderThemeToggle()}
+      ${renderThemeSelector(view.theme)}
+    </div>
     <p data-testid="turn-indicator" class="turn-indicator" aria-live="polite">
       ${turnIndicatorText(view.turn, view.mode)}
     </p>

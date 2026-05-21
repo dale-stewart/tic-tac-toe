@@ -1,95 +1,74 @@
 /**
- * Theme manager - handles theme switching and persistence
- * Provides functionality to switch between different themes and save preference
- * to localStorage.
+ * Theme DOM adapter — the side-effecting shell around theme-pure.ts.
+ *
+ * All decisions (validation, class mapping, initial resolution, toggle) live in
+ * theme-pure and are vitest/Stryker-covered. This file only touches the world:
+ * the body className, localStorage, and the OS colour-scheme media query. It is
+ * excluded from coverage + mutation (see vitest.config.ts / stryker.config.json)
+ * and exercised end-to-end via Playwright instead.
  */
+import {
+  classForTheme,
+  DEFAULT_THEME,
+  nextToggleTheme,
+  parseStoredTheme,
+  resolveInitialTheme,
+  THEME_CLASSES,
+  themeFromClassName,
+  type Theme,
+} from './theme-pure';
 
-// Define available themes
-export type Theme = 'light' | 'dark' | 'retro';
+const STORAGE_KEY = 'preferred-theme';
 
-// Theme configuration
-const themes: Record<Theme, string> = {
-  light: 'theme-light',
-  dark: 'theme-dark',
-  retro: 'theme-retro',
+/** Read the active theme back from the body's class list. */
+export const getCurrentTheme = (): Theme => themeFromClassName(document.body.className);
+
+/** Apply a theme to the body: exactly one theme class is present afterwards. */
+const applyTheme = (theme: Theme): void => {
+  const body = document.body;
+  body.classList.remove(THEME_CLASSES.light, THEME_CLASSES.dark, THEME_CLASSES.retro);
+  body.classList.add(classForTheme(theme));
 };
 
-// Default theme
-const DEFAULT_THEME: Theme = 'light';
-
-/**
- * Get the current theme from document body class
- * @returns The current theme
- */
-export const getCurrentTheme = (): Theme => {
-  const body = document.body;
-
-  if (body.classList.contains('theme-dark')) {
-    return 'dark';
-  } else if (body.classList.contains('theme-retro')) {
-    return 'retro';
-  }
-
-  return 'light';
-};
-
-/**
- * Set the theme by adding/removing classes from body
- * @param theme The theme to set
- */
-export const setTheme = (theme: Theme): void => {
-  const body = document.body;
-
-  // Remove all theme classes
-  body.classList.remove('theme-dark', 'theme-retro');
-
-  // Add the new theme class if not light (default)
-  if (theme !== 'light') {
-    body.classList.add(themes[theme]);
-  }
-
-  // Save to localStorage
+const persistTheme = (theme: Theme): void => {
   try {
-    localStorage.setItem('preferred-theme', theme);
+    localStorage.setItem(STORAGE_KEY, theme);
   } catch (e) {
     console.warn('Failed to save theme preference:', e);
   }
 };
 
-/**
- * Initialize theme on page load
- * Sets theme based on localStorage preference or OS preference
- */
-export const initTheme = (): void => {
-  // Check localStorage first
-  let savedTheme: Theme | null = null;
+const readStoredTheme = (): Theme | null => {
   try {
-    const stored = localStorage.getItem('preferred-theme');
-    if (stored && (stored === 'light' || stored === 'dark' || stored === 'retro')) {
-      savedTheme = stored as Theme;
-    }
+    return parseStoredTheme(localStorage.getItem(STORAGE_KEY));
   } catch (e) {
     console.warn('Failed to read theme preference:', e);
+    return null;
   }
+};
 
-  // If no saved theme, check for OS dark mode preference
-  if (
-    !savedTheme &&
-    window.matchMedia &&
-    window.matchMedia('(prefers-color-scheme: dark)').matches
-  ) {
-    savedTheme = 'dark';
-  }
+const prefersDark = (): boolean =>
+  typeof window.matchMedia === 'function' &&
+  window.matchMedia('(prefers-color-scheme: dark)').matches;
 
-  // Set the theme (will use default if no preference found)
-  setTheme(savedTheme || DEFAULT_THEME);
+/** Apply and persist a theme. The single entry point for user-driven changes. */
+export const setTheme = (theme: Theme): void => {
+  applyTheme(theme);
+  persistTheme(theme);
 };
 
 /**
- * Toggle between light and dark themes
+ * First-paint initialisation. Resolves saved preference → OS preference →
+ * default, then applies it. Does NOT persist: visiting the site shouldn't lock
+ * in a preference the user never chose.
  */
-export const toggleTheme = (): void => {
-  const current = getCurrentTheme();
-  const newTheme = current === 'dark' ? 'light' : 'dark';
-  setTheme(newTheme);
+export const initTheme = (): void => {
+  applyTheme(resolveInitialTheme(readStoredTheme(), prefersDark()));
 };
+
+/** Light/dark toggle convenience used by the (optional) toggle affordance. */
+export const toggleTheme = (): void => {
+  setTheme(nextToggleTheme(getCurrentTheme()));
+};
+
+export { DEFAULT_THEME, type Theme };

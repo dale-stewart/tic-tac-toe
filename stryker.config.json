@@ -16,7 +16,8 @@
     "!src/adapters/render.ts",
     "!src/adapters/announce.ts",
     "!src/adapters/input/pointer.ts",
-    "!src/adapters/input/keyboard.ts"
+    "!src/adapters/input/keyboard.ts",
+    "!src/theme-manager/theme.ts"
   ],
   "coverageAnalysis": "perTest",
   "reporters": ["progress", "clear-text", "html"],

@@ -11,8 +11,10 @@
  */
 import { render } from 'lit-html';
 import '../styles.css';
-// Initialize theme manager
-import { initTheme } from '../theme-manager/theme';
+// Initialize theme manager before first paint so the correct palette is
+// applied without a flash of the default theme.
+import { getCurrentTheme, initTheme, setTheme } from '../theme-manager/theme';
+import { isTheme } from '../theme-manager/theme-pure';
 initTheme();
 import {
   initialState,
@@ -144,6 +146,18 @@ const wireModeClick = (app: HTMLElement, store: Store): void => {
   });
 };
 
+// Theme is independent of GameState — the change handler applies + persists it
+// directly. The CSS cascade re-themes the page off the body class with no
+// re-render needed; the next state-driven render re-syncs the select value.
+const wireThemeChange = (app: HTMLElement): void => {
+  app.addEventListener('change', (event) => {
+    const target = event.target;
+    if (!(target instanceof HTMLSelectElement)) return;
+    if (target.id !== 'theme-select') return;
+    if (isTheme(target.value)) setTheme(target.value);
+  });
+};
+
 interface RuntimeContext {
   readonly app: HTMLElement;
   readonly store: Store;
@@ -167,6 +181,7 @@ const createRenderApp =
         difficultyDisabled: isMidGame(state),
         modeDisabled: isMidGame(state),
         result: state.result,
+        theme: getCurrentTheme(),
       }),
       ctx.app,
     );
@@ -236,6 +251,7 @@ const mount = (): void => {
   wirePlayAgainClick(app, store);
   wireDifficultyClick(app, store);
   wireModeClick(app, store);
+  wireThemeChange(app);
 
   renderApp();
   focusInitialCell(app);
